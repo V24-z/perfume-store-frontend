@@ -2,10 +2,10 @@ import { Routes, Route } from "react-router-dom";
 import AdminLayout from "../admin/layouts/AdminLayout";
 import Dashboard from "../admin/pages/Dashboard";
 import Products from "../admin/pages/Products";
-import Banner from "../admin/pages/Banner";
-import Users from "../admin/pages/Users";
-import AdminRoute from "./AdminRoute";
-import Category from "../admin/pages/Category";
+import Banner from "../admin/pages/Banner.jsx";
+import Users from "../admin/pages/Users.jsx";
+import AdminRoute from "./adminRoute";
+import Category from "../admin/pages/category.jsx";
 const AdminRoutes = () => {
   console.log("adminroutes")
   return (
