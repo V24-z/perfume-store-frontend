@@ -4,7 +4,7 @@ import { useAuth } from "../../context/useAuth.jsx";
 import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 function Login() {
-  const [error, setError] = useState("");
+  const [error, setError] = useState({});
   const [serverError, setServerError] = useState(""); // server/network errors
   const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -13,8 +13,9 @@ function Login() {
 
   const validate = () => {
     const newErrors = {};
-    if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))
-      newErrors.email = "Invalid email";
+    if (!form.email || !form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+  newErrors.email = "Invalid email";
+}
     if (form.password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
     return newErrors;
