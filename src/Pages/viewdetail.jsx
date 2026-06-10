@@ -9,6 +9,7 @@ function ViewSingleProduct() {
   const [error, setError] = useState(null);
   const [wishlisted, setWishlisted] = useState(false);
   //const [addedToCart, setAddedToCart] = useState(false);
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -17,9 +18,7 @@ function ViewSingleProduct() {
     const getProduct = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(
-          `http://127.0.0.1:8000/products/by-id/${id}`,
-        );
+        const res = await axios.get(`${API_URL}/products/by-id/${id}`);
         setProduct(res.data);
       } catch (err) {
         console.error("Error fetching product:", err);
@@ -29,7 +28,7 @@ function ViewSingleProduct() {
       }
     };
     getProduct();
-  }, [id]);
+  }, [id,API_URL]);
   const { addToCart } = useCart();
 
   if (loading) {

@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 
 import { Link } from "react-router-dom";
 function Home() {
@@ -16,7 +17,7 @@ function Home() {
     const fetchNewArrivals = async () => {
       try {
         const res = await axios.get(
-          "http://127.0.0.1:8000/products/new-arrivals",
+          `${API_URL}/products/new-arrivals`,
         );
         setNewArrivals(res.data);
       } catch (err) {
@@ -29,7 +30,7 @@ function Home() {
   useEffect(() => {
     const getFeaturedProducts = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/products/");
+        const res = await axios.get(`${API_URL}/products/featured/list`);
         setFeaturedProducts(res.data.filter((p) => p.is_featured === true));
       } catch (err) {
         console.error("Error fetching featured products:", err);
@@ -41,7 +42,7 @@ function Home() {
   useEffect(() => {
     const getBanners = async () => {
       try {
-        const res = await axios.get("http://127.0.0.1:8000/banners");
+        const res = await axios.get(`${API_URL}/banners`);
         setBanners(res.data);
       } catch (err) {
         console.error("Error fetching banners:", err);

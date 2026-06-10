@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Signup() {
   const [error, setError] = useState("");
@@ -30,40 +34,60 @@ function Signup() {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setMessage("");
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setError(validationErrors);
-      return;
-    }
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const res = await fetch("http://127.0.0.1:8000/signin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      setServerError(data.message || "Something went wrong!");
-      return;
-    }
+  setError({});
+  setServerError("");
+  setMessage("");
+
+  const validationErrors = validate();
+
+  if (Object.keys(validationErrors).length > 0) {
+    setError(validationErrors);
+    return;
+  }
+
+  try {
+     await axios.post(
+      `${API_URL}/signin`,
+      form
+    );
+
     setMessage("User created successfully");
-    setForm({ name: "", email: "", phon: "", password: "" });
-    console.log(data);
-    setTimeout(() => {
-      navigate("/login"); // <-- Change "/login" if your login route is different
-    }, 1000);
-    await fetch("https://n8n-task.app.n8n.cloud/webhook/user-registration", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: form.name, email: form.email ,registerd:form.registerd }),
+
+    setForm({
+      name: "",
+      email: "",
+      phon: "",
+      password: "",
     });
-  };
+
+    // Optional: trigger n8n webhook
+    await axios.post(
+      "https://n8n-task.app.n8n.cloud/webhook/user-registration",
+      {
+        name: form.name,
+        email: form.email,
+      }
+    );
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000);
+
+  } catch (err) {
+    if (err.response) {
+      // Backend returned an error
+      setServerError(
+        err.response.data.detail || "Something went wrong!"
+      );
+    } else {
+      // Network error
+      setServerError("Unable to connect to server");
+    }
+  }
+};
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 overflow-hidden">
       {/* Animated background circles */}

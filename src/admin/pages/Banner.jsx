@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const API_URL = "http://127.0.0.1:8000/banners";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const initialForm = {
   title: "",
   subtitle: "",
@@ -19,7 +18,7 @@ function Banner() {
   const [editId, setEditId] = useState(null);
   const fetchBanners = async () => {
     try {
-      const res = await axios.get(API_URL);
+      const res = await axios.get(`${API_URL}/banners` );
       setBanners(res.data || []);
     } catch (error) {
       console.error("Error fetching banners:", error);

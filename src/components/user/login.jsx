@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/useAuth.jsx";
-
+import axios from "axios";
+const API_URL = import.meta.env.VITE_API_URL;
 function Login() {
   const [error, setError] = useState("");
   const [serverError, setServerError] = useState(""); // server/network errors
@@ -26,41 +27,52 @@ function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setMessage("");
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setError(validationErrors);
-      return;
+  e.preventDefault();
+
+  setError({});
+  setMessage("");
+  setServerError("");
+
+  const validationErrors = validate();
+
+  if (Object.keys(validationErrors).length > 0) {
+    setError(validationErrors);
+    return;
+  }
+
+  try {
+    const { data } = await axios.post(
+      `${API_URL}/login`,
+      form
+    );
+
+    // Save user in context
+    login(data);
+
+    setMessage("Logged in successfully");
+
+    setForm({
+      email: "",
+      password: "",
+    });
+
+    console.log(data);
+
+    if (data.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
     }
-    try {
-      const res = await fetch("http://127.0.0.1:8000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setServerError(data.message || "Something went wrong!");
-        return;
-      }
-      // Save user in context
-      login(data);
-      setMessage("Logged in successfully");
-      setForm({ email: "", password: "" });
-      console.log(data);
-      if (data.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/");
-      }
-    } catch (err) {
-      setServerError("connection error!!", err);
+  } catch (err) {
+    if (err.response) {
+      setServerError(
+        err.response.data.detail || "Login failed"
+      );
+    } else {
+      setServerError("Connection error!");
     }
-  };
+  }
+};
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 overflow-hidden">
       {/* Animated background circles */}

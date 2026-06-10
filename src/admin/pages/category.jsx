@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 function Category() {
-  const API_URL = "http://127.0.0.1:8000/categories";
-
+  const API_URL = import.meta.env.VITE_API_URL;
   const [categories, setCategories] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -15,7 +14,7 @@ function Category() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const res = await axios.get(API_URL);
+        const res = await axios.get(`${API_URL}/categories`);
         setCategories(res.data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -23,7 +22,7 @@ function Category() {
     };
 
     loadCategories();
-  }, []);
+  }, [API_URL]);
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -36,9 +35,9 @@ function Category() {
     e.preventDefault();
 
     try {
-      await axios.post(API_URL, formData);
+      await axios.post(`${API_URL}/categories`, formData);
 
-      const res = await axios.get(API_URL);
+      const res = await axios.get(`${API_URL}/categories`);
       setCategories(res.data);
 
       setFormData({
@@ -55,7 +54,7 @@ function Category() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      await axios.delete(`${API_URL}/categories/${id}`);
 
       setCategories((prev) =>
         prev.filter((category) => category.id !== id)
