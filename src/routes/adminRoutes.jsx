@@ -4,7 +4,7 @@ import Dashboard from "../admin/pages/Dashboard";
 import Products from "../admin/pages/Products";
 import Banner from "../admin/pages/Banner.jsx";
 import Users from "../admin/pages/Users.jsx";
-import AdminRoute from "./adminRoute";
+import AdminRoute from "./adminroute";
 import Category from "../admin/pages/category.jsx";
 const AdminRoutes = () => {
   console.log("adminroutes")
