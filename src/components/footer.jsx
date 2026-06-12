@@ -22,11 +22,28 @@ const NAV = {
 };
 
 const SOCIALS = [
-  { label: "IG", name: "Instagram", href: "#" },
-  { label: "FB", name: "Facebook", href: "#" },
-  { label: "PT", name: "Pinterest", href: "#" },
-  { label: "TW", name: "Twitter", href: "#" },
+  { label: "IG", name: "Instagram" },
+  { label: "FB", name: "Facebook" },
+  { label: "PT", name: "Pinterest" },
+  { label: "TW", name: "Twitter" },
 ];
+
+const navLinkStyle = {
+  fontSize: "13px",
+  color: "rgba(255,255,255,0.42)",
+  textDecoration: "none",
+  display: "inline-block",
+  transition: "color 0.15s",
+};
+
+const columnHeadingStyle = {
+  fontSize: "10px",
+  fontWeight: 700,
+  letterSpacing: "0.20em",
+  textTransform: "uppercase",
+  marginBottom: "20px",
+  color: "rgba(250,204,21,0.65)",
+};
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -39,70 +56,98 @@ export default function Footer() {
 
   return (
     <footer
-      className="w-full text-white"
       style={{
+        width: "100%",
+        color: "white",
         background: "linear-gradient(160deg, #1a0533 0%, #0f0120 55%, #110028 100%)",
         borderTop: "1px solid rgba(250,204,21,0.10)",
+        fontFamily: "inherit",
       }}
     >
-      {/* Thin gold accent line */}
+      {/* Gold shimmer line */}
       <div
-        className="w-full h-px"
         style={{
+          width: "100%",
+          height: "1px",
           background:
-            "linear-gradient(90deg, transparent 0%, rgba(250,204,21,0.45) 40%, rgba(250,204,21,0.45) 60%, transparent 100%)",
+            "linear-gradient(90deg, transparent 0%, rgba(250,204,21,0.50) 40%, rgba(250,204,21,0.50) 60%, transparent 100%)",
         }}
       />
 
       <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-        {/* ── Main grid ───────────────────────────────────────── */}
-        <div className="py-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_1.4fr] gap-x-8 gap-y-12">
 
-          {/* Brand */}
-          <div className="sm:col-span-2 lg:col-span-1">
-            <Link to="/" className="inline-flex items-center gap-3 no-underline mb-5 group">
+        {/* ── Main grid ── */}
+        <div
+          className="py-14"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+            gap: "32px 40px",
+          }}
+        >
+          {/* Brand column — full width on mobile */}
+          <div style={{ gridColumn: "span 1" }}>
+            <Link
+              to="/"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "12px",
+                textDecoration: "none",
+                marginBottom: "20px",
+              }}
+            >
               <div
-                className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300 group-hover:scale-105"
                 style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "14px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
                   background: "rgba(250,204,21,0.12)",
                   border: "1px solid rgba(250,204,21,0.30)",
                   boxShadow: "0 0 18px rgba(250,204,21,0.08)",
                 }}
               >
-                <span className="text-yellow-300 text-lg leading-none">◈</span>
+                <span style={{ color: "#fde047", fontSize: "18px", lineHeight: 1 }}>◈</span>
               </div>
               <div>
-                <p className="text-white font-extrabold text-sm tracking-[0.18em] m-0 leading-none">
+                <p style={{ color: "white", fontWeight: 800, fontSize: "13px", letterSpacing: "0.18em", margin: 0, lineHeight: 1 }}>
                   LUMIÈRE
                 </p>
-                <p
-                  className="text-[9px] tracking-[0.28em] m-0 mt-0.5"
-                  style={{ color: "rgba(250,204,21,0.55)" }}
-                >
+                <p style={{ fontSize: "9px", letterSpacing: "0.28em", margin: 0, marginTop: "3px", color: "rgba(250,204,21,0.55)" }}>
                   PARFUM
                 </p>
               </div>
             </Link>
 
-            <p
-              className="text-sm leading-relaxed mb-6 max-w-[220px]"
-              style={{ color: "rgba(255,255,255,0.38)" }}
-            >
+            <p style={{ fontSize: "13px", lineHeight: 1.7, marginBottom: "22px", color: "rgba(255,255,255,0.38)", maxWidth: "210px" }}>
               Crafting timeless fragrances that tell your story. Every bottle, a memory.
             </p>
 
-            <div className="flex gap-2 flex-wrap">
-              {SOCIALS.map(({ label, name, href }) => (
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {SOCIALS.map(({ label, name }) => (
                 <a
                   key={name}
-                  href={href}
+                  href="#"
                   aria-label={name}
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-200 no-underline cursor-pointer"
                   style={{
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "11px",
+                    fontWeight: 700,
                     background: "rgba(255,255,255,0.06)",
                     border: "1px solid rgba(255,255,255,0.12)",
                     color: "rgba(255,255,255,0.42)",
                     letterSpacing: "0.05em",
+                    textDecoration: "none",
+                    transition: "all 0.2s",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.color = "#fde047";
@@ -123,56 +168,73 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Nav columns */}
-          {Object.entries(NAV).map(([heading, links]) => (
-            <div key={heading}>
-              <h3
-                className="text-[10px] font-bold uppercase tracking-[0.20em] mb-5"
-                style={{ color: "rgba(250,204,21,0.65)" }}
-              >
-                {heading}
-              </h3>
-              <ul className="list-none p-0 m-0 space-y-3">
-                {links.map(({ label, to }) => (
-                  <li key={label}>
-                    <Link
-                      to={to}
-                      className="text-sm no-underline transition-all duration-150 hover:translate-x-0.5 inline-block"
-                      style={{ color: "rgba(255,255,255,0.42)" }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.color = "rgba(253,224,71,0.95)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.color = "rgba(255,255,255,0.42)")
-                      }
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* Learn */}
+          <div>
+            <p style={columnHeadingStyle}>Learn</p>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
+              {NAV.Learn.map(({ label, to }) => (
+                <li key={label}>
+                  <Link
+                    to={to}
+                    style={navLinkStyle}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(253,224,71,0.95)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.42)")}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* About + Support */}
+          <div>
+            <p style={columnHeadingStyle}>About</p>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", marginBottom: "28px" }}>
+              {NAV.About.map(({ label, to }) => (
+                <li key={label}>
+                  <Link
+                    to={to}
+                    style={navLinkStyle}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(253,224,71,0.95)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.42)")}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <p style={columnHeadingStyle}>Support</p>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
+              {NAV.Support.map(({ label, to }) => (
+                <li key={label}>
+                  <Link
+                    to={to}
+                    style={navLinkStyle}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(253,224,71,0.95)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.42)")}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           {/* Newsletter */}
           <div>
-            <h3
-              className="text-[10px] font-bold uppercase tracking-[0.20em] mb-5"
-              style={{ color: "rgba(250,204,21,0.65)" }}
-            >
-              Newsletter
-            </h3>
-            <p
-              className="text-sm leading-relaxed mb-5"
-              style={{ color: "rgba(255,255,255,0.38)" }}
-            >
+            <p style={columnHeadingStyle}>Newsletter</p>
+            <p style={{ fontSize: "13px", lineHeight: 1.6, marginBottom: "20px", color: "rgba(255,255,255,0.38)" }}>
               Early access to new arrivals and exclusive offers.
             </p>
 
             {joined ? (
               <div
-                className="rounded-xl px-4 py-3 text-sm"
                 style={{
+                  borderRadius: "10px",
+                  padding: "12px 16px",
+                  fontSize: "13px",
                   background: "rgba(250,204,21,0.10)",
                   border: "1px solid rgba(250,204,21,0.25)",
                   color: "rgba(250,204,21,0.85)",
@@ -181,48 +243,49 @@ export default function Footer() {
                 ✦ You're on the list.
               </div>
             ) : (
-              <form onSubmit={handleJoin} className="flex flex-col gap-2.5">
+              <form onSubmit={handleJoin} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 <input
                   type="email"
                   placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full rounded-xl px-4 py-2.5 text-sm focus:outline-none transition-all duration-200"
                   style={{
+                    width: "100%",
+                    borderRadius: "10px",
+                    padding: "10px 14px",
+                    fontSize: "13px",
                     background: "rgba(255,255,255,0.06)",
                     border: "1px solid rgba(255,255,255,0.12)",
                     color: "#fff",
+                    outline: "none",
+                    transition: "border-color 0.2s",
+                    boxSizing: "border-box",
                   }}
-                  onFocus={(e) =>
-                    (e.target.style.borderColor = "rgba(250,204,21,0.40)")
-                  }
-                  onBlur={(e) =>
-                    (e.target.style.borderColor = "rgba(255,255,255,0.12)")
-                  }
+                  onFocus={(e) => (e.target.style.borderColor = "rgba(250,204,21,0.40)")}
+                  onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.12)")}
                 />
                 <button
                   type="submit"
-                  className="w-full rounded-xl py-2.5 text-sm font-bold tracking-wide transition-all duration-200 cursor-pointer"
                   style={{
+                    width: "100%",
+                    borderRadius: "10px",
+                    padding: "10px 0",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
                     background: "rgba(250,204,21,0.95)",
                     color: "#3b0764",
                     border: "none",
-                    letterSpacing: "0.08em",
+                    cursor: "pointer",
+                    transition: "background 0.2s",
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "#fde047")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "rgba(250,204,21,0.95)")
-                  }
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#fde047")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(250,204,21,0.95)")}
                 >
                   Join
                 </button>
-                <p
-                  className="text-[11px] leading-relaxed"
-                  style={{ color: "rgba(255,255,255,0.20)" }}
-                >
+                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.20)", margin: 0 }}>
                   No spam. Unsubscribe anytime.
                 </p>
               </form>
@@ -230,18 +293,22 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* ── Bottom bar ──────────────────────────────────────── */}
+        {/* ── Bottom bar ── */}
         <div
-          className="py-5 flex flex-col sm:flex-row items-center justify-between gap-3"
-          style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}
+          style={{
+            padding: "18px 0",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "12px",
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+          }}
         >
-          <p
-            className="text-xs m-0 order-2 sm:order-1"
-            style={{ color: "rgba(255,255,255,0.20)" }}
-          >
+          <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.20)", margin: 0 }}>
             © 2026 Lumière Parfum. All rights reserved.
           </p>
-          <div className="flex gap-6 order-1 sm:order-2">
+          <div style={{ display: "flex", gap: "24px" }}>
             {[
               { label: "Privacy Policy", to: "/privacy" },
               { label: "Terms of Use", to: "/terms" },
@@ -249,20 +316,16 @@ export default function Footer() {
               <Link
                 key={label}
                 to={to}
-                className="text-xs no-underline transition-colors duration-150"
-                style={{ color: "rgba(255,255,255,0.22)" }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.color = "rgba(253,224,71,0.7)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.color = "rgba(255,255,255,0.22)")
-                }
+                style={{ fontSize: "12px", color: "rgba(255,255,255,0.22)", textDecoration: "none", transition: "color 0.15s" }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(253,224,71,0.70)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.22)")}
               >
                 {label}
               </Link>
             ))}
           </div>
         </div>
+
       </div>
     </footer>
   );
