@@ -9,7 +9,7 @@ import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 const Layout =lazy(()=>import ('../components/layout.jsx'));
 const Home=lazy(()=>import ('../Pages/home.jsx'));
-const About=lazy(()=>import ('../pages/about.jsx'));
+const About=lazy(()=>import ('../Pages/about.jsx'));
 const Contact=lazy(()=>import('../Pages/contact.jsx'));
 const ViewSingleProduct=lazy(()=>import ('../Pages/viewdetail.jsx'));
 const Cart=lazy(()=>import('../Pages/cart.jsx'));
