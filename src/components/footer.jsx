@@ -28,21 +28,34 @@ const SOCIALS = [
   { label: "TW", name: "Twitter" },
 ];
 
-const navLinkStyle = {
-  fontSize: "13px",
-  color: "rgba(255,255,255,0.42)",
-  textDecoration: "none",
-  display: "inline-block",
-  transition: "color 0.15s",
-};
-
-const columnHeadingStyle = {
-  fontSize: "10px",
-  fontWeight: 700,
-  letterSpacing: "0.20em",
-  textTransform: "uppercase",
-  marginBottom: "20px",
-  color: "rgba(250,204,21,0.65)",
+// ─── Shared style objects ────────────────────────────────────────────────────
+const S = {
+  heading: {
+    fontSize: 10,
+    fontWeight: 700,
+    letterSpacing: "0.20em",
+    textTransform: "uppercase",
+    marginBottom: 20,
+    color: "rgba(250,204,21,0.65)",
+    margin: "0 0 20px 0",
+    padding: 0,
+  },
+  navLink: {
+    fontSize: 13,
+    color: "rgba(255,255,255,0.45)",
+    textDecoration: "none",
+    display: "inline-block",
+    transition: "color 0.15s",
+    lineHeight: 1.4,
+  },
+  ul: {
+    listStyle: "none",
+    padding: 0,
+    margin: 0,
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+  },
 };
 
 export default function Footer() {
@@ -55,273 +68,196 @@ export default function Footer() {
   }
 
   return (
-    <footer
-      style={{
+    /*
+      KEY FIX: using a <div> wrapper with a CSS className defined in your
+      global CSS / index.css instead of relying on inline style for the
+      gradient — because some bundler/browser combos strip or override
+      inline background on <footer> tags.
+
+      Add this to your index.css or App.css:
+
+        .lumiere-footer {
+          background: linear-gradient(160deg, #1a0533 0%, #0f0120 55%, #110028 100%) !important;
+        }
+
+      The component below also keeps the inline style as a fallback.
+    */
+    <footer className="lumiere-footer" style={{ width: "100%", color: "#fff" }}>
+
+      {/* Gold shimmer line — implemented as a <div> not a Tailwind class */}
+      <div style={{
         width: "100%",
-        color: "white",
-        background: "linear-gradient(160deg, #1a0533 0%, #0f0120 55%, #110028 100%)",
-        borderTop: "1px solid rgba(250,204,21,0.10)",
-        fontFamily: "inherit",
-      }}
-    >
-      {/* Gold shimmer line */}
-      <div
-        style={{
-          width: "100%",
-          height: "1px",
-          background:
-            "linear-gradient(90deg, transparent 0%, rgba(250,204,21,0.50) 40%, rgba(250,204,21,0.50) 60%, transparent 100%)",
-        }}
-      />
+        height: 1,
+        background: "linear-gradient(90deg, transparent 0%, rgba(250,204,21,0.55) 40%, rgba(250,204,21,0.55) 60%, transparent 100%)",
+      }} />
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px" }}>
 
-        {/* ── Main grid ── */}
-        <div
-          className="py-14"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-            gap: "32px 40px",
-          }}
-        >
-          {/* Brand column — full width on mobile */}
-          <div style={{ gridColumn: "span 1" }}>
-            <Link
-              to="/"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "12px",
-                textDecoration: "none",
-                marginBottom: "20px",
-              }}
-            >
-              <div
-                style={{
-                  width: "40px",
-                  height: "40px",
-                  borderRadius: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0,
-                  background: "rgba(250,204,21,0.12)",
-                  border: "1px solid rgba(250,204,21,0.30)",
-                  boxShadow: "0 0 18px rgba(250,204,21,0.08)",
-                }}
-              >
-                <span style={{ color: "#fde047", fontSize: "18px", lineHeight: 1 }}>◈</span>
+        {/* ── Main grid ────────────────────────────────────────── */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+          gap: "40px 40px",
+          padding: "56px 0 48px",
+        }}>
+
+          {/* Brand */}
+          <div style={{ minWidth: 0 }}>
+            <Link to="/" style={{ display: "inline-flex", alignItems: "center", gap: 12, textDecoration: "none", marginBottom: 20 }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: 14, flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: "rgba(250,204,21,0.14)",
+                border: "1px solid rgba(250,204,21,0.32)",
+              }}>
+                <span style={{ color: "#fde047", fontSize: 18, lineHeight: 1 }}>◈</span>
               </div>
               <div>
-                <p style={{ color: "white", fontWeight: 800, fontSize: "13px", letterSpacing: "0.18em", margin: 0, lineHeight: 1 }}>
-                  LUMIÈRE
-                </p>
-                <p style={{ fontSize: "9px", letterSpacing: "0.28em", margin: 0, marginTop: "3px", color: "rgba(250,204,21,0.55)" }}>
-                  PARFUM
-                </p>
+                <p style={{ color: "#fff", fontWeight: 800, fontSize: 13, letterSpacing: "0.18em", margin: 0, lineHeight: 1 }}>LUMIÈRE</p>
+                <p style={{ fontSize: 9, letterSpacing: "0.28em", margin: "3px 0 0", color: "rgba(250,204,21,0.55)" }}>PARFUM</p>
               </div>
             </Link>
 
-            <p style={{ fontSize: "13px", lineHeight: 1.7, marginBottom: "22px", color: "rgba(255,255,255,0.38)", maxWidth: "210px" }}>
+            <p style={{ fontSize: 13, lineHeight: 1.75, color: "rgba(255,255,255,0.38)", margin: "0 0 22px", maxWidth: 210 }}>
               Crafting timeless fragrances that tell your story. Every bottle, a memory.
             </p>
 
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {SOCIALS.map(({ label, name }) => (
-                <a
-                  key={name}
-                  href="#"
-                  aria-label={name}
+                <a key={name} href="#" aria-label={name}
                   style={{
-                    width: "36px",
-                    height: "36px",
-                    borderRadius: "50%",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "11px",
-                    fontWeight: 700,
+                    width: 36, height: 36, borderRadius: "50%",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 11, fontWeight: 700, letterSpacing: "0.05em",
                     background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
+                    border: "1px solid rgba(255,255,255,0.13)",
                     color: "rgba(255,255,255,0.42)",
-                    letterSpacing: "0.05em",
-                    textDecoration: "none",
-                    transition: "all 0.2s",
+                    textDecoration: "none", transition: "all 0.2s",
                   }}
-                  onMouseEnter={(e) => {
+                  onMouseEnter={e => {
                     e.currentTarget.style.color = "#fde047";
                     e.currentTarget.style.borderColor = "rgba(250,204,21,0.45)";
                     e.currentTarget.style.background = "rgba(250,204,21,0.10)";
                     e.currentTarget.style.transform = "translateY(-2px)";
                   }}
-                  onMouseLeave={(e) => {
+                  onMouseLeave={e => {
                     e.currentTarget.style.color = "rgba(255,255,255,0.42)";
-                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.13)";
                     e.currentTarget.style.background = "rgba(255,255,255,0.06)";
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
-                >
-                  {label}
-                </a>
+                >{label}</a>
               ))}
             </div>
           </div>
 
           {/* Learn */}
-          <div>
-            <p style={columnHeadingStyle}>Learn</p>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
+          <div style={{ minWidth: 0 }}>
+            <p style={S.heading}>Learn</p>
+            <ul style={S.ul}>
               {NAV.Learn.map(({ label, to }) => (
                 <li key={label}>
-                  <Link
-                    to={to}
-                    style={navLinkStyle}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(253,224,71,0.95)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.42)")}
-                  >
-                    {label}
-                  </Link>
+                  <Link to={to} style={S.navLink}
+                    onMouseEnter={e => (e.currentTarget.style.color = "rgba(253,224,71,0.95)")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
+                  >{label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* About + Support */}
-          <div>
-            <p style={columnHeadingStyle}>About</p>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px", marginBottom: "28px" }}>
+          {/* About */}
+          <div style={{ minWidth: 0 }}>
+            <p style={S.heading}>About</p>
+            <ul style={{ ...S.ul, marginBottom: 28 }}>
               {NAV.About.map(({ label, to }) => (
                 <li key={label}>
-                  <Link
-                    to={to}
-                    style={navLinkStyle}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(253,224,71,0.95)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.42)")}
-                  >
-                    {label}
-                  </Link>
+                  <Link to={to} style={S.navLink}
+                    onMouseEnter={e => (e.currentTarget.style.color = "rgba(253,224,71,0.95)")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
+                  >{label}</Link>
                 </li>
               ))}
             </ul>
-
-            <p style={columnHeadingStyle}>Support</p>
-            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "12px" }}>
+            <p style={S.heading}>Support</p>
+            <ul style={S.ul}>
               {NAV.Support.map(({ label, to }) => (
                 <li key={label}>
-                  <Link
-                    to={to}
-                    style={navLinkStyle}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(253,224,71,0.95)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.42)")}
-                  >
-                    {label}
-                  </Link>
+                  <Link to={to} style={S.navLink}
+                    onMouseEnter={e => (e.currentTarget.style.color = "rgba(253,224,71,0.95)")}
+                    onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.45)")}
+                  >{label}</Link>
                 </li>
               ))}
             </ul>
           </div>
 
           {/* Newsletter */}
-          <div>
-            <p style={columnHeadingStyle}>Newsletter</p>
-            <p style={{ fontSize: "13px", lineHeight: 1.6, marginBottom: "20px", color: "rgba(255,255,255,0.38)" }}>
+          <div style={{ minWidth: 0 }}>
+            <p style={S.heading}>Newsletter</p>
+            <p style={{ fontSize: 13, lineHeight: 1.65, margin: "0 0 20px", color: "rgba(255,255,255,0.38)" }}>
               Early access to new arrivals and exclusive offers.
             </p>
 
             {joined ? (
-              <div
-                style={{
-                  borderRadius: "10px",
-                  padding: "12px 16px",
-                  fontSize: "13px",
-                  background: "rgba(250,204,21,0.10)",
-                  border: "1px solid rgba(250,204,21,0.25)",
-                  color: "rgba(250,204,21,0.85)",
-                }}
-              >
-                ✦ You're on the list.
-              </div>
+              <div style={{
+                borderRadius: 10, padding: "12px 16px", fontSize: 13,
+                background: "rgba(250,204,21,0.10)",
+                border: "1px solid rgba(250,204,21,0.28)",
+                color: "rgba(250,204,21,0.85)",
+              }}>✦ You're on the list.</div>
             ) : (
-              <form onSubmit={handleJoin} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <form onSubmit={handleJoin} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <input
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
+                  type="email" placeholder="your@email.com"
+                  value={email} onChange={e => setEmail(e.target.value)} required
                   style={{
-                    width: "100%",
-                    borderRadius: "10px",
-                    padding: "10px 14px",
-                    fontSize: "13px",
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    color: "#fff",
-                    outline: "none",
+                    width: "100%", boxSizing: "border-box",
+                    borderRadius: 10, padding: "10px 14px", fontSize: 13,
+                    background: "rgba(255,255,255,0.07)",
+                    border: "1px solid rgba(255,255,255,0.13)",
+                    color: "#fff", outline: "none",
                     transition: "border-color 0.2s",
-                    boxSizing: "border-box",
                   }}
-                  onFocus={(e) => (e.target.style.borderColor = "rgba(250,204,21,0.40)")}
-                  onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.12)")}
+                  onFocus={e => (e.target.style.borderColor = "rgba(250,204,21,0.45)")}
+                  onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.13)")}
                 />
-                <button
-                  type="submit"
+                <button type="submit"
                   style={{
-                    width: "100%",
-                    borderRadius: "10px",
-                    padding: "10px 0",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    letterSpacing: "0.08em",
-                    background: "rgba(250,204,21,0.95)",
-                    color: "#3b0764",
-                    border: "none",
-                    cursor: "pointer",
-                    transition: "background 0.2s",
+                    width: "100%", borderRadius: 10, padding: "10px 0",
+                    fontSize: 13, fontWeight: 700, letterSpacing: "0.08em",
+                    background: "#facc15", color: "#3b0764",
+                    border: "none", cursor: "pointer", transition: "background 0.2s",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#fde047")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(250,204,21,0.95)")}
-                >
-                  Join
-                </button>
-                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.20)", margin: 0 }}>
+                  onMouseEnter={e => (e.currentTarget.style.background = "#fde047")}
+                  onMouseLeave={e => (e.currentTarget.style.background = "#facc15")}
+                >Join</button>
+                <p style={{ fontSize: 11, color: "rgba(255,255,255,0.22)", margin: 0 }}>
                   No spam. Unsubscribe anytime.
                 </p>
               </form>
             )}
           </div>
+
         </div>
 
         {/* ── Bottom bar ── */}
-        <div
-          style={{
-            padding: "18px 0",
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "12px",
-            borderTop: "1px solid rgba(255,255,255,0.07)",
-          }}
-        >
-          <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.20)", margin: 0 }}>
+        <div style={{
+          padding: "18px 0",
+          display: "flex", flexWrap: "wrap",
+          alignItems: "center", justifyContent: "space-between", gap: 12,
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+        }}>
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.22)", margin: 0 }}>
             © 2026 Lumière Parfum. All rights reserved.
           </p>
-          <div style={{ display: "flex", gap: "24px" }}>
-            {[
-              { label: "Privacy Policy", to: "/privacy" },
-              { label: "Terms of Use", to: "/terms" },
-            ].map(({ label, to }) => (
-              <Link
-                key={label}
-                to={to}
-                style={{ fontSize: "12px", color: "rgba(255,255,255,0.22)", textDecoration: "none", transition: "color 0.15s" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(253,224,71,0.70)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.22)")}
-              >
-                {label}
-              </Link>
+          <div style={{ display: "flex", gap: 24 }}>
+            {[{ label: "Privacy Policy", to: "/privacy" }, { label: "Terms of Use", to: "/terms" }].map(({ label, to }) => (
+              <Link key={label} to={to}
+                style={{ fontSize: 12, color: "rgba(255,255,255,0.22)", textDecoration: "none", transition: "color 0.15s" }}
+                onMouseEnter={e => (e.currentTarget.style.color = "rgba(253,224,71,0.70)")}
+                onMouseLeave={e => (e.currentTarget.style.color = "rgba(255,255,255,0.22)")}
+              >{label}</Link>
             ))}
           </div>
         </div>
