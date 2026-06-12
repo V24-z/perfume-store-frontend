@@ -1,152 +1,196 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import styles from "./Footer.module.css";
 
-const NAV = {
-  Learn: [
-    { label: "Perfume Guide", to: "/learn/guide" },
-    { label: "Fragrance Notes", to: "/learn/notes" },
-    { label: "How to Choose", to: "/learn/choose" },
-    { label: "Care Tips", to: "/learn/care" },
-    { label: "Blog", to: "/blog" },
-  ],
-  About: [
-    { label: "Our Story", to: "/about" },
-    { label: "Ingredients", to: "/about/ingredients" },
-    { label: "Sustainability", to: "/about/sustainability" },
-  ],
-  Support: [
-    { label: "Contact Us", to: "/contact" },
-    { label: "FAQs", to: "/faq" },
-    { label: "Shipping & Returns", to: "/shipping" },
-  ],
-};
-
-const SOCIALS = [
-  { label: "IG", name: "Instagram" },
-  { label: "FB", name: "Facebook" },
-  { label: "PT", name: "Pinterest" },
-  { label: "TW", name: "Twitter" },
-];
-
-export default function Footer() {
-  const [email, setEmail] = useState("");
-  const [joined, setJoined] = useState(false);
-
-  function handleJoin(e) {
-    e.preventDefault();
-    if (email.trim()) setJoined(true);
-  }
-
+function Footer() {
   return (
-    <footer className={styles.footer}>
+    <footer className="w-full bg-gradient-to-b from-[#1a0533] to-[#110222]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 sm:pt-12 pb-6">
 
-      {/* Gold shimmer line */}
-      <div className={styles.shimmer} />
+        <div className="grid grid-cols-auto sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
 
-      <div className={styles.inner}>
-
-        {/* ── Main grid ── */}
-        <div className={styles.grid}>
-
-          {/* Brand */}
+          {/* Brand column */}
           <div>
-            <Link to="/" className={styles.brandLink}>
-              <div className={styles.logoBox}>
-                <span className={styles.logoIcon}>◈</span>
+            <Link to="/" className="flex items-center gap-2.5 no-underline mb-4">
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center"
+                style={{
+                  background: "rgba(250,204,21,0.15)",
+                  border: "1px solid rgba(250,204,21,0.35)",
+                }}
+              >
+                <span className="text-yellow-300 text-base">◈</span>
               </div>
               <div>
-                <p className={styles.brandName}>LUMIÈRE</p>
-                <p className={styles.brandSub}>PARFUM</p>
+                <p className="text-white font-bold text-sm tracking-[0.1em] m-0">LUMIÈRE</p>
+                <p className="text-[9px] tracking-[0.2em] m-0" style={{ color: "rgba(250,204,21,0.6)" }}>
+                  PARFUM
+                </p>
               </div>
             </Link>
 
-            <p className={styles.tagline}>
+            <p className="text-xs leading-relaxed mb-5" style={{ color: "rgba(255,255,255,0.4)" }}>
               Crafting timeless fragrances that tell your story. Every bottle, a memory.
             </p>
 
-            <div className={styles.socials}>
-              {SOCIALS.map(({ label, name }) => (
-                <a key={name} href="#" aria-label={name} className={styles.socialBtn}>
+            {/* ✅ Fixed: <a tag was missing opening bracket */}
+            <div className="flex gap-2">
+              {[
+                { label: "Ig", name: "Instagram" },
+                { label: "Fb", name: "Facebook" },
+                { label: "Pt", name: "Pinterest" },
+                { label: "Tw", name: "Twitter" },
+              ].map(({ label, name }) => (
+                <a
+                  key={name}
+                  href="#"
+                  aria-label={name}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all no-underline"
+                  style={{
+                    background: "rgba(255,255,255,0.07)",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    color: "rgba(255,255,255,0.5)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = "#fde047";
+                    e.currentTarget.style.borderColor = "rgba(250,204,21,0.4)";
+                    e.currentTarget.style.background = "rgba(250,204,21,0.1)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                    e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
+                    e.currentTarget.style.background = "rgba(255,255,255,0.07)";
+                  }}
+                >
                   {label}
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Learn */}
+          {/* Learn column */}
           <div>
-            <p className={styles.colHeading}>Learn</p>
-            <ul className={styles.navList}>
-              {NAV.Learn.map(({ label, to }) => (
+            <h3 className="text-yellow-400 text-[11px] font-semibold uppercase tracking-[0.12em] mb-4">
+              Learn
+            </h3>
+            <ul className="space-y-2.5 list-none p-0 m-0">
+              {[
+                { label: "Perfume Guide", to: "/learn/guide" },
+                { label: "Fragrance Notes Explained", to: "/learn/notes" },
+                { label: "How to Choose a Perfume", to: "/learn/choose" },
+                { label: "Perfume Care Tips", to: "/learn/care" },
+                { label: "Blog", to: "/blog" },
+              ].map(({ label, to }) => (
                 <li key={label}>
-                  <Link to={to} className={styles.navLink}>{label}</Link>
+                  <Link
+                    to={to}
+                    className="text-xs no-underline hover:text-yellow-300 transition-colors"
+                    style={{ color: "rgba(255,255,255,0.5)" }}
+                  >
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* About + Support */}
+          {/* About + Support column */}
           <div>
-            <p className={styles.colHeading}>About</p>
-            <ul className={styles.navList}>
-              {NAV.About.map(({ label, to }) => (
+            <h3 className="text-yellow-400 text-[11px] font-semibold uppercase tracking-[0.12em] mb-4">
+              About
+            </h3>
+            <ul className="space-y-2.5 list-none p-0 m-0">
+              {[
+                { label: "Our Story", to: "/about" },
+                { label: "Ingredients", to: "/about/ingredients" },
+                { label: "Sustainability", to: "/about/sustainability" },
+              ].map(({ label, to }) => (
                 <li key={label}>
-                  <Link to={to} className={styles.navLink}>{label}</Link>
+                  <Link
+                    to={to}
+                    className="text-xs no-underline hover:text-yellow-300 transition-colors"
+                    style={{ color: "rgba(255,255,255,0.5)" }}
+                  >
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
 
-            <p className={styles.colHeading} style={{ marginTop: 28 }}>Support</p>
-            <ul className={styles.navList}>
-              {NAV.Support.map(({ label, to }) => (
+            <h3 className="text-yellow-400 text-[11px] font-semibold uppercase tracking-[0.12em] mb-4 mt-7">
+              Support
+            </h3>
+            <ul className="space-y-2.5 list-none p-0 m-0">
+              {[
+                { label: "Contact Us", to: "/contact" },
+                { label: "FAQs", to: "/faq" },
+                { label: "Shipping & Returns", to: "/shipping" },
+              ].map(({ label, to }) => (
                 <li key={label}>
-                  <Link to={to} className={styles.navLink}>{label}</Link>
+                  <Link
+                    to={to}
+                    className="text-xs no-underline hover:text-yellow-300 transition-colors"
+                    style={{ color: "rgba(255,255,255,0.5)" }}
+                  >
+                    {label}
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Newsletter */}
+          {/* Newsletter column */}
           <div>
-            <p className={styles.colHeading}>Newsletter</p>
-            <p className={styles.newsletterDesc}>
-              Early access to new arrivals and exclusive offers.
+            <h3 className="text-yellow-400 text-[11px] font-semibold uppercase tracking-[0.12em] mb-4">
+              Newsletter
+            </h3>
+            <p className="text-xs leading-relaxed mb-4" style={{ color: "rgba(255,255,255,0.4)" }}>
+              Get early access to new arrivals and exclusive offers.
             </p>
-
-            {joined ? (
-              <div className={styles.successBox}>✦ You're on the list.</div>
-            ) : (
-              <form onSubmit={handleJoin} className={styles.form}>
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className={styles.emailInput}
-                />
-                <button type="submit" className={styles.joinBtn}>
-                  Join
-                </button>
-                <p className={styles.spamNote}>No spam. Unsubscribe anytime.</p>
-              </form>
-            )}
+            <div className="flex gap-2">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                className="flex-1 min-w-0 rounded-lg px-3 py-2 text-xs focus:outline-none transition"
+                style={{
+                  background: "rgba(255,255,255,0.07)",
+                  border: "1px solid rgba(255,255,255,0.15)",
+                  color: "#fff",
+                }}
+                onFocus={(e) => (e.target.style.borderColor = "rgba(250,204,21,0.4)")}
+                onBlur={(e) => (e.target.style.borderColor = "rgba(255,255,255,0.15)")}
+              />
+              <button
+                className="bg-yellow-400 hover:bg-yellow-300 text-purple-900 text-xs font-bold px-3 py-2 rounded-lg transition whitespace-nowrap cursor-pointer"
+                style={{ border: "none" }}
+              >
+                Join
+              </button>
+            </div>
+            <p className="text-[10px] mt-2.5" style={{ color: "rgba(255,255,255,0.2)" }}>
+              No spam. Unsubscribe anytime.
+            </p>
           </div>
 
         </div>
 
-        {/* ── Bottom bar ── */}
-        <div className={styles.bottomBar}>
-          <p className={styles.copyright}>
+        {/* Bottom bar */}
+        <div
+          className="pt-5 flex flex-col sm:flex-row items-center justify-between gap-3"
+          style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+        >
+          <p className="text-xs m-0" style={{ color: "rgba(255,255,255,0.2)" }}>
             © 2026 Lumière Parfum. All rights reserved.
           </p>
-          <div className={styles.legalLinks}>
+          <div className="flex gap-5">
             {[
               { label: "Privacy Policy", to: "/privacy" },
               { label: "Terms of Use", to: "/terms" },
             ].map(({ label, to }) => (
-              <Link key={label} to={to} className={styles.legalLink}>
+              <Link
+                key={label}
+                to={to}
+                className="text-xs no-underline hover:text-yellow-300 transition-colors"
+                style={{ color: "rgba(255,255,255,0.2)" }}
+              >
                 {label}
               </Link>
             ))}
@@ -157,3 +201,5 @@ export default function Footer() {
     </footer>
   );
 }
+
+export default Footer;
