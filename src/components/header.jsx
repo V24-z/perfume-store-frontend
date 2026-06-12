@@ -3,16 +3,16 @@ import { useAuth } from "../context/useAuth";
 import useCart from "../context/useCart";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { createPortal } from "react-dom"; // ✅ import this
+import { createPortal } from "react-dom";
 import Navbar from "./Navbar";
 
 function Header() {
   const { cartItems } = useCart();
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 }); // ✅ track position
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef(null);
-  const buttonRef = useRef(null); // ✅ ref on the button
+  const buttonRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -47,7 +47,6 @@ function Header() {
     navigate("/login");
   };
 
-  // Dropdown rendered via portal — fully outside header stacking context
   const dropdown =
     dropdownOpen &&
     createPortal(
@@ -68,7 +67,9 @@ function Header() {
           {user?.name && (
             <p className="text-sm font-semibold text-gray-900">{user.name}</p>
           )}
-          {user?.email && <p className="text-xs text-gray-500">{user.email}</p>}
+          {user?.email && (
+            <p className="text-xs text-gray-500">{user.email}</p>
+          )}
         </div>
         <div className="py-1">
           <Link
@@ -102,8 +103,9 @@ function Header() {
           </button>
         </div>
       </div>,
-      document.body, // renders directly into <body>, above everything
+      document.body,
     );
+
   const formatDate = (dateString) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -112,46 +114,86 @@ function Header() {
       day: "numeric",
     });
   };
+
   return (
     <>
-      <header className="w-full sticky top-0 z-50 bg-gradient-to-r from-[#1a0533] via-[#2d0a4e] to-[#4a1060]">
+      <header
+        className="w-full sticky top-0 z-50"
+        style={{
+          background: "linear-gradient(to right, #1a0533, #2d0a4e, #4a1060)",
+        }}
+      >
+        {/* Welcome bar */}
         {user?.registerd && (
-          <div className="flex w-full bg-black/20 py-1.5 justify-center items-center gap-x-3 flex-wrap px-4">
-            <p className="text-[11px] text-gray-300">
+          <div
+            className="flex w-full py-1.5 justify-center items-center gap-x-3 flex-wrap px-4"
+            style={{ background: "rgba(0,0,0,0.2)" }}
+          >
+            <p className="text-xs" style={{ color: "#d1d5db" }}>
               Welcome{" "}
-              <span className="text-gray-300 font-medium">
+              <span className="font-medium" style={{ color: "#d1d5db" }}>
                 {user.name} !!
-              </span>{" "}
-            </p>{" "}
-            <p className="text-[11px] px-1 text-gray-300">
+              </span>
+            </p>
+            <p className="text-xs px-1" style={{ color: "#d1d5db" }}>
               Joined on:{" "}
-              <span className="text-yellow-300 font-medium">
+              <span className="font-medium" style={{ color: "#fde047" }}>
                 {formatDate(user.registerd)}
               </span>
             </p>
           </div>
         )}
-        <div className="backdrop-blur-xl bg-white/5 border-b border-white/10">
+
+        {/* Main bar */}
+        <div
+          style={{
+            backdropFilter: "blur(20px)",
+            background: "rgba(255,255,255,0.05)",
+            borderBottom: "1px solid rgba(255,255,255,0.10)",
+          }}
+        >
           <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 max-w-7xl mx-auto">
+
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2.5 no-underline">
-              <div className="w-10 h-10 bg-yellow-400/20 border border-yellow-400/40 rounded-xl flex flex-col items-center justify-center">
-                <span className="text-yellow-300 text-lg leading-none">◈</span>
+              <div
+                className="w-10 h-10 rounded-xl flex flex-col items-center justify-center"
+                style={{
+                  background: "rgba(250,204,21,0.20)",
+                  border: "1px solid rgba(250,204,21,0.40)",
+                }}
+              >
+                <span style={{ color: "#fde047", fontSize: 18, lineHeight: 1 }}>◈</span>
               </div>
               <div>
-                <p className="text-white font-bold text-base tracking-[0.12em] leading-tight m-0">
+                <p
+                  className="font-bold text-base m-0"
+                  style={{ color: "#fff", letterSpacing: "0.12em", lineHeight: 1.2 }}
+                >
                   LUMIÈRE
                 </p>
-                <p className="text-yellow-400/70 text-[9px] tracking-[0.22em] leading-tight m-0">
+                <p
+                  className="m-0"
+                  style={{ color: "rgba(250,204,21,0.70)", fontSize: 9, letterSpacing: "0.22em", lineHeight: 1.2 }}
+                >
                   PARFUM
                 </p>
               </div>
             </Link>
 
             {/* Search bar */}
-            <div className="hidden lg:flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/20 rounded-full px-4 py-2 cursor-pointer transition-all w-56 lg:w-72">
+            <div
+              className="hidden lg:flex items-center gap-2 rounded-full px-4 py-2 cursor-pointer transition-all w-56 lg:w-72"
+              style={{
+                background: "rgba(255,255,255,0.10)",
+                border: "1px solid rgba(255,255,255,0.20)",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.15)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.10)")}
+            >
               <svg
-                className="w-3.5 h-3.5 text-white/50"
+                className="w-3.5 h-3.5"
+                style={{ color: "rgba(255,255,255,0.50)" }}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -163,51 +205,68 @@ function Header() {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-              <span className="text-white/40 text-xs tracking-wide">
+              <span style={{ color: "rgba(255,255,255,0.40)", fontSize: 12, letterSpacing: "0.04em" }}>
                 Search fragrances...
               </span>
             </div>
 
             {/* Right icons */}
             <div className="flex items-center gap-1.5 sm:gap-2.5">
+
               {/* Wishlist */}
-              <button className="relative w-9 h-9 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full flex items-center justify-center text-white/80 hover:text-white transition cursor-pointer">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                  />
+              <button
+                className="relative w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer"
+                style={{
+                  background: "rgba(255,255,255,0.10)",
+                  border: "1px solid rgba(255,255,255,0.20)",
+                  color: "rgba(255,255,255,0.80)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.20)";
+                  e.currentTarget.style.color = "#fff";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "rgba(255,255,255,0.10)";
+                  e.currentTarget.style.color = "rgba(255,255,255,0.80)";
+                }}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
-                <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                <span
+                  className="absolute -top-1 -right-1 text-white font-bold w-4 h-4 rounded-full flex items-center justify-center"
+                  style={{ background: "#f43f5e", fontSize: 9 }}
+                >
                   2
                 </span>
               </button>
 
               {/* Cart */}
-              <Link to={"/cart"}>
-                <button className="relative w-9 h-9 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full flex items-center justify-center text-white/80 hover:text-white transition cursor-pointer">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 7H4l1-7z"
-                    />
+              <Link to="/cart">
+                <button
+                  className="relative w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer"
+                  style={{
+                    background: "rgba(255,255,255,0.10)",
+                    border: "1px solid rgba(255,255,255,0.20)",
+                    color: "rgba(255,255,255,0.80)",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.20)";
+                    e.currentTarget.style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,0.10)";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.80)";
+                  }}
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 7H4l1-7z" />
                   </svg>
-                  <span className="absolute -top-1 -right-1 bg-rose-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                     {cartItems.length}
+                  <span
+                    className="absolute -top-1 -right-1 text-white font-bold w-4 h-4 rounded-full flex items-center justify-center"
+                    style={{ background: "#f43f5e", fontSize: 9 }}
+                  >
+                    {cartItems.length}
                   </span>
                 </button>
               </Link>
@@ -216,16 +275,24 @@ function Header() {
               {!user ? (
                 <Link
                   to="/signup"
-                  className="bg-yellow-400 hover:bg-yellow-300 text-purple-900 text-xs font-bold px-5 py-2 rounded-full tracking-wide transition no-underline"
+                  className="text-xs font-bold px-5 py-2 rounded-full tracking-wide transition no-underline"
+                  style={{ background: "#facc15", color: "#3b0764" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#fde047")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "#facc15")}
                 >
                   Sign Up
                 </Link>
               ) : (
-                // ✅ Only the button here — dropdown is portaled to body
                 <button
                   ref={buttonRef}
                   onClick={handleToggle}
-                  className="w-9 h-9 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-white font-bold text-sm hover:bg-white/30 transition cursor-pointer"
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm transition cursor-pointer"
+                  style={{
+                    background: "rgba(255,255,255,0.20)",
+                    border: "2px solid rgba(255,255,255,0.40)",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.30)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.20)")}
                 >
                   {user.email ? user.email.charAt(0).toUpperCase() : "U"}
                 </button>
@@ -238,7 +305,7 @@ function Header() {
         <Navbar className="relative z-50" />
       </header>
 
-      {/* ✅ Portal dropdown renders here, outside header */}
+      {/* Portal dropdown */}
       {dropdown}
     </>
   );
