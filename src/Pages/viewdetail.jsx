@@ -12,8 +12,7 @@ function ViewSingleProduct() {
   //const [addedToCart, setAddedToCart] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
   const {user} = useAuth();
-  //const USER_ID = user?.id;  
-
+  
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -93,27 +92,26 @@ function ViewSingleProduct() {
 
 
   //--------------const add to car----------
- const add_to_cart = async (product) => {
+const add_to_cart = async (product) => {
   try {
     if (!user?.id) {
       alert("Please login first");
       return;
     }
 
-    const payload = {
+    const { data } = await axios.post(`${API_URL}/cart/`, {
       user_id: user.id,
       product_id: product.id,
       quantity: 1,
-    };
+      price: product.price,
+    });
 
-    const { data } = await axios.post(`${API_URL}/cart/`, payload);
-
-    console.log("Added to cart:", data);
-    alert("Product added to cart!");
+    console.log(data);
+    alert("Product added to cart");
   } catch (error) {
     console.error(
       "Add to cart error:",
-      error?.response?.data || error.message
+      error.response?.data || error.message
     );
   }
 };
