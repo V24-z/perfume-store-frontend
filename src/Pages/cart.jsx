@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
+import { useAuth } from "../context/useAuth";
 
 const API_URL = import.meta.env.VITE_API_URL;
-const USER_ID = 1; // replace with auth later
+ // replace with auth later
 
 // ─── animations ───
 const pageVariants = {
@@ -100,7 +101,8 @@ function OrderSummary({ subtotal }) {
 // ─── MAIN CART ───
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
-
+  const {user}=useAuth();
+  const USER_ID =user?.id ;
   // ✅ SAFE FETCH (FIX 404 + STRUCTURE ISSUE)
   const fetchCart = async () => {
     try {
@@ -124,7 +126,7 @@ export default function Cart() {
       setCartItems(Array.isArray(data) ? data : data?.data || []);
    }
     fetchCart();
-  }, []);
+  }, [USER_ID]);
 
   // ─── INCREASE ───
   const increaseQty = async (item) => {

@@ -9,7 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(false);
-  const user = useAuth();
+  const {user} = useAuth();
   const USER_ID = user?.id; 
   // Fetch cart from backend
   const fetchCart = async () => {

@@ -11,7 +11,7 @@ function ViewSingleProduct() {
   const [wishlisted, setWishlisted] = useState(false);
   //const [addedToCart, setAddedToCart] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
-  const user = useAuth();
+  const {user} = useAuth();
   const USER_ID = user?.id;  
 
   const { id } = useParams();
