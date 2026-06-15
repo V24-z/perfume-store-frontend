@@ -1,137 +1,156 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { CartContext } from "./cartcontext";
-import { useAuth } from "./useAuth";
+import { useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Trash2, Plus, Minus } from "lucide-react";
+//import { useAuth } from "../context/useAuth";
+import { useCart } from "../context/cartcontext";
 
-const API_URL = import.meta.env.VITE_API_URL;
-// Replace later with logged-in user ID
+// ─── animations ───
+const pageVariants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
-export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const {user} = useAuth();
-  const USER_ID = user?.id; 
-  // Fetch cart from backend
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
 
-      const { data } = await axios.get(
-        `${API_URL}/cart/${USER_ID}`
-      );
+// ─── helper ───
+const fmt = (n) =>
+  Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
 
-      setCartItems(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Fetch cart error:", error);
-      setCartItems([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+// ─── CART ITEM ───
+function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
+  return (
+    <motion.div
+      variants={itemVariants}
+      className="bg-white border rounded-xl p-4 flex gap-4"
+    >
+      <img
+        src={item.products?.image_url}
+        className="w-20 h-24 object-cover rounded-lg"
+      />
 
-  useEffect(() => {
-    const fetchCart = async () => {
-    try {
-      setLoading(true);
+      <div className="flex-1">
+        <h3 className="font-semibold">{item.products?.name}</h3>
+        <p className="text-sm text-gray-500">₹{item.price}</p>
 
-      const { data } = await axios.get(
-        `${API_URL}/cart/${USER_ID}`
-      );
+        <div className="flex items-center gap-2 mt-2">
+          <button onClick={() => onDecrease(item)}>
+            <Minus size={14} />
+          </button>
 
-      setCartItems(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Fetch cart error:", error);
-    }
-  
-  } ;
-   fetchCart();
-  }, [USER_ID]);
+          <span>{item.quantity}</span>
 
-  // Add item to cart
-  const addToCart = async (product) => {
-    try {
-      await axios.post(`${API_URL}/cart/`, {
-        user_id: USER_ID,
-        product_id: product.id,
-        quantity: 1,
-        price: product.price, // only if you added price column
-      });
+          <button onClick={() => onIncrease(item)}>
+            <Plus size={14} />
+          </button>
+        </div>
+      </div>
 
-      await fetchCart();
-    } catch (error) {
-      console.error(
-        "Add to cart error:",
-        error.response?.data || error.message
-      );
-    }
-  };
+      <button onClick={() => onRemove(item.id)}>
+        <Trash2 size={16} />
+      </button>
+    </motion.div>
+  );
+}
 
-  // Increase quantity
-  const increaseQty = async (item) => {
-    try {
-      await axios.put(`${API_URL}/cart/${item.id}`, {
-        quantity: item.quantity + 1,
-      });
-
-      await fetchCart();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  // Decrease quantity
-  const decreaseQty = async (item) => {
-    if (item.quantity <= 1) return;
-
-    try {
-      await axios.put(`${API_URL}/cart/${item.id}`, {
-        quantity: item.quantity - 1,
-      });
-
-      await fetchCart();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  // Remove item
-  const removeFromCart = async (cartId) => {
-    try {
-      await axios.delete(`${API_URL}/cart/${cartId}`);
-
-      await fetchCart();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  // Clear cart
-  const clearCart = async () => {
-    try {
-      await axios.delete(
-        `${API_URL}/cart/clear/${USER_ID}`
-      );
-
-      setCartItems([]);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+// ─── ORDER SUMMARY ───
+function OrderSummary({ subtotal }) {
+  const shipping = subtotal > 1999 ? 0 : 199;
+  const tax = Math.round(subtotal * 0.18);
+  const total = subtotal + shipping + tax;
 
   return (
-    <CartContext.Provider
-      value={{
-        cartItems,
-        loading,
-        addToCart,
-        increaseQty,
-        decreaseQty,
-        removeFromCart,
-        clearCart,
-        fetchCart,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+    <div className="bg-white border rounded-xl p-5">
+      <h2 className="font-bold mb-4">Order Summary</h2>
+
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span>Subtotal</span>
+          <span>₹{fmt(subtotal)}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span>Shipping</span>
+          <span>{shipping === 0 ? "Free" : `₹${shipping}`}</span>
+        </div>
+
+        <div className="flex justify-between">
+          <span>Tax</span>
+          <span>₹{fmt(tax)}</span>
+        </div>
+
+        <hr />
+
+        <div className="flex justify-between font-bold">
+          <span>Total</span>
+          <span>₹{fmt(total)}</span>
+        </div>
+      </div>
+
+      <button className="w-full mt-4 bg-black text-white py-2 rounded-lg">
+        Checkout
+      </button>
+    </div>
   );
-};
+}
+
+// ─── MAIN CART ───
+export default function Cart() {
+  //const { user } = useAuth();
+  const {
+    cartItems,
+    increaseQty,
+    decreaseQty,
+    removeFromCart,
+    loading,
+  } = useCart();
+
+  //const USER_ID = user?.id;
+
+  // safe array
+const safeCart = useMemo(() => {
+  return Array.isArray(cartItems) ? cartItems : [];
+}, [cartItems]);
+  // subtotal
+  const subtotal = useMemo(() => {
+    return safeCart.reduce(
+      (sum, i) => sum + (i.price || 0) * (i.quantity || 0),
+      0
+    );
+  }, [safeCart]);
+
+  return (
+    <motion.div
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+      className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6"
+    >
+      {/* LEFT CART */}
+      <div className="lg:col-span-2 space-y-4">
+        {loading && <p>Loading cart...</p>}
+
+        {!loading && safeCart.length === 0 && (
+          <p className="text-gray-500">Your cart is empty</p>
+        )}
+
+        <AnimatePresence>
+          {safeCart.map((item) => (
+            <CartItemCard
+              key={item.id}
+              item={item}
+              onIncrease={increaseQty}
+              onDecrease={decreaseQty}
+              onRemove={removeFromCart}
+            />
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* RIGHT SUMMARY */}
+      <OrderSummary subtotal={subtotal} />
+    </motion.div>
+  );
+}
