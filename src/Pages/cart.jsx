@@ -104,7 +104,7 @@ export default function Cart() {
   // ✅ SAFE FETCH (FIX 404 + STRUCTURE ISSUE)
   const fetchCart = async () => {
     try {
-      const res = await fetch(`${API_URL}/${USER_ID}`);
+      const res = await fetch(`${API_URL}/cart/${USER_ID}`);
       const data = await res.json();
 
       // FIX: backend may return array OR object
@@ -117,7 +117,7 @@ export default function Cart() {
 
   useEffect(() => {
    const fetchCart = async () => {
-      const res = await fetch(`${API_URL}/${USER_ID}`);
+      const res = await fetch(`${API_URL}/cart/${USER_ID}`);
       const data = await res.json();
 
       // FIX: backend may return array OR object
@@ -128,7 +128,7 @@ export default function Cart() {
 
   // ─── INCREASE ───
   const increaseQty = async (item) => {
-    await fetch(`${API_URL}/${item.id}`, {
+    await fetch(`${API_URL}/cart/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ quantity: item.quantity + 1 }),
@@ -141,7 +141,7 @@ export default function Cart() {
   const decreaseQty = async (item) => {
     if (item.quantity <= 1) return;
 
-    await fetch(`${API_URL}/${item.id}`, {
+    await fetch(`${API_URL}/cart/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ quantity: item.quantity - 1 }),
@@ -152,7 +152,7 @@ export default function Cart() {
 
   // ─── REMOVE ───
   const removeFromCart = async (id) => {
-    await fetch(`${API_URL}/${id}`, {
+    await fetch(`${API_URL}/cart/${id}`, {
       method: "DELETE",
     });
 
