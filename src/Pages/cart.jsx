@@ -1,22 +1,11 @@
 import { useEffect, useState } from "react";
-//import { Link } from "react-router-dom";
-
 import { motion, AnimatePresence } from "framer-motion";
-import {
- 
-  Trash2,
-  Plus,
-  Minus,
-  
- 
-  
-} from "lucide-react";
+import { Trash2, Plus, Minus } from "lucide-react";
+
 const API_URL = import.meta.env.VITE_API_URL;
-// ─── API BASE ───
+const USER_ID = 1; // replace with auth later
 
-const USER_ID = 1; // ⚠️ replace with logged-in user id later
-
-// ─── animation variants ───
+// ─── animations ───
 const pageVariants = {
   hidden: { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
@@ -29,12 +18,10 @@ const itemVariants = {
 
 // ─── helper ───
 const fmt = (n) =>
-  Number(n).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+  Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
 
 // ─── CART ITEM ───
 function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
-  //const subtotal = item.price * item.quantity;
-
   return (
     <motion.div
       variants={itemVariants}
@@ -114,19 +101,29 @@ function OrderSummary({ subtotal }) {
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
 
-  // ─── FETCH CART ───
+  // ✅ SAFE FETCH (FIX 404 + STRUCTURE ISSUE)
   const fetchCart = async () => {
-    const res = await fetch(`${API_URL}/${USER_ID}`);
-    const data = await res.json();
-    setCartItems(data || []);
+    try {
+      const res = await fetch(`${API_URL}/${USER_ID}`);
+      const data = await res.json();
+
+      // FIX: backend may return array OR object
+      setCartItems(Array.isArray(data) ? data : data?.data || []);
+    } catch (err) {
+      console.error("Cart fetch error:", err);
+      setCartItems([]);
+    }
   };
 
   useEffect(() => {
-    (async () => {
+   const fetchCart = async () => {
       const res = await fetch(`${API_URL}/${USER_ID}`);
       const data = await res.json();
-      setCartItems(data || []);
-    })();
+
+      // FIX: backend may return array OR object
+      setCartItems(Array.isArray(data) ? data : data?.data || []);
+   }
+    fetchCart();
   }, []);
 
   // ─── INCREASE ───
@@ -162,8 +159,11 @@ export default function Cart() {
     fetchCart();
   };
 
-  const subtotal = cartItems.reduce(
-    (sum, i) => sum + i.price * i.quantity,
+  // ✅ SAFE REDUCE (FIX crash)
+  const safeCart = Array.isArray(cartItems) ? cartItems : [];
+
+  const subtotal = safeCart.reduce(
+    (sum, i) => sum + (i.price || 0) * (i.quantity || 0),
     0
   );
 
@@ -177,7 +177,7 @@ export default function Cart() {
       {/* LEFT CART */}
       <div className="lg:col-span-2 space-y-4">
         <AnimatePresence>
-          {cartItems.map((item) => (
+          {safeCart.map((item) => (
             <CartItemCard
               key={item.id}
               item={item}
