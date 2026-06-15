@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
-import { useAuth } from "../context/useAuth";
-
-const API_URL = import.meta.env.VITE_API_URL;
-// replace with auth later
+//import { useAuth } from "../context/useAuth";
+import { useCart } from "../context/cartcontext";
 
 // ─── animations ───
 const pageVariants = {
@@ -100,54 +98,28 @@ function OrderSummary({ subtotal }) {
 
 // ─── MAIN CART ───
 export default function Cart() {
-  const [cartItems, setCartItems] = useState([]);
-  const { user } = useAuth();
-  const USER_ID = user?.id;
-  const fetchCart = useCallback(async () => {
-    const res = await fetch(`${API_URL}/cart/${USER_ID}`);
-    const data = await res.json();
-    return Array.isArray(data) ? data : data?.data || [];
-  }, [USER_ID]);
+  //const { user } = useAuth();
+  const {
+    cartItems,
+    increaseQty,
+    decreaseQty,
+    removeFromCart,
+   
+    loading,
+  } = useCart();
 
-  useEffect(() => {
-    if (!USER_ID) return;
-    fetchCart().then(setCartItems);
-  }, [USER_ID, fetchCart]);
+  //const USER_ID = user?.id;
 
-  // ─── INCREASE ───
-  const increaseQty = async (item) => {
-    await fetch(`${API_URL}/cart/${item.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ quantity: item.quantity + 1 }),
-    });
-    fetchCart().then(setCartItems);
-  };
+  // safe array
+  //const safeCart = Array.isArray(cartItems) ? cartItems : [];
 
-  // ─── DECREASE ───
-  const decreaseQty = async (item) => {
-    if (item.quantity <= 1) return;
-    await fetch(`${API_URL}/cart/${item.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ quantity: item.quantity - 1 }),
-    });
-    fetchCart().then(setCartItems);
-  };
-
-  // ─── REMOVE ───
-  const removeFromCart = async (id) => {
-    await fetch(`${API_URL}/cart/${id}`, { method: "DELETE" });
-    fetchCart().then(setCartItems);
-  };
-
-  // ✅ SAFE REDUCE (FIX crash)
-  const safeCart = Array.isArray(cartItems) ? cartItems : [];
-
-  const subtotal = safeCart.reduce(
+  // subtotal
+const subtotal = useMemo(() => {
+  return cartItems.reduce(
     (sum, i) => sum + (i.price || 0) * (i.quantity || 0),
-    0,
+    0
   );
+}, [cartItems]);
 
   return (
     <motion.div
@@ -158,8 +130,14 @@ export default function Cart() {
     >
       {/* LEFT CART */}
       <div className="lg:col-span-2 space-y-4">
+        {loading && <p>Loading cart...</p>}
+
+        {!loading && cartItems.length === 0 && (
+          <p className="text-gray-500">Your cart is empty</p>
+        )}
+
         <AnimatePresence>
-          {safeCart.map((item) => (
+          {cartItems.map((item) => (
             <CartItemCard
               key={item.id}
               item={item}
