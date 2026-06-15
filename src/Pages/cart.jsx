@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
 //import { useAuth } from "../context/useAuth";
-import { useCart } from "../context/useCart";
+import  useCart  from "../context/useCart";
 
 // ─── animations ───
 const pageVariants = {
