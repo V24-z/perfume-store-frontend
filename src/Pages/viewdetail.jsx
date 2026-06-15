@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import useCart from "../context/useCart";
+import { useAuth } from "../context/useAuth";
+//import useCart from "../context/useCart";
 import axios from "axios";
 
 function ViewSingleProduct() {
@@ -10,6 +11,8 @@ function ViewSingleProduct() {
   const [wishlisted, setWishlisted] = useState(false);
   //const [addedToCart, setAddedToCart] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
+  const user = useAuth();
+  const USER_ID = user?.id;  
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -29,7 +32,9 @@ function ViewSingleProduct() {
     };
     getProduct();
   }, [id,API_URL]);
-  const { addToCart } = useCart();
+  //const { addToCart } = useCart();
+  
+ 
 
   if (loading) {
     return (
@@ -85,6 +90,28 @@ function ViewSingleProduct() {
             color: "bg-amber-50 text-amber-700",
           }
         : { label: "Out of Stock", color: "bg-red-50 text-red-600" };
+
+
+  //--------------const add to car----------
+  const add_to_cart=async (product)=>{
+    if (!USER_ID) {
+    alert("Please login first");
+    return;
+  }
+
+    try{
+      const {data}=await  axios.post(`${API_URL}/cart/`,{
+        user_id:USER_ID,
+        product_id:product.id,
+        quantity:1,
+        price:product.price
+      })
+       console.log("Added to cart:", data);
+       alert("Product added to cart!");
+  } catch (error) {
+    console.error("Add to cart error:", error?.response?.data || error.message);
+  }
+  }      
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -220,7 +247,7 @@ function ViewSingleProduct() {
               {/* CTA buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={() => addToCart(product)}
+                  onClick={() => add_to_cart(product)}
                   disabled={product.stock_quantity === 0}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-xl text-sm font-medium transition-all duration-150
     ${
