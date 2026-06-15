@@ -45,7 +45,7 @@ export const CartProvider = ({ children }) => {
   
   } ;
    fetchCart();
-  }, []);
+  }, [USER_ID]);
 
   // Add item to cart
   const addToCart = async (product) => {
