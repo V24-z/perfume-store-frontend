@@ -17,10 +17,11 @@ function UserRoutes() {
           <Route path="/" element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="/cart" element={<Cart />} />
         </Route>
         <Route path="/Profile" element={<Profile />} />
         <Route path="/viewdetail/:id" element={<ViewSingleProduct />} />
-        <Route path="/cart" element={<Cart />} />
+        
       </Routes>
     </Suspense>
   );
