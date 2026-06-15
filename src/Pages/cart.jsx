@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 //import { Link } from "react-router-dom";
+
 import { motion, AnimatePresence } from "framer-motion";
 import {
  
@@ -10,9 +11,9 @@ import {
  
   
 } from "lucide-react";
-
+const API_URL = import.meta.env.VITE_API_URL;
 // ─── API BASE ───
-const API = "http://localhost:8000/cart";
+
 const USER_ID = 1; // ⚠️ replace with logged-in user id later
 
 // ─── animation variants ───
@@ -115,14 +116,14 @@ export default function Cart() {
 
   // ─── FETCH CART ───
   const fetchCart = async () => {
-    const res = await fetch(`${API}/${USER_ID}`);
+    const res = await fetch(`${API_URL}/${USER_ID}`);
     const data = await res.json();
     setCartItems(data || []);
   };
 
   useEffect(() => {
     (async () => {
-      const res = await fetch(`${API}/${USER_ID}`);
+      const res = await fetch(`${API_URL}/${USER_ID}`);
       const data = await res.json();
       setCartItems(data || []);
     })();
@@ -130,7 +131,7 @@ export default function Cart() {
 
   // ─── INCREASE ───
   const increaseQty = async (item) => {
-    await fetch(`${API}/${item.id}`, {
+    await fetch(`${API_URL}/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ quantity: item.quantity + 1 }),
@@ -143,7 +144,7 @@ export default function Cart() {
   const decreaseQty = async (item) => {
     if (item.quantity <= 1) return;
 
-    await fetch(`${API}/${item.id}`, {
+    await fetch(`${API_URL}/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ quantity: item.quantity - 1 }),
@@ -154,7 +155,7 @@ export default function Cart() {
 
   // ─── REMOVE ───
   const removeFromCart = async (id) => {
-    await fetch(`${API}/${id}`, {
+    await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
     });
 
