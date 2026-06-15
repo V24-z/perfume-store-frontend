@@ -79,7 +79,7 @@ function User() {
 
   // ── Fetch users from FastAPI ──
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users`)
+    fetch(`${API_BASE_URL}/`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data.data || []);
