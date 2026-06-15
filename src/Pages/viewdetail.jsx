@@ -12,7 +12,7 @@ function ViewSingleProduct() {
   //const [addedToCart, setAddedToCart] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
   const {user} = useAuth();
-  const USER_ID = user?.id;  
+  //const USER_ID = user?.id;  
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -93,26 +93,30 @@ function ViewSingleProduct() {
 
 
   //--------------const add to car----------
-  const add_to_cart=async (product)=>{
-    if (!USER_ID) {
-    alert("Please login first");
-    return;
-  }
+ const add_to_cart = async (product) => {
+  try {
+    if (!user?.id) {
+      alert("Please login first");
+      return;
+    }
 
-    try{
-      const {data}=await  axios.post(`${API_URL}/cart/`,{
-        user_id:USER_ID,
-        product_id:product.id,
-        quantity:1,
-        price:product.price
-      })
-       console.log("Added to cart:", data);
-       alert("Product added to cart!");
+    const payload = {
+      user_id: user.id,
+      product_id: product.id,
+      quantity: 1,
+    };
+
+    const { data } = await axios.post(`${API_URL}/cart/`, payload);
+
+    console.log("Added to cart:", data);
+    alert("Product added to cart!");
   } catch (error) {
-    console.error("Add to cart error:", error?.response?.data || error.message);
+    console.error(
+      "Add to cart error:",
+      error?.response?.data || error.message
+    );
   }
-  }      
-
+};
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top nav / breadcrumb */}
