@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
 import { useAuth } from "../context/useAuth";
 
 const API_URL = import.meta.env.VITE_API_URL;
- // replace with auth later
+// replace with auth later
 
 // ─── animations ───
 const pageVariants = {
@@ -101,32 +101,18 @@ function OrderSummary({ subtotal }) {
 // ─── MAIN CART ───
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
-  const {user}=useAuth();
-  const USER_ID =user?.id ;
-  // ✅ SAFE FETCH (FIX 404 + STRUCTURE ISSUE)
-  const fetchCart = async () => {
-    try {
-      const res = await fetch(`${API_URL}/cart/${USER_ID}`);
-      const data = await res.json();
-
-      // FIX: backend may return array OR object
-      setCartItems(Array.isArray(data) ? data : data?.data || []);
-    } catch (err) {
-      console.error("Cart fetch error:", err);
-      setCartItems([]);
-    }
-  };
+  const { user } = useAuth();
+  const USER_ID = user?.id;
+  const fetchCart = useCallback(async () => {
+    const res = await fetch(`${API_URL}/cart/${USER_ID}`);
+    const data = await res.json();
+    return Array.isArray(data) ? data : data?.data || [];
+  }, [USER_ID]);
 
   useEffect(() => {
-   const fetchCart = async () => {
-      const res = await fetch(`${API_URL}/cart/${USER_ID}`);
-      const data = await res.json();
-
-      // FIX: backend may return array OR object
-      setCartItems(Array.isArray(data) ? data : data?.data || []);
-   }
-    fetchCart();
-  }, [USER_ID]);
+    if (!USER_ID) return;
+    fetchCart().then(setCartItems);
+  }, [USER_ID, fetchCart]);
 
   // ─── INCREASE ───
   const increaseQty = async (item) => {
@@ -135,30 +121,24 @@ export default function Cart() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ quantity: item.quantity + 1 }),
     });
-
-    fetchCart();
+    fetchCart().then(setCartItems);
   };
 
   // ─── DECREASE ───
   const decreaseQty = async (item) => {
     if (item.quantity <= 1) return;
-
     await fetch(`${API_URL}/cart/${item.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ quantity: item.quantity - 1 }),
     });
-
-    fetchCart();
+    fetchCart().then(setCartItems);
   };
 
   // ─── REMOVE ───
   const removeFromCart = async (id) => {
-    await fetch(`${API_URL}/cart/${id}`, {
-      method: "DELETE",
-    });
-
-    fetchCart();
+    await fetch(`${API_URL}/cart/${id}`, { method: "DELETE" });
+    fetchCart().then(setCartItems);
   };
 
   // ✅ SAFE REDUCE (FIX crash)
@@ -166,7 +146,7 @@ export default function Cart() {
 
   const subtotal = safeCart.reduce(
     (sum, i) => sum + (i.price || 0) * (i.quantity || 0),
-    0
+    0,
   );
 
   return (
