@@ -10,6 +10,7 @@ const ViewSingleProduct = lazy(() => import("../Pages/viewdetail.jsx"));
 const Cart = lazy(() => import("../Pages/cart.jsx"));
 const Profile = lazy(() => import("../components/user/Profile.jsx"));
 const Checkout = lazy(()=>import("../Pages/checkout.jsx"))
+const OrderSuccess =lazy(()=>import("../Pages/success_page.jsx"))
 function UserRoutes() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -23,7 +24,10 @@ function UserRoutes() {
           <Route path="/checkout" element={<Checkout/>}/>
         </Route>
         <Route path="/Profile" element={<Profile />} />
-        
+        <Route
+  path="/order-success/:orderId"
+  element={<OrderSuccess />}
+/>
         
       </Routes>
     </Suspense>

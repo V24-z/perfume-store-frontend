@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import useCart from "../hooks/useCart";
+import { useNavigate } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Checkout() {
@@ -8,6 +9,7 @@ function Checkout() {
 
   const [loading, setLoading] = useState(false);
 
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     full_name: "",
     phone: "",
@@ -42,7 +44,7 @@ function Checkout() {
 
       alert(`Order Created: ${response.data.order_id}`);
 
-      // navigate("/order-success");
+      navigate(`/order-success/${response.data.order_id}`);
     } catch (error) {
       console.error(error);
       alert("Checkout failed");
