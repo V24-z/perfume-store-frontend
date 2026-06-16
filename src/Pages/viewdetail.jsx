@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useAuth } from "../context/useAuth";
-//import useCart from "../context/useCart";
+//import { useAuth } from "../context/useAuth";
+import useCart from "../context/useCart";
 import axios from "axios";
 
 function ViewSingleProduct() {
@@ -11,11 +11,12 @@ function ViewSingleProduct() {
   const [wishlisted, setWishlisted] = useState(false);
   //const [addedToCart, setAddedToCart] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
-  const {user} = useAuth();
-  
+  //const {user} = useAuth();
+  const { addToCart } = useCart();
+
   const { id } = useParams();
   const navigate = useNavigate();
-
+  //----get product by id----
   useEffect(() => {
     const getProduct = async () => {
       try {
@@ -30,10 +31,7 @@ function ViewSingleProduct() {
       }
     };
     getProduct();
-  }, [id,API_URL]);
-  //const { addToCart } = useCart();
-  
- 
+  }, [id, API_URL]);
 
   if (loading) {
     return (
@@ -90,31 +88,6 @@ function ViewSingleProduct() {
           }
         : { label: "Out of Stock", color: "bg-red-50 text-red-600" };
 
-
-  //--------------const add to car----------
-const add_to_cart = async (product) => {
-  try {
-    if (!user?.id) {
-      alert("Please login first");
-      return;
-    }
-
-    const { data } = await axios.post(`${API_URL}/cart/`, {
-      user_id: user.id,
-      product_id: product.id,
-      quantity: 1,
-      price: product.price,
-    });
-
-    console.log(data);
-    alert("Product added to cart");
-  } catch (error) {
-    console.error(
-      "Add to cart error:",
-      error.response?.data || error.message
-    );
-  }
-};
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Top nav / breadcrumb */}
@@ -249,7 +222,7 @@ const add_to_cart = async (product) => {
               {/* CTA buttons */}
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={() => add_to_cart(product)}
+                  onClick={() => addToCart(product)}
                   disabled={product.stock_quantity === 0}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-xl text-sm font-medium transition-all duration-150
     ${
