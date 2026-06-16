@@ -3,6 +3,10 @@ import axios from "axios";
 import useCart from "../context/useCart";
 import { useNavigate } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL;
+import {useAuth} from "../context/useAuth"
+
+
+
 
 function Checkout() {
   const { cartItems } = useCart();
@@ -10,6 +14,8 @@ function Checkout() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const USER_ID = user?.id;
   const [formData, setFormData] = useState({
     full_name: "",
     phone: "",
@@ -28,7 +34,7 @@ function Checkout() {
       setLoading(true);
 
       const payload = {
-        user_id: localStorage.getItem("user_id"), // or from auth context
+        user_id: USER_ID, // or from auth context
         items: cartItems.map((item) => ({
           product_id: item.id,
           quantity: item.quantity,
