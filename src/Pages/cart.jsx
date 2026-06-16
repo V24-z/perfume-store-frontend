@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link } from "lucide-react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
 //import { useAuth } from "../context/useAuth";
