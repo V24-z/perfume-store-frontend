@@ -13,32 +13,25 @@ const Profile = lazy(() => import("../components/user/Profile.jsx"));
 const Checkout = lazy(()=>import("../Pages/checkout.jsx"))
 const OrderSuccess =lazy(()=>import("../Pages/success_page.jsx"))
 function UserRoutes() {
-  const dotVariants = {
-    animate: {
-      scale: [1, 1.5, 1],
-      transition: {
-        repeat: Infinity,
-        duration: 0.6
-      }
-    }
-  };
-
+ 
   return (
     <Suspense fallback={ 
-      [0, 1, 2].map((i) => (
-        <motion.div
-          key={i}
-          variants={dotVariants}
-          animate="animate"
-          style={{
-            width: 12,
-            height: 12,
-            borderRadius: "50%",
-            background: "black"
-          }}
-          transition={{ delay: i * 0.2 }}
-        />
-      ))}>
+    <motion.div
+      style={{
+        width: 50,
+        height: 50,
+        border: "5px solid #ccc",
+        borderTop: "5px solid black",
+        borderRadius: "50%",
+        margin: "100px auto"
+      }}
+      animate={{ rotate: 360 }}
+      transition={{
+        repeat: Infinity,
+        duration: 1,
+        ease: "linear"
+      }}
+    />}>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
