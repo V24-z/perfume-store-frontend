@@ -31,22 +31,7 @@ function UserRoutes() {
         duration: 1,
         ease: "linear"
       }}
-    ><motion.div
-      style={{
-        width: 50,
-        height: 50,
-        border: "5px solid #ccc",
-        borderTop: "5px solid black",
-        borderRadius: "50%",
-        margin: "100px auto"
-      }}
-      animate={{ rotate: 360 }}
-      transition={{
-        repeat: Infinity,
-        duration: 1,
-        ease: "linear"
-      }}
-    ></motion.div></motion.div>}>
+    ></motion.div>}>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
