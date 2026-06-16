@@ -34,20 +34,22 @@ export const CartProvider = ({ children }) => {
     }
 
     try {
-      await axios.post(`${API_URL}/cart/`, {
-        user_id: USER_ID,
-        product_id: product.id,
-        quantity: 1,
-        //price: product.price, only if you added price column
-      });
+       const payload = {
+      user_id: USER_ID,
+      product_id: product.id,
+      quantity: 1,
+    };
 
-      await fetchCart();
-    } catch (error) {
-      console.error(
-        "Add to cart error:",
-        error.response?.data || error.message,
-      );
-    }
+    console.log("Sending:", payload);
+
+    await axios.post(`${API_URL}/cart/`, payload);
+
+    await fetchCart();
+  } catch (error) {
+    console.error("Add to cart error:");
+    console.error(error.response?.data);
+    console.error(error);
+  }
   };
 
   // Increase quantity
