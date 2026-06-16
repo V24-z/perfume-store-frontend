@@ -90,10 +90,10 @@ function OrderSummary({ subtotal }) {
         </div>
       </div>
 
-      
-        <Link to="/checkout" className="w-full mt-4 bg-black text-white py-2 rounded-lg">
-        Checkout
-       </Link>
+      <button className="w-full mt-4 bg-black text-white py-2 rounded-lg">
+        <Link to="/checkout">     Checkout</Link>
+    
+      </button>
     </div>
   );
 }
