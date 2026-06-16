@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { Link } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
 //import { useAuth } from "../context/useAuth";
@@ -89,9 +90,10 @@ function OrderSummary({ subtotal }) {
         </div>
       </div>
 
-      <button className="w-full mt-4 bg-black text-white py-2 rounded-lg">
+      
+        <Link to="/checkout" className="w-full mt-4 bg-black text-white py-2 rounded-lg">
         Checkout
-      </button>
+       </Link>
     </div>
   );
 }
