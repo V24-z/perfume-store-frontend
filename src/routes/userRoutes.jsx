@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { motion } from "framer-motion";
 
 
 const Layout = lazy(() => import("../components/layout.jsx"));
@@ -13,7 +14,20 @@ const Checkout = lazy(()=>import("../Pages/checkout.jsx"))
 const OrderSuccess =lazy(()=>import("../Pages/success_page.jsx"))
 function UserRoutes() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={ <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontSize: 20
+      }}
+    >
+      Loading...
+    </motion.div>}>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
