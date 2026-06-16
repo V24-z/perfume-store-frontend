@@ -3,7 +3,7 @@ import { Link } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Trash2, Plus, Minus } from "lucide-react";
 //import { useAuth } from "../context/useAuth";
-import  useCart  from "../context/useCart";
+import useCart from "../context/useCart";
 
 // ─── animations ───
 const pageVariants = {
@@ -90,9 +90,12 @@ function OrderSummary({ subtotal }) {
         </div>
       </div>
 
-     <Link to="/checkout" className="block w-full mt-4 bg-black text-white py-2 rounded-lg text-center">
-  Checkout
-</Link>
+      <Link
+        to="/checkout"
+        className="block w-full mt-4 bg-black text-white py-2 rounded-lg text-center"
+      >
+        Checkout
+      </Link>
     </div>
   );
 }
@@ -105,7 +108,7 @@ export default function Cart() {
     increaseQty,
     decreaseQty,
     removeFromCart,
-   
+
     loading,
   } = useCart();
 
@@ -115,12 +118,12 @@ export default function Cart() {
   //const safeCart = Array.isArray(cartItems) ? cartItems : [];
 
   // subtotal
-const subtotal = useMemo(() => {
-  return cartItems.reduce(
-    (sum, i) => sum + (i.products?.price || 0) * (i.quantity || 0),
-    0
-  );
-}, [cartItems]);
+  const subtotal = useMemo(() => {
+    return cartItems.reduce(
+      (sum, i) => sum + (i.products?.price || 0) * (i.quantity || 0),
+      0,
+    );
+  }, [cartItems]);
 
   return (
     <motion.div
