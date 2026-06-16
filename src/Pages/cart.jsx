@@ -33,7 +33,7 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
 
       <div className="flex-1">
         <h3 className="font-semibold">{item.products?.name}</h3>
-        <p className="text-sm text-gray-500">₹{item.product?.price}</p>
+        <p className="text-sm text-gray-500">₹₹{item.products?.price}</p>
 
         <div className="flex items-center gap-2 mt-2">
           <button onClick={() => onDecrease(item)}>
@@ -116,7 +116,7 @@ export default function Cart() {
   // subtotal
 const subtotal = useMemo(() => {
   return cartItems.reduce(
-    (sum, i) => sum + (i.product?.price || 0) * (i.quantity || 0),
+    (sum, i) => sum + (i.products?.price || 0) * (i.quantity || 0),
     0
   );
 }, [cartItems]);
