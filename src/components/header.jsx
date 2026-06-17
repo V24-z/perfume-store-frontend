@@ -169,40 +169,7 @@ function Header() {
           className="w-[380px] max-w-[95vw] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
         >
           {/* move your existing cart content here */}
-          <AnimatePresence>
-            {cartOpen && (
-              <motion.div
-                ref={cartRef}
-                initial={{
-                  opacity: 0,
-                  y: -10,
-                  scale: 0.95,
-                }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                }}
-                exit={{
-                  opacity: 0,
-                  y: -10,
-                  scale: 0.95,
-                }}
-                transition={{ duration: 0.2 }}
-                className="
-          absolute
-          right-0
-          top-12
-          w-[380px]
-          bg-white
-          rounded-2xl
-          shadow-2xl
-          border
-          border-gray-100
-          overflow-hidden
-          z-[9999]
-        "
-              >
+         
                 <div className="p-4 border-b">
                   <h3 className="font-bold text-lg">Shopping Cart</h3>
 
@@ -346,9 +313,7 @@ function Header() {
                     </div>
                   </>
                 )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          
         </motion.div>
       </AnimatePresence>,
       document.body,
