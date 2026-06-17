@@ -104,7 +104,7 @@ function Checkout() {
         {cartItems.length > 0 ? (
           cartItems.map((item) => (
             <div key={item.id} className="flex justify-between border-b pb-2">
-              <span>{item.name}</span>
+              <span>{item.products?.name}</span>
               <span>× {item.quantity}</span>
             </div>
           ))
