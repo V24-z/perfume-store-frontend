@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { usecartAnimation } from "../context/usecartAnimation.jsx";
 import Navbar from "./Navbar";
 
 function Header() {
@@ -16,6 +17,7 @@ function Header() {
     top: 0,
     right: 0,
   });
+  const { setCartPosition } = usecartAnimation();
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
@@ -134,6 +136,10 @@ function Header() {
         top: rect.bottom + 12,
         right: window.innerWidth - rect.right,
       });
+       setCartPosition({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    });
     }
 
     setCartOpen((prev) => !prev);
