@@ -225,22 +225,34 @@ function ViewSingleProduct() {
                   onClick={() => addToCart(product)}
                   disabled={product.stock_quantity === 0}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-xl text-sm font-medium transition-all duration-150
-    ${
-      product.stock_quantity === 0
-        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-        : "bg-[#534AB7] text-white hover:bg-[#443da0]"
-    }`}
+                ${
+                  product.stock_quantity === 0
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-[#534AB7] text-white hover:bg-[#443da0]"
+                }`}
                 >
                   Add To Cart
                 </button>
                 <button
+                  onClick={async () => {
+                    try {
+                      // Add product to cart
+                      await addToCart(product);
+
+                      // Redirect to checkout page
+                      navigate("/checkout");
+                    } catch (error) {
+                      console.error("Buy Now Error:", error);
+                      alert("Failed to proceed to checkout");
+                    }
+                  }}
                   disabled={product.stock_quantity === 0}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-5 rounded-xl text-sm font-medium border transition-all duration-150
-                    ${
-                      product.stock_quantity === 0
-                        ? "border-gray-100 text-gray-300 cursor-not-allowed"
-                        : "border-gray-200 text-gray-800 hover:bg-gray-50 active:scale-[0.98]"
-                    }`}
+                ${
+                  product.stock_quantity === 0
+                    ? "border-gray-100 text-gray-300 cursor-not-allowed"
+                    : "border-gray-200 text-gray-800 hover:bg-gray-50 active:scale-[0.98]"
+                }`}
                 >
                   <svg
                     className="w-4 h-4"
@@ -255,7 +267,7 @@ function ViewSingleProduct() {
                       d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
                     />
                   </svg>
-                  Buy now
+                  Buy Now
                 </button>
               </div>
 

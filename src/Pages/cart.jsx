@@ -57,18 +57,18 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
 }
 
 // ─── ORDER SUMMARY ───
-function OrderSummary({ subtotal }) {
+function OrderSummary({ subtotal, itemCount }) {
   const shipping = subtotal > 1999 ? 0 : 199;
   const tax = Math.round(subtotal * 0.18);
   const total = subtotal + shipping + tax;
 
   return (
-    <div className="bg-white border rounded-xl p-5">
-      <h2 className="font-bold mb-4">Order Summary</h2>
+    <div className="bg-white border rounded-xl p-5 sticky top-4">
+      <h2 className="font-bold text-lg mb-4">Order Summary</h2>
 
-      <div className="space-y-2 text-sm">
+      <div className="space-y-3 text-sm">
         <div className="flex justify-between">
-          <span>Subtotal</span>
+          <span>Items ({itemCount})</span>
           <span>₹{fmt(subtotal)}</span>
         </div>
 
@@ -78,13 +78,13 @@ function OrderSummary({ subtotal }) {
         </div>
 
         <div className="flex justify-between">
-          <span>Tax</span>
+          <span>GST (18%)</span>
           <span>₹{fmt(tax)}</span>
         </div>
 
         <hr />
 
-        <div className="flex justify-between font-bold">
+        <div className="flex justify-between font-bold text-base">
           <span>Total</span>
           <span>₹{fmt(total)}</span>
         </div>
@@ -92,9 +92,14 @@ function OrderSummary({ subtotal }) {
 
       <Link
         to="/checkout"
-        className="block w-full mt-4 bg-black text-white py-2 rounded-lg text-center"
+        className={`block w-full mt-5 py-3 rounded-lg text-center font-medium transition
+          ${
+            itemCount === 0
+              ? "bg-gray-300 text-gray-500 pointer-events-none"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
       >
-        Checkout
+        Proceed to Checkout
       </Link>
     </div>
   );
@@ -154,7 +159,7 @@ export default function Cart() {
       </div>
 
       {/* RIGHT SUMMARY */}
-      <OrderSummary subtotal={subtotal} />
+      <OrderSummary subtotal={subtotal} itemCount={cartItems.length} />
     </motion.div>
   );
 }
