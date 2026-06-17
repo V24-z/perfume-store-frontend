@@ -169,6 +169,186 @@ function Header() {
           className="w-[380px] max-w-[95vw] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
         >
           {/* move your existing cart content here */}
+          <AnimatePresence>
+            {cartOpen && (
+              <motion.div
+                ref={cartRef}
+                initial={{
+                  opacity: 0,
+                  y: -10,
+                  scale: 0.95,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  scale: 1,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -10,
+                  scale: 0.95,
+                }}
+                transition={{ duration: 0.2 }}
+                className="
+          absolute
+          right-0
+          top-12
+          w-[380px]
+          bg-white
+          rounded-2xl
+          shadow-2xl
+          border
+          border-gray-100
+          overflow-hidden
+          z-[9999]
+        "
+              >
+                <div className="p-4 border-b">
+                  <h3 className="font-bold text-lg">Shopping Cart</h3>
+
+                  <p className="text-sm text-gray-500">
+                    {cartItems.length} item(s)
+                  </p>
+                </div>
+
+                {cartItems.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <div className="text-4xl mb-3">🛒</div>
+
+                    <p className="text-gray-500">Your cart is empty</p>
+
+                    <Link
+                      to="/"
+                      className="
+                inline-block
+                mt-4
+                bg-black
+                text-white
+                px-5
+                py-2
+                rounded-lg
+              "
+                    >
+                      Continue Shopping
+                    </Link>
+                  </div>
+                ) : (
+                  <>
+                    <div className="max-h-[350px] overflow-y-auto">
+                      {cartItems.slice(0, 5).map((item) => (
+                        <div
+                          key={item.id}
+                          className="
+                      flex
+                      gap-3
+                      p-4
+                      border-b
+                    "
+                        >
+                          <img
+                            src={item.products?.image_url}
+                            alt=""
+                            className="
+                        w-16
+                        h-16
+                        rounded-lg
+                        object-cover
+                      "
+                          />
+
+                          <div className="flex-1">
+                            <h4
+                              className="
+                        text-sm
+                        font-medium
+                        line-clamp-1
+                      "
+                            >
+                              {item.products?.name}
+                            </h4>
+
+                            <p className="text-xs text-gray-500 mt-1">
+                              Qty: {item.quantity}
+                            </p>
+
+                            <p className="font-semibold mt-1">
+                              ₹{(item.products?.price || 0) * item.quantity}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* FREE SHIPPING */}
+                    <div className="px-4 pt-4">
+                      {subtotal < 1999 ? (
+                        <>
+                          <p className="text-xs text-gray-600 mb-2">
+                            Add ₹{1999 - subtotal} more for FREE shipping
+                          </p>
+
+                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-green-500"
+                              style={{
+                                width: `${Math.min(
+                                  (subtotal / 1999) * 100,
+                                  100,
+                                )}%`,
+                              }}
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <p className="text-green-600 text-sm font-medium">
+                          🎉 Free Shipping Unlocked
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="p-4 bg-gray-50 border-t mt-4">
+                      <div className="flex justify-between font-semibold mb-4">
+                        <span>Subtotal</span>
+
+                        <span>₹{subtotal}</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <Link
+                          to="/cart"
+                          onClick={() => setCartOpen(false)}
+                          className="
+                    text-center
+                    border
+                    py-2.5
+                    rounded-lg
+                    font-medium
+                  "
+                        >
+                          View Cart
+                        </Link>
+
+                        <Link
+                          to="/checkout"
+                          onClick={() => setCartOpen(false)}
+                          className="
+                    text-center
+                    bg-black
+                    text-white
+                    py-2.5
+                    rounded-lg
+                    font-medium
+                  "
+                        >
+                          Checkout
+                        </Link>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </AnimatePresence>,
       document.body,
@@ -373,188 +553,6 @@ function Header() {
                     {cartItems.length}
                   </span>
                 </button>
-                <AnimatePresence>
-                  {cartOpen && (
-                    <motion.div
-                      ref={cartRef}
-                      initial={{
-                        opacity: 0,
-                        y: -10,
-                        scale: 0.95,
-                      }}
-                      animate={{
-                        opacity: 1,
-                        y: 0,
-                        scale: 1,
-                      }}
-                      exit={{
-                        opacity: 0,
-                        y: -10,
-                        scale: 0.95,
-                      }}
-                      transition={{ duration: 0.2 }}
-                      className="
-          absolute
-          right-0
-          top-12
-          w-[380px]
-          bg-white
-          rounded-2xl
-          shadow-2xl
-          border
-          border-gray-100
-          overflow-hidden
-          z-[9999]
-        "
-                    >
-                      <div className="p-4 border-b">
-                        <h3 className="font-bold text-lg">Shopping Cart</h3>
-
-                        <p className="text-sm text-gray-500">
-                          {cartItems.length} item(s)
-                        </p>
-                      </div>
-
-                      {cartItems.length === 0 ? (
-                        <div className="p-8 text-center">
-                          <div className="text-4xl mb-3">🛒</div>
-
-                          <p className="text-gray-500">Your cart is empty</p>
-
-                          <Link
-                            to="/"
-                            className="
-                inline-block
-                mt-4
-                bg-black
-                text-white
-                px-5
-                py-2
-                rounded-lg
-              "
-                          >
-                            Continue Shopping
-                          </Link>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="max-h-[350px] overflow-y-auto">
-                            {cartItems.slice(0, 5).map((item) => (
-                              <div
-                                key={item.id}
-                                className="
-                      flex
-                      gap-3
-                      p-4
-                      border-b
-                    "
-                              >
-                                <img
-                                  src={item.products?.image_url}
-                                  alt=""
-                                  className="
-                        w-16
-                        h-16
-                        rounded-lg
-                        object-cover
-                      "
-                                />
-
-                                <div className="flex-1">
-                                  <h4
-                                    className="
-                        text-sm
-                        font-medium
-                        line-clamp-1
-                      "
-                                  >
-                                    {item.products?.name}
-                                  </h4>
-
-                                  <p className="text-xs text-gray-500 mt-1">
-                                    Qty: {item.quantity}
-                                  </p>
-
-                                  <p className="font-semibold mt-1">
-                                    ₹
-                                    {(item.products?.price || 0) *
-                                      item.quantity}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* FREE SHIPPING */}
-                          <div className="px-4 pt-4">
-                            {subtotal < 1999 ? (
-                              <>
-                                <p className="text-xs text-gray-600 mb-2">
-                                  Add ₹{1999 - subtotal} more for FREE shipping
-                                </p>
-
-                                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-green-500"
-                                    style={{
-                                      width: `${Math.min(
-                                        (subtotal / 1999) * 100,
-                                        100,
-                                      )}%`,
-                                    }}
-                                  />
-                                </div>
-                              </>
-                            ) : (
-                              <p className="text-green-600 text-sm font-medium">
-                                🎉 Free Shipping Unlocked
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="p-4 bg-gray-50 border-t mt-4">
-                            <div className="flex justify-between font-semibold mb-4">
-                              <span>Subtotal</span>
-
-                              <span>₹{subtotal}</span>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2">
-                              <Link
-                                to="/cart"
-                                onClick={() => setCartOpen(false)}
-                                className="
-                    text-center
-                    border
-                    py-2.5
-                    rounded-lg
-                    font-medium
-                  "
-                              >
-                                View Cart
-                              </Link>
-
-                              <Link
-                                to="/checkout"
-                                onClick={() => setCartOpen(false)}
-                                className="
-                    text-center
-                    bg-black
-                    text-white
-                    py-2.5
-                    rounded-lg
-                    font-medium
-                  "
-                              >
-                                Checkout
-                              </Link>
-                            </div>
-                          </div>
-                        </>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
 
               {/* Auth */}
