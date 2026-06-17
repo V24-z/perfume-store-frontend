@@ -12,6 +12,10 @@ function Header() {
   const [cartOpen, setCartOpen] = useState(false);
   const cartRef = useRef(null);
   const cartButtonRef = useRef(null);
+  const [cartPos, setCartPos] = useState({
+    top: 0,
+    right: 0,
+  });
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
@@ -39,12 +43,13 @@ function Header() {
       if (!clickedCart) {
         setCartOpen(false);
       }
-      {
-        setDropdownOpen(false);
-      }
     };
+
     document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+
+    return () => {
+      document.removeEventListener("mousedown", handler);
+    };
   }, []);
 
   const handleToggle = () => {
@@ -121,6 +126,53 @@ function Header() {
       document.body,
     );
 
+  const handleCartToggle = () => {
+    if (!cartOpen && cartButtonRef.current) {
+      const rect = cartButtonRef.current.getBoundingClientRect();
+
+      setCartPos({
+        top: rect.bottom + 12,
+        right: window.innerWidth - rect.right,
+      });
+    }
+
+    setCartOpen((prev) => !prev);
+  };
+  const cartDropdown =
+    cartOpen &&
+    createPortal(
+      <AnimatePresence>
+        <motion.div
+          ref={cartRef}
+          initial={{
+            opacity: 0,
+            y: -10,
+            scale: 0.95,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            scale: 1,
+          }}
+          exit={{
+            opacity: 0,
+            y: -10,
+            scale: 0.95,
+          }}
+          transition={{ duration: 0.2 }}
+          style={{
+            position: "fixed",
+            top: cartPos.top,
+            right: cartPos.right,
+            zIndex: 999999,
+          }}
+          className="w-[380px] max-w-[95vw] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+        >
+          {/* move your existing cart content here */}
+        </motion.div>
+      </AnimatePresence>,
+      document.body,
+    );
   const formatDate = (dateString) => {
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString("en-IN", {
@@ -289,7 +341,7 @@ function Header() {
               <div className="relative">
                 <button
                   ref={cartButtonRef}
-                  onClick={() => setCartOpen(!cartOpen)}
+                  onClick={handleCartToggle}
                   className="relative w-9 h-9 rounded-full flex items-center justify-center transition cursor-pointer"
                   style={{
                     background: "rgba(255,255,255,0.10)",
@@ -321,7 +373,6 @@ function Header() {
                     {cartItems.length}
                   </span>
                 </button>
-
                 <AnimatePresence>
                   {cartOpen && (
                     <motion.div
@@ -552,6 +603,7 @@ function Header() {
 
       {/* Portal dropdown */}
       {dropdown}
+      {cartDropdown}
     </>
   );
 }
