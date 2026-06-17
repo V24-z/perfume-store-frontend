@@ -79,13 +79,13 @@ function Home() {
     };
   }, [current, banners.length, isPaused]);
 
-  const goTo = useCallback(
-    (i) => {
-      setDirection(i > current ? "next" : "prev");
-      setCurrent(i);
-    },
-    [current],
-  );
+  //const goTo = useCallback(
+  //  (i) => {
+   //   setDirection(i > current ? "next" : "prev");
+   //   setCurrent(i);
+   // },
+    //[current],
+  //);
 
   const goPrev = useCallback(() => {
     setDirection("prev");
@@ -399,7 +399,7 @@ function Home() {
                   </>
                 )}
 
-                {/* Dot indicators */}
+                {/* Dot indicators 
                 {banners.length > 1 && (
                   <div
                     role="tablist"
@@ -428,7 +428,7 @@ function Home() {
                       />
                     ))}
                   </div>
-                )}
+                )}*/}
 
                 {/* Progress bar */}
                 <div
@@ -441,7 +441,7 @@ function Home() {
                 />
               </div>
 
-              {/* Thumbnail strip — sm+ only */}
+              {/* Thumbnail strip — sm+ only 
               {banners.length > 1 && (
                 <div
                   role="list"
@@ -493,9 +493,9 @@ function Home() {
                     </button>
                   ))}
                 </div>
-              )}
+              )}*/}
 
-              {/* Mobile dot strip — xs only */}
+              {/* Mobile dot strip — xs only 
               {banners.length > 1 && (
                 <div className="flex sm:hidden gap-1.5 justify-center pt-1">
                   {banners.map((_, i) => (
@@ -512,7 +512,7 @@ function Home() {
                     />
                   ))}
                 </div>
-              )}
+              )}*/}
             </div>
           )}
         </section>
