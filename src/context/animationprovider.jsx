@@ -1,6 +1,6 @@
-import { createContext,useState } from "react";
+import {useState } from "react";
+import {CartAnimationContext} from './cart_animation_context'
 
-const CartAnimationContext = createContext();
 
 export const CartAnimationProvider = ({ children }) => {
   const [cartPosition, setCartPosition] = useState(null);
