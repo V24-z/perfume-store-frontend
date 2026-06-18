@@ -431,19 +431,7 @@ function Header() {
             </Link>
 
             {/* Search bar */}
-            <div
-              className="hidden lg:flex items-center gap-2 rounded-full px-4 py-2 cursor-pointer transition-all w-56 lg:w-72"
-              style={{
-                background: "rgba(255,255,255,0.10)",
-                border: "1px solid rgba(255,255,255,0.20)",
-              }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(255,255,255,0.15)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "rgba(255,255,255,0.10)")
-              }
-            >
+            <div>
               
                <SearchBar/>
              

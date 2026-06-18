@@ -1,5 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { ShoppingCart } from "lucide-react";
+import { useRef } from "react";
+import { animate } from "motion";
+import useCart from "../context/useCart";
+import useCartAnimation from "../context/usecartAnimation";
 const API_URL = import.meta.env.VITE_API_URL;
 
 import { Link } from "react-router-dom";
@@ -12,13 +17,56 @@ function Home() {
   const [isPaused, setIsPaused] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
+  const { addToCart } = useCart();
+  const { cartPosition } = useCartAnimation();
 
+  const imageRefs = useRef({});
+
+  //==fly to cart animation==
+  const flyToCart = (productId) => {
+    const img = imageRefs.current[productId];
+
+    if (!img || !cartPosition) return;
+
+    const rect = img.getBoundingClientRect();
+
+    const clone = img.cloneNode(true);
+
+    clone.style.position = "fixed";
+    clone.style.left = `${rect.left}px`;
+    clone.style.top = `${rect.top}px`;
+    clone.style.width = `${rect.width}px`;
+    clone.style.height = `${rect.height}px`;
+    clone.style.zIndex = "999999";
+    clone.style.pointerEvents = "none";
+
+    document.body.appendChild(clone);
+
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+
+    const dx = cartPosition.x - startX;
+    const dy = cartPosition.y - startY;
+
+    animate(
+      clone,
+      {
+        x: [0, dx],
+        y: [0, dy],
+        scale: [1, 0.8, 0.3],
+        opacity: [1, 1, 0],
+      },
+      {
+        duration: 0.8,
+        easing: "ease-in-out",
+        onComplete: () => clone.remove(),
+      },
+    );
+  };
   useEffect(() => {
     const fetchNewArrivals = async () => {
       try {
-        const res = await axios.get(
-          `${API_URL}/products/new-arrivals`,
-        );
+        const res = await axios.get(`${API_URL}/products/new-arrivals`);
         setNewArrivals(res.data);
       } catch (err) {
         console.error(err);
@@ -81,10 +129,10 @@ function Home() {
 
   //const goTo = useCallback(
   //  (i) => {
-   //   setDirection(i > current ? "next" : "prev");
-   //   setCurrent(i);
-   // },
-    //[current],
+  //   setDirection(i > current ? "next" : "prev");
+  //   setCurrent(i);
+  // },
+  //[current],
   //);
 
   const goPrev = useCallback(() => {
@@ -543,6 +591,7 @@ function Home() {
                 >
                   <div className="relative h-36 sm:h-44 md:h-52 lg:h-60 xl:h-64 bg-slate-100">
                     <img
+                      ref={(el) => (imageRefs.current[product.id] = el)}
                       src={product.image_url}
                       alt={product.name}
                       className="w-full h-full object-cover"
@@ -584,13 +633,23 @@ function Home() {
                         </span>
                       )}
                     </div>
-                    <button
-                      className="w-full mt-3 m sm:mt-4 py-3 sm:py-2 rounded-xl text-white font-semibold
-                                       text-xs sm:text-sm bg-[#534AB7] hover:bg-[#443da0] transition-colors duration-200"
-                    >
-                      <Link to={`/viewdetail/${product.id}`}>
-                      View Detail</Link>
-                    </button>
+                    <div className="flex gap-2 mt-4">
+                      <button
+                        onClick={() => {
+                          flyToCart(product.id);
+                          addToCart(product);
+                        }}
+                        className="w-12 h-12 flex items-center justify-center rounded-xl bg-purple-100 text-[#534AB7] hover:bg-purple-200 transition"
+                      >
+                        <ShoppingCart size={20} />
+                      </button>
+
+                      <Link to={`/viewdetail/${product.id}`} className="flex-1">
+                        <button className="w-full h-12 rounded-xl bg-[#534AB7] text-white font-semibold hover:bg-[#443da0] transition">
+                          View Detail
+                        </button>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               ))}
