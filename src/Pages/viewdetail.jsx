@@ -3,13 +3,14 @@ import { useState, useEffect, useRef } from "react";
 import useCart from "../context/useCart";
 import axios from "axios";
 import { animate, arc } from "motion";
+import { usecartAnimation } from "../context/usecartAnimation";
 
 function ViewSingleProduct() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [wishlisted, setWishlisted] = useState(false);
-
+  const { cartPosition } = usecartAnimation();
   const API_URL = import.meta.env.VITE_API_URL;
   const { addToCart } = useCart();
 
@@ -68,25 +69,30 @@ function ViewSingleProduct() {
       : { label: "Out of Stock", color: "bg-red-50 text-red-600" };
 
   // ─── ANIMATION FUNCTION ───
+  
   const flyToCart = () => {
-    if (!imgRef.current) return;
+  if (!imgRef.current || !cartPosition) return;
 
-    animate(
-      imgRef.current,
-      {
-        x: [0, 120, 260],
-        y: [0, -80, -220],
-        scale: [1, 0.85, 0.2],
-        opacity: [1, 1, 0],
-      },
-      {
-        duration: 0.8,
-        easing: "ease-in-out",
-        path: arc({ curvature: -0.6 }),
-      }
-    );
-  };
+  const rect = imgRef.current.getBoundingClientRect();
 
+  const dx = cartPosition.x - rect.left;
+  const dy = cartPosition.y - rect.top;
+
+  animate(
+    imgRef.current,
+    {
+      x: [0, dx * 0.6, dx],
+      y: [0, dy * 0.6, dy],
+      scale: [1, 0.7, 0.2],
+      opacity: [1, 1, 0],
+    },
+    {
+      duration: 0.9,
+      easing: "ease-in-out",
+      path: arc({ curvature: -0.8 }),
+    }
+  );
+};
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ─── BREADCRUMB ─── */}
