@@ -3,14 +3,14 @@ import { useState, useEffect, useRef } from "react";
 import useCart from "../context/useCart";
 import axios from "axios";
 import { animate, arc } from "motion";
-import { usecartAnimation } from "../context/usecartAnimation";
+import { useCartAnimation } from "../context/usecartAnimation";
 
 function ViewSingleProduct() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [wishlisted, setWishlisted] = useState(false);
-  const { cartPosition } = usecartAnimation();
+  const { cartPosition } = useCartAnimation();
   const API_URL = import.meta.env.VITE_API_URL;
   const { addToCart } = useCart();
 

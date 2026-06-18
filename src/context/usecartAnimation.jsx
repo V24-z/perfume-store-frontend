@@ -1,4 +1,4 @@
-import { useContext,  } from "react";
+import { useContext } from "react";
 import CartAnimationContext from './cart_animation_context'
 
 //export const useCartAnimation = () => useContext(CartAnimationContext);
