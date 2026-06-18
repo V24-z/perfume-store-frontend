@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useCartAnimation } from "../context/usecartAnimation";
+import useCartAnimation  from "../context/usecartAnimation";
 import Navbar from "./Navbar";
 
 function Header() {

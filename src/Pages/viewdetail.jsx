@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import useCart from "../context/useCart";
 import axios from "axios";
 import { animate, arc } from "motion";
-import { useCartAnimation } from "../context/usecartAnimation";
+import useCartAnimation from "../context/usecartAnimation";
 
 function ViewSingleProduct() {
   const [product, setProduct] = useState(null);
