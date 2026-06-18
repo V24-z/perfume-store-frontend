@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import useCart from "../context/useCart";
 import axios from "axios";
-import { animate, arc } from "motion";
+import { animate} from "motion";
 import useCartAnimation from "../context/usecartAnimation";
 
 function ViewSingleProduct() {
@@ -62,37 +62,54 @@ function ViewSingleProduct() {
     product.stock_quantity > 10
       ? { label: "In Stock", color: "bg-green-50 text-green-700" }
       : product.stock_quantity > 0
-      ? {
-          label: `Only ${product.stock_quantity} left`,
-          color: "bg-amber-50 text-amber-700",
-        }
-      : { label: "Out of Stock", color: "bg-red-50 text-red-600" };
+        ? {
+            label: `Only ${product.stock_quantity} left`,
+            color: "bg-amber-50 text-amber-700",
+          }
+        : { label: "Out of Stock", color: "bg-red-50 text-red-600" };
 
   // ─── ANIMATION FUNCTION ───
-  
+
   const flyToCart = () => {
-  if (!imgRef.current || !cartPosition) return;
+    console.log("cartPosition:", cartPosition);
 
-  const rect = imgRef.current.getBoundingClientRect();
+    if (!imgRef.current || !cartPosition) {
+      console.log("Animation blocked");
+      return;
+    }
 
-  const dx = cartPosition.x - rect.left;
-  const dy = cartPosition.y - rect.top;
+    const img = imgRef.current;
+  const rect = img.getBoundingClientRect();
+
+  const clone = img.cloneNode(true);
+
+  clone.style.position = "fixed";
+  clone.style.left = `${rect.left}px`;
+  clone.style.top = `${rect.top}px`;
+  clone.style.width = `${rect.width}px`;
+  clone.style.height = `${rect.height}px`;
+  clone.style.zIndex = "9999";
+  clone.style.pointerEvents = "none";
+
+  document.body.appendChild(clone);
 
   animate(
-    imgRef.current,
+    clone,
     {
-      x: [0, dx * 0.6, dx],
-      y: [0, dy * 0.6, dy],
+      x: cartPosition.x - rect.left,
+      y: cartPosition.y - rect.top,
       scale: [1, 0.7, 0.2],
       opacity: [1, 1, 0],
     },
     {
-      duration: 0.9,
+      duration: 0.8,
       easing: "ease-in-out",
-      path: arc({ curvature: -0.8 }),
+      onComplete: () => {
+        clone.remove();
+      },
     }
   );
-};
+  };
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ─── BREADCRUMB ─── */}
@@ -106,7 +123,6 @@ function ViewSingleProduct() {
       {/* ─── MAIN ─── */}
       <div className="max-w-6xl mx-auto p-6">
         <div className="grid md:grid-cols-2 gap-10 bg-white p-6 rounded-2xl">
-
           {/* ─── IMAGE ─── */}
           <div className="flex justify-center items-center bg-gray-50 rounded-xl p-6 relative">
             <img
@@ -130,9 +146,7 @@ function ViewSingleProduct() {
             <h1 className="text-2xl font-semibold">{product.name}</h1>
             <p className="text-gray-500">{product.brand}</p>
 
-            <p className="text-3xl font-bold mt-4">
-              ₹{product.price}
-            </p>
+            <p className="text-3xl font-bold mt-4">₹{product.price}</p>
 
             <span
               className={`inline-block mt-2 px-3 py-1 rounded-full text-xs ${stockStatus.color}`}
@@ -140,15 +154,13 @@ function ViewSingleProduct() {
               {stockStatus.label}
             </span>
 
-            <p className="mt-6 text-gray-600">
-              {product.description}
-            </p>
+            <p className="mt-6 text-gray-600">{product.description}</p>
 
             {/* ─── BUTTONS ─── */}
             <div className="mt-8 flex gap-4">
               <button
                 onClick={() => {
-                  flyToCart();      // 🔥 animation
+                  flyToCart(); // 🔥 animation
                   addToCart(product);
                 }}
                 disabled={product.stock_quantity === 0}

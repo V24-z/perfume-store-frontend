@@ -17,13 +17,28 @@ function Header() {
     top: 0,
     right: 0,
   });
-  const { setCartPosition } = useCartAnimation();
+  //const { setCartPosition } = useCartAnimation();
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
   const navigate = useNavigate();
+
+const { setCartPosition } = useCartAnimation();
+
+useEffect(() => {
+  if (cartButtonRef.current) {
+    const rect = cartButtonRef.current.getBoundingClientRect();
+
+    setCartPosition({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    });
+  }
+}, [setCartPosition]);
+
+
   const subtotal = cartItems.reduce(
     (sum, item) => sum + (item.products?.price || 0) * (item.quantity || 0),
     0,
