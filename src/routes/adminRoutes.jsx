@@ -17,6 +17,7 @@ const Users =lazy(()=>import('../admin/pages/Users.jsx'));
 const Category =lazy(()=>import('../admin/pages/category.jsx'));
 const  AdminRoute=lazy(()=>import('./adminroute.jsx'));
 const AdminCart =lazy(()=>import('../admin/pages/Cart_admin.jsx'))
+const Orders =lazy(()=>import('../admin/pages/orders.jsx'))
 
 const AdminRoutes = () => {
   
@@ -36,9 +37,10 @@ const AdminRoutes = () => {
         <Route path="users" element={<Users />} /> 
         <Route path="Banner" element={<Banner />}/>     
           <Route path="category" element={<Category />}/>      
-        <Route path="cart_admin" element={<AdminCart />}/>       {/* /admin/users */}
+        <Route path="cart_admin" element={<AdminCart />}/>      
+         <Route path="orders" element={<Orders />}/>      
 
-  {/* /admin/users */}
+
       </Route>
     </Routes>
     </Suspense>
