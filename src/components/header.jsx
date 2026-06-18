@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import useCartAnimation  from "../context/usecartAnimation";
+import useCartAnimation from "../context/usecartAnimation";
 import Navbar from "./Navbar";
 
 function Header() {
@@ -25,19 +25,33 @@ function Header() {
   const buttonRef = useRef(null);
   const navigate = useNavigate();
 
-const { setCartPosition } = useCartAnimation();
+  const { setCartPosition } = useCartAnimation();
 
-useEffect(() => {
-  if (cartButtonRef.current) {
-    const rect = cartButtonRef.current.getBoundingClientRect();
+  // ===========================
+  // SAVE CART ICON POSITION
+  // ===========================
+  useEffect(() => {
+    const updateCartPosition = () => {
+      if (!cartButtonRef.current) return;
 
-    setCartPosition({
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-    });
-  }
-}, [setCartPosition]);
+      const rect = cartButtonRef.current.getBoundingClientRect();
 
+      setCartPosition({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      });
+    };
+
+    updateCartPosition();
+
+    window.addEventListener("resize", updateCartPosition);
+    window.addEventListener("scroll", updateCartPosition);
+
+    return () => {
+      window.removeEventListener("resize", updateCartPosition);
+      window.removeEventListener("scroll", updateCartPosition);
+    };
+  }, [setCartPosition]);
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + (item.products?.price || 0) * (item.quantity || 0),
@@ -151,10 +165,7 @@ useEffect(() => {
         top: rect.bottom + 12,
         right: window.innerWidth - rect.right,
       });
-       setCartPosition({
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-    });
+      
     }
 
     setCartOpen((prev) => !prev);
@@ -190,24 +201,22 @@ useEffect(() => {
           className="w-[380px] max-w-[95vw] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
         >
           {/* move your existing cart content here */}
-         
-                <div className="p-4 border-b">
-                  <h3 className="font-bold text-lg">Shopping Cart</h3>
 
-                  <p className="text-sm text-gray-500">
-                    {cartItems.length} item(s)
-                  </p>
-                </div>
+          <div className="p-4 border-b">
+            <h3 className="font-bold text-lg">Shopping Cart</h3>
 
-                {cartItems.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <div className="text-4xl mb-3">🛒</div>
+            <p className="text-sm text-gray-500">{cartItems.length} item(s)</p>
+          </div>
 
-                    <p className="text-gray-500">Your cart is empty</p>
+          {cartItems.length === 0 ? (
+            <div className="p-8 text-center">
+              <div className="text-4xl mb-3">🛒</div>
 
-                    <Link
-                      to="/"
-                      className="
+              <p className="text-gray-500">Your cart is empty</p>
+
+              <Link
+                to="/"
+                className="
                 inline-block
                 mt-4
                 bg-black
@@ -216,110 +225,107 @@ useEffect(() => {
                 py-2
                 rounded-lg
               "
-                    >
-                      Continue Shopping
-                    </Link>
-                  </div>
-                ) : (
-                  <>
-                    <div className="max-h-[350px] overflow-y-auto">
-                      {cartItems.slice(0, 5).map((item) => (
-                        <div
-                          key={item.id}
-                          className="
+              >
+                Continue Shopping
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="max-h-[350px] overflow-y-auto">
+                {cartItems.slice(0, 5).map((item) => (
+                  <div
+                    key={item.id}
+                    className="
                       flex
                       gap-3
                       p-4
                       border-b
                     "
-                        >
-                          <img
-                            src={item.products?.image_url}
-                            alt=""
-                            className="
+                  >
+                    <img
+                      src={item.products?.image_url}
+                      alt=""
+                      className="
                         w-16
                         h-16
                         rounded-lg
                         object-cover
                       "
-                          />
+                    />
 
-                          <div className="flex-1">
-                            <h4
-                              className="
+                    <div className="flex-1">
+                      <h4
+                        className="
                         text-sm
                         font-medium
                         line-clamp-1
                       "
-                            >
-                              {item.products?.name}
-                            </h4>
+                      >
+                        {item.products?.name}
+                      </h4>
 
-                            <p className="text-xs text-gray-500 mt-1">
-                              Qty: {item.quantity}
-                            </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Qty: {item.quantity}
+                      </p>
 
-                            <p className="font-semibold mt-1">
-                              ₹{(item.products?.price || 0) * item.quantity}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                      <p className="font-semibold mt-1">
+                        ₹{(item.products?.price || 0) * item.quantity}
+                      </p>
                     </div>
+                  </div>
+                ))}
+              </div>
 
-                    {/* FREE SHIPPING */}
-                    <div className="px-4 pt-4">
-                      {subtotal < 1999 ? (
-                        <>
-                          <p className="text-xs text-gray-600 mb-2">
-                            Add ₹{1999 - subtotal} more for FREE shipping
-                          </p>
+              {/* FREE SHIPPING */}
+              <div className="px-4 pt-4">
+                {subtotal < 1999 ? (
+                  <>
+                    <p className="text-xs text-gray-600 mb-2">
+                      Add ₹{1999 - subtotal} more for FREE shipping
+                    </p>
 
-                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-green-500"
-                              style={{
-                                width: `${Math.min(
-                                  (subtotal / 1999) * 100,
-                                  100,
-                                )}%`,
-                              }}
-                            />
-                          </div>
-                        </>
-                      ) : (
-                        <p className="text-green-600 text-sm font-medium">
-                          🎉 Free Shipping Unlocked
-                        </p>
-                      )}
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-green-500"
+                        style={{
+                          width: `${Math.min((subtotal / 1999) * 100, 100)}%`,
+                        }}
+                      />
                     </div>
+                  </>
+                ) : (
+                  <p className="text-green-600 text-sm font-medium">
+                    🎉 Free Shipping Unlocked
+                  </p>
+                )}
+              </div>
 
-                    <div className="p-4 bg-gray-50 border-t mt-4">
-                      <div className="flex justify-between font-semibold mb-4">
-                        <span>Subtotal</span>
+              <div className="p-4 bg-gray-50 border-t mt-4">
+                <div className="flex justify-between font-semibold mb-4">
+                  <span>Subtotal</span>
 
-                        <span>₹{subtotal}</span>
-                      </div>
+                  <span>₹{subtotal}</span>
+                </div>
 
-                      <div className="grid grid-cols-2 gap-2">
-                        <Link
-                          to="/cart"
-                          onClick={() => setCartOpen(false)}
-                          className="
+                <div className="grid grid-cols-2 gap-2">
+                  <Link
+                    to="/cart"
+                    onClick={() => setCartOpen(false)}
+                    className="
                     text-center
                     border
                     py-2.5
                     rounded-lg
                     font-medium
                   "
-                        >
-                          View Cart
-                        </Link>
+                  >
+                    View Cart
+                  </Link>
 
-                        <Link
-                          to="/checkout"
-                          onClick={() => setCartOpen(false)}
-                          className="
+                  <Link
+                    to="/checkout"
+                    onClick={() => setCartOpen(false)}
+                    className="
                     text-center
                     bg-black
                     text-white
@@ -327,14 +333,13 @@ useEffect(() => {
                     rounded-lg
                     font-medium
                   "
-                        >
-                          Checkout
-                        </Link>
-                      </div>
-                    </div>
-                  </>
-                )}
-          
+                  >
+                    Checkout
+                  </Link>
+                </div>
+              </div>
+            </>
+          )}
         </motion.div>
       </AnimatePresence>,
       document.body,

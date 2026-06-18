@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import useCart from "../context/useCart";
 import axios from "axios";
-import { animate} from "motion";
+import { animate } from "motion";
 import useCartAnimation from "../context/usecartAnimation";
 
 function ViewSingleProduct() {
@@ -79,37 +79,48 @@ function ViewSingleProduct() {
     }
 
     const img = imgRef.current;
-  const rect = img.getBoundingClientRect();
+    const rect = img.getBoundingClientRect();
 
-  const clone = img.cloneNode(true);
+    // Clone image
+    const clone = img.cloneNode(true);
 
-  clone.style.position = "fixed";
-  clone.style.left = `${rect.left}px`;
-  clone.style.top = `${rect.top}px`;
-  clone.style.width = `${rect.width}px`;
-  clone.style.height = `${rect.height}px`;
-  clone.style.zIndex = "9999";
-  clone.style.pointerEvents = "none";
+    clone.style.position = "fixed";
+    clone.style.left = `${rect.left}px`;
+    clone.style.top = `${rect.top}px`;
+    clone.style.width = `${rect.width}px`;
+    clone.style.height = `${rect.height}px`;
+    clone.style.zIndex = "999999";
+    clone.style.pointerEvents = "none";
+    clone.style.willChange = "transform";
 
-  document.body.appendChild(clone);
+    document.body.appendChild(clone);
 
-  animate(
-    clone,
-    {
-      x: cartPosition.x - rect.left,
-      y: cartPosition.y - rect.top,
-      scale: [1, 0.7, 0.2],
-      opacity: [1, 1, 0],
-    },
-    {
-      duration: 0.8,
-      easing: "ease-in-out",
-      onComplete: () => {
-        clone.remove();
+    // Start from image center
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+
+    // Move toward cart center
+    const dx = cartPosition.x - startX;
+    const dy = cartPosition.y - startY;
+
+    animate(
+      clone,
+      {
+        x: [0, dx],
+        y: [0, dy],
+        scale: [1, 0.8, 0.3],
+        opacity: [1, 1, 0],
       },
-    }
-  );
+      {
+        duration: 0.9,
+        easing: "ease-in-out",
+        onComplete: () => {
+          clone.remove();
+        },
+      },
+    );
   };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ─── BREADCRUMB ─── */}
