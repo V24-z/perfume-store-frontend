@@ -6,8 +6,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refresh, setRefresh] = useState(0);
-
+  //const [refresh, setRefresh] = useState(0);
+  const [updatingId, setUpdatingId] = useState(null);
   useEffect(() => {
     const loadOrders = async () => {
       try {
@@ -22,17 +22,25 @@ function Orders() {
     };
 
     loadOrders();
-  }, [refresh]);
+  }, []);
 
   const updateStatus = async (orderId, status) => {
     try {
+      setUpdatingId(orderId);
+
       await axios.put(`${API_URL}/orders/${orderId}`, {
-        status: status,
+        status,
       });
 
-      setRefresh((r) => r + 1);
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, status } : order,
+        ),
+      );
     } catch (err) {
       console.error(err);
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -88,6 +96,7 @@ function Orders() {
                 <td className="p-3">
                   <select
                     value={order.status}
+                    disabled={updatingId === order.id}
                     onChange={(e) => updateStatus(order.id, e.target.value)}
                     className="border rounded px-2 py-1"
                   >

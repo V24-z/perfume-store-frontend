@@ -27,7 +27,7 @@ const steps = ["pending", "confirmed", "processing", "shipped", "delivered"];
   }, [orderId]);
 
   const handleDownloadInvoice = async () => {
-    await fetch("https://YOUR_N8N_WEBHOOK/webhook/invoice", {
+    await fetch("https://task-ocr.app.n8n.cloud/webhook/generate-invoice", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
