@@ -9,7 +9,8 @@ const navSections = [
       { to: "/admin/products",  icon: "ti-box",              label: "Products",  badge: "12", badgeType: "yellow" },
       { to: "/admin/orders",    icon: "ti-shopping-cart",    label: "Orders",    badge: "5",  badgeType: "red" },
       { to: "/admin/users",     icon: "ti-users",            label: "Users" },
-      
+      { to: "/admin/cart",     icon: "ti-users",            label: "user_Cart" },
+
     ],
   },
   {
