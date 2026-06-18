@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import useCart from "../context/useCart";
+import SearchBar from "../components/seachBar";
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
@@ -443,29 +444,9 @@ function Header() {
                 (e.currentTarget.style.background = "rgba(255,255,255,0.10)")
               }
             >
-              <svg
-                className="w-3.5 h-3.5"
-                style={{ color: "rgba(255,255,255,0.50)" }}
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              <span
-                style={{
-                  color: "rgba(255,255,255,0.40)",
-                  fontSize: 12,
-                  letterSpacing: "0.04em",
-                }}
-              >
-                Search fragrances...
-              </span>
+              
+               <SearchBar/>
+             
             </div>
 
             {/* Right icons */}
