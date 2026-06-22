@@ -4,11 +4,11 @@ import { Filter } from "lucide-react";
 
 import useCart from "../context/useCart";
 
-import ProductCard from "../components/shop/ProductCard";
-import FilterSidebar from "../components/shop/FilterSidebar";
-import MobileFilterDrawer from "../components/shop/MobileFilterDrawer";
-import QuickViewModal from "../components/shop/QuickViewModal";
-import RecentlyViewed from "../components/shop/RecentlyViewed";
+import ProductCard from "../components/shop/productCard";
+import FilterSidebar from "../components/shop/filterSidebar";
+import MobileFilterDrawer from "../components/shop/mobileFilterDrawer";
+import QuickViewModal from "../components/shop/quickViewModal";
+import RecentlyViewed from "../components/shop/recentlyViewed";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
