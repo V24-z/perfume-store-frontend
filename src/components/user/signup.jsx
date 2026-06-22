@@ -96,7 +96,7 @@ function Signup() {
       {/* ── Wordmark / brand bar ── */}
       <div className="mb-6 flex flex-col items-center gap-1">
         <span className="text-2xl font-extrabold tracking-tight text-[#131921]">
-          shop<span className="text-[#FF9900]">hub</span>
+          Lumiere<span className="text-[#FF9900]">perfum</span>
         </span>
         <span className="text-[11px] uppercase tracking-widest text-[#6B7280] font-medium">
           Premium Marketplace
