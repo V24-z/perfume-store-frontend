@@ -1,4 +1,5 @@
-import { CheckCircle, ShoppingBag, ArrowRight } from "lucide-react";
+import { CheckCircle, ShoppingBag} from "lucide-react";
+import { Link } from "react-router-dom";
 
 function OrderSuccess() {
   return (
@@ -44,13 +45,11 @@ function OrderSuccess() {
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
           <button className="flex-1 bg-black text-white py-3 rounded-xl font-medium hover:bg-gray-800 transition duration-300 flex items-center justify-center gap-2">
             <ShoppingBag size={18} />
-            Continue Shopping
+            <Link to="/shop">
+            Continue Shopping</Link>
           </button>
 
-          <button className="flex-1 border border-gray-300 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-50 transition duration-300 flex items-center justify-center gap-2">
-            View Orders
-            <ArrowRight size={18} />
-          </button>
+          
         </div>
 
         {/* Footer Text */}
