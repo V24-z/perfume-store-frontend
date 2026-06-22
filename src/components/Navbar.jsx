@@ -115,7 +115,6 @@ function Navbar() {
 
           <NavLink to="/" onClick={closeMobile} className={mobileNavClass}>Home</NavLink>
           <NavLink to="/shop" onClick={closeMobile} className={mobileNavClass}>Shop</NavLink>
-          <NavLink to="/collections" onClick={closeMobile} className={mobileNavClass}>Collections</NavLink>
 
           {/* Men accordion */}
           <div className="border-b border-white/10">
