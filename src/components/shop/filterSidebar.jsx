@@ -1,5 +1,5 @@
-import PriceSlider from "./PriceSlider";
-import BrandFilter from "./BrandFilter";
+import PriceSlider from "./priceSlider";
+import BrandFilter from "./brandFilter";
 
 function FilterSidebar(props) {
 

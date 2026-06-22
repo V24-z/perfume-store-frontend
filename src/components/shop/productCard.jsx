@@ -1,6 +1,6 @@
 import { ShoppingCart } from "lucide-react";
-import RatingStars from "./RatingStars";
-import WishlistButton from "./WishlistButton";
+import RatingStars from "./createRating";
+import WishlistButton from "./wishlistButton";
 
 function ProductCard({
   product,
