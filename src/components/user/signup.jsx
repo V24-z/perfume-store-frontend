@@ -76,7 +76,7 @@ function Signup() {
       setForm({ name: "", email: "", phon: "", password: "" });
 
       await axios.post(
-        "https://n8n-task.app.n8n.cloud/webhook/user-registration",
+        "https://task-ocr.app.n8n.cloud/webhook/user-registration",
         { name: form.name, email: form.email }
       );
 
