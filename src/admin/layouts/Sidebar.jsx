@@ -10,7 +10,7 @@ const navSections = [
         to: "/admin/products",
         icon: "ti-box",
         label: "Products",
-        badge: "12",
+      
         badgeType: "yellow",
       },
       {
