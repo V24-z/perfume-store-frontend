@@ -80,7 +80,7 @@ function SearchBar() {
 
       {/* Suggestions */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl z-50 overflow-hidden max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl z-[9999] overflow-hidden max-h-96 overflow-y-auto">
 
           {suggestions.map((product) => (
             <Link
