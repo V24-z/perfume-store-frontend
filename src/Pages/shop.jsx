@@ -75,47 +75,6 @@ function Shop() {
   };
 
   // ==========================
-  // Search
-  // ==========================
-
-  const handleSearch = async () => {
-    if (!search.trim()) {
-      loadProducts();
-      return;
-    }
-
-    try {
-      const res = await axios.get(
-        `${API_URL}/products/search?q=${search}`
-      );
-
-      setProducts(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // ==========================
-  // Category
-  // ==========================
-
-  const loadCategoryProducts = async () => {
-    try {
-      setLoading(true);
-
-      const res = await axios.get(
-        `${API_URL}/products/category/${selectedCategory}`
-      );
-
-      setProducts(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ==========================
   // Initial Load
   // ==========================
 
@@ -131,8 +90,21 @@ function Shop() {
   // ==========================
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      handleSearch();
+    const timer = setTimeout(async () => {
+      if (!search.trim()) {
+        await loadProducts();
+        return;
+      }
+
+      try {
+        const res = await axios.get(
+          `${API_URL}/products/search?q=${search}`
+        );
+
+        setProducts(res.data);
+      } catch (err) {
+        console.error(err);
+      }
     }, 500);
 
     return () => clearTimeout(timer);
@@ -144,12 +116,21 @@ function Shop() {
 
   useEffect(() => {
     (async () => {
-      if (!selectedCategory) {
-        await loadProducts();
-        return;
-      }
+      try {
+        setLoading(true);
 
-      await loadCategoryProducts();
+        const url = selectedCategory
+          ? `${API_URL}/products/category/${selectedCategory}`
+          : `${API_URL}/products`;
+
+        const res = await axios.get(url);
+
+        setProducts(res.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [selectedCategory]);
 
