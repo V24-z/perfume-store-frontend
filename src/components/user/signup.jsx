@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -138,7 +138,7 @@ function Signup() {
           email: form.email,
         })
         .catch(console.error);
-      setMessage("User created successfully");
+      setMessage("Account created successfully");
       setForm({ name: "", email: "", phon: "", password: "" });
       setTimeout(() => {
         navigate("/login");
@@ -383,13 +383,13 @@ function Signup() {
           {/* Sign In link */}
           <p className="text-center text-sm text-gray-500">
             Already have an account?{" "}
-            <a
-              href="/login"
+            <Link
+              to="/login"
               className="font-semibold hover:underline transition-colors duration-150"
               style={{ color: "#534AB7" }}
             >
               Sign In
-            </a>
+            </Link>
           </p>
         </div>
 
