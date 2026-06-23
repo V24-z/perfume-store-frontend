@@ -4,7 +4,7 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-// ── Eye Icon ──────────────────────────────────────────────────────────────
+// ── Eye Icon ───────────────────────────────────────────────────────────────
 const EyeIcon = ({ open }) => (
   <svg
     className="w-4 h-4"
@@ -29,15 +29,15 @@ const EyeIcon = ({ open }) => (
   </svg>
 );
 
-// ── Reusable field wrapper ─────────────────────────────────────────────────
+// ── Field wrapper ──────────────────────────────────────────────────────────
 const Field = ({ label, error, children }) => (
   <div className="flex flex-col gap-1.5">
-    <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
+    <label className="text-xs font-semibold text-[#1a0533] tracking-wide">
       {label}
     </label>
     {children}
     {error && (
-      <p className="flex items-center gap-1.5 text-red-400 text-xs font-medium">
+      <p className="flex items-center gap-1.5 text-red-500 text-xs font-medium">
         <svg
           className="w-3 h-3 shrink-0"
           viewBox="0 0 20 20"
@@ -55,15 +55,15 @@ const Field = ({ label, error, children }) => (
   </div>
 );
 
-const inputBase = (hasError) => `
-  w-full h-11 px-4 rounded-xl text-sm text-white placeholder-white/20 outline-none
-  bg-white/5 border transition-all duration-200
-  ${
-    hasError
-      ? "border-red-400/50 focus:border-red-400 focus:ring-2 focus:ring-red-400/15"
-      : "border-white/10 hover:border-white/20 focus:border-yellow-300/50 focus:ring-2 focus:ring-yellow-300/10"
-  }
-`;
+// ── Input class helper ─────────────────────────────────────────────────────
+const inputCls = (hasError) =>
+  `w-full h-11 px-4 rounded-xl text-sm text-[#1a0533] placeholder-gray-400 bg-white outline-none
+   border transition-all duration-200
+   ${
+     hasError
+       ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
+       : "border-slate-200 hover:border-slate-300 focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/10"
+   }`;
 
 // ── Main component ─────────────────────────────────────────────────────────
 function Signup() {
@@ -95,78 +95,51 @@ function Signup() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    let error = "";
-
+    setForm((prev) => ({ ...prev, [name]: value }));
+    let err = "";
     switch (name) {
       case "name":
-        if (!value.trim()) error = "Name is required";
+        if (!value.trim()) err = "Name is required";
         break;
-
       case "email":
         if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
-          error = "Invalid email";
+          err = "Invalid email";
         break;
-
       case "phon":
         if (value && !/^\d{10}$/.test(value))
-          error = "Phone number must be 10 digits";
+          err = "Phone number must be 10 digits";
         break;
-
       case "password":
         if (value && value.length < 6)
-          error = "Password must be at least 6 characters";
+          err = "Password must be at least 6 characters";
         break;
-
       default:
         break;
     }
-
-    setError((prev) => ({
-      ...prev,
-      [name]: error,
-    }));
+    setError((prev) => ({ ...prev, [name]: err }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     setError({});
     setServerError("");
     setMessage("");
-
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setError(validationErrors);
       return;
     }
-
     setLoading(true);
-
     try {
       await axios.post(`${API_URL}/signin`, form);
-
-      await axios.post(
-        "https://task-ocr.app.n8n.cloud/webhook/user-registration",
-        {
+      axios
+        .post("https://task-ocr.app.n8n.cloud/webhook/user-registration", {
           name: form.name,
           email: form.email,
-        },
-      );
-
+        })
+        .catch(console.error);
       setMessage("User created successfully");
-      setForm({
-        name: "",
-        email: "",
-        phon: "",
-        password: "",
-      });
-
+      setForm({ name: "", email: "", phon: "", password: "" });
       setTimeout(() => {
         navigate("/login");
       }, 1000);
@@ -182,221 +155,248 @@ function Signup() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center px-4 py-12"
-      style={{
-        background:
-          "linear-gradient(135deg, #1a0533 0%, #2d0a4e 50%, #4a1060 100%)",
-      }}
-    >
-      <div className="w-full max-w-[460px]">
-        {/* ── Brand ── */}
-        <div className="flex flex-col items-center mb-8">
-         
-          <span className="text-xl font-bold tracking-tight text-white">
-            Lumière<span className="text-yellow-300">Parfum</span>
-          </span>
-          <span className="mt-1 text-[10px] uppercase tracking-[0.3em] text-white/25 font-medium">
-            Maison de Parfum
-          </span>
-        </div>
-
-        {/* ── Card ── */}
+    /* Page background — matches site body: light slate */
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 py-12">
+      {/* ── Brand mark ── */}
+      <div className="flex items-center justify-center gap-3 mb-7">
+        {/* Logo */}
         <div
-          className="rounded-2xl border border-white/10 overflow-hidden"
+          className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
           style={{
-            background: "rgba(255,255,255,0.05)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            boxShadow:
-              "0 24px 48px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08)",
+            background: "linear-gradient(to right, #1a0533, #2d0a4e, #4a1060)",
           }}
         >
-          {/* Gold hairline */}
-          <div
-            className="h-px w-full"
+          <span
             style={{
-              background:
-                "linear-gradient(90deg, transparent, #facc15 50%, transparent)",
+              color: "#fde047",
+              fontSize: 20,
+              lineHeight: 1,
             }}
-          />
+          >
+            ◈
+          </span>
+        </div>
 
-          <div className="px-8 py-8">
-            {/* Heading */}
-            <div className="mb-7 text-center">
-              <h1 className="text-xl font-bold text-white tracking-tight">
-                Create Your Account
-              </h1>
-              <p className="mt-1.5 text-sm text-white/35">
-                Join thousands discovering premium fragrances
-              </p>
-            </div>
+        {/* Brand Name */}
+        <div>
+          <p
+            className="font-bold text-lg m-0 leading-tight"
+            style={{
+              color: "#1a0533",
+              letterSpacing: "0.12em",
+            }}
+          >
+            LUMIÈRE
+          </p>
 
-            {/* Success */}
-            {message && (
-              <div
-                className="mb-5 flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-yellow-300 font-medium"
-                style={{
-                  background: "rgba(253,224,71,0.08)",
-                  border: "1px solid rgba(253,224,71,0.18)",
-                }}
-              >
-                <svg
-                  className="w-4 h-4 shrink-0"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                {message}
-              </div>
-            )}
-
-            {/* Server error */}
-            {serverError && (
-              <div
-                className="mb-5 flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm text-red-400 font-medium"
-                style={{
-                  background: "rgba(239,68,68,0.08)",
-                  border: "1px solid rgba(239,68,68,0.18)",
-                }}
-              >
-                <svg
-                  className="w-4 h-4 shrink-0"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                {serverError}
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Field label="Full Name" error={error.name}>
-                <input
-                  type="text"
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Isabelle Moreau"
-                  className={inputBase(!!error.name)}
-                />
-              </Field>
-
-              <Field label="Email Address" error={error.email}>
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="isabelle@example.com"
-                  className={inputBase(!!error.email)}
-                />
-              </Field>
-
-              <Field label="Phone Number" error={error.phon}>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-white/30 font-medium select-none pointer-events-none">
-                    +91
-                  </span>
-                  <input
-                    type="tel"
-                    name="phon"
-                    value={form.phon}
-                    maxLength={10}
-                    onChange={handleChange}
-                    placeholder="XXXXXXXXXX"
-                    className={`${inputBase(!!error.phon)} pl-12`}
-                  />
-                </div>
-              </Field>
-
-              <Field label="Password" error={error.password}>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
-                    value={form.password}
-                    onChange={handleChange}
-                    placeholder="Min. 6 characters"
-                    className={`${inputBase(!!error.password)} pr-11`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/25 hover:text-yellow-300/70 transition-colors duration-150"
-                  >
-                    <EyeIcon open={showPassword} />
-                  </button>
-                </div>
-              </Field>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full h-11 mt-1 rounded-xl text-sm font-bold tracking-wide text-purple-900 transition-all duration-200
-    ${loading ? "opacity-70 cursor-not-allowed" : "hover:brightness-110 hover:scale-[1.01] active:scale-[0.99]"}`}
-                style={{
-                  background: "linear-gradient(135deg, #fde047, #facc15)",
-                  boxShadow: "0 4px 20px rgba(250,204,21,0.25)",
-                }}
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <svg
-                      className="animate-spin h-4 w-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        opacity="0.25"
-                      />
-                      <path
-                        d="M22 12a10 10 0 00-10-10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    Creating Account...
-                  </div>
-                ) : (
-                  "Create Account"
-                )}
-              </button>
-            </form>
-
-            {/* Footer */}
-            <div className="mt-6 space-y-3 text-center">
-              <p className="text-sm text-white/30">
-                Already have an account?{" "}
-                <a
-                  href="/login"
-                  className="text-yellow-300 hover:text-yellow-200 font-semibold transition-colors duration-150"
-                >
-                  Sign In
-                </a>
-              </p>
-              
-            </div>
-          </div>
+          <p
+            className="m-0 font-medium"
+            style={{
+              color: "rgba(250,204,21,0.85)",
+              fontSize: 10,
+              letterSpacing: "0.22em",
+            }}
+          >
+            PARFUM
+          </p>
         </div>
       </div>
+
+      {/* ── Card ── */}
+      <div className="w-full max-w-[460px] bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        {/* Thin brand-color top strip — same purple gradient as header */}
+        <div
+          className="h-1 w-full"
+          style={{
+            background: "linear-gradient(to right, #1a0533, #2d0a4e, #4a1060)",
+          }}
+        />
+
+        <div className="px-7 py-8 sm:px-8">
+          {/* Heading */}
+          <div className="mb-6 text-center">
+            <h1 className="text-xl font-bold text-[#1a0533] tracking-tight">
+              Create Your Account
+            </h1>
+            <p className="mt-1.5 text-sm text-gray-500">
+              Join thousands discovering premium fragrances
+            </p>
+          </div>
+
+          {/* Success banner */}
+          {message && (
+            <div className="mb-5 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
+              <svg
+                className="w-4 h-4 shrink-0 text-green-500"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {message}
+            </div>
+          )}
+
+          {/* Server error banner */}
+          {serverError && (
+            <div className="mb-5 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium">
+              <svg
+                className="w-4 h-4 shrink-0"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              {serverError}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Field label="Full Name" error={error.name}>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Isabelle Moreau"
+                className={inputCls(!!error.name)}
+              />
+            </Field>
+
+            <Field label="Email Address" error={error.email}>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="isabelle@example.com"
+                className={inputCls(!!error.email)}
+              />
+            </Field>
+
+            <Field label="Phone Number" error={error.phon}>
+              <div className="relative">
+                {/* +91 prefix */}
+                <span className="absolute inset-y-0 left-4 flex items-center text-sm font-medium text-[#1a0533] pointer-events-none select-none">
+                  +91
+                </span>
+                <span className="absolute inset-y-0 left-12 flex items-center text-slate-300 pointer-events-none select-none text-base">
+                  |
+                </span>
+                <input
+                  type="tel"
+                  name="phon"
+                  value={form.phon}
+                  maxLength={10}
+                  onChange={handleChange}
+                  placeholder="XXXXXXXXXX"
+                  className={`${inputCls(!!error.phon)} pl-16`}
+                />
+              </div>
+            </Field>
+
+            <Field label="Password" error={error.password}>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Min. 6 characters"
+                  className={`${inputCls(!!error.password)} pr-11`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3.5 flex items-center text-gray-400 hover:text-[#534AB7] transition-colors duration-150"
+                >
+                  <EyeIcon open={showPassword} />
+                </button>
+              </div>
+            </Field>
+
+            {/* CTA — gold button matching header "Sign Up" button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`
+                w-full h-11 mt-1 rounded-full text-sm font-bold tracking-wide
+                transition-all duration-200
+                ${
+                  loading
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:brightness-105 hover:scale-[1.01] active:scale-[0.99]"
+                }
+              `}
+              style={{
+                background: "#facc15",
+                color: "#3b0764",
+                boxShadow: "0 2px 12px rgba(250,204,21,0.30)",
+              }}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg
+                    className="animate-spin h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      opacity="0.25"
+                    />
+                    <path
+                      d="M22 12a10 10 0 00-10-10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  Creating Account...
+                </span>
+              ) : (
+                "Create Account"
+              )}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="my-5 flex items-center gap-3">
+            <div className="flex-1 h-px bg-slate-100" />
+            <span className="text-xs text-gray-400 font-medium">or</span>
+            <div className="flex-1 h-px bg-slate-100" />
+          </div>
+
+          {/* Sign In link */}
+          <p className="text-center text-sm text-gray-500">
+            Already have an account?{" "}
+            <a
+              href="/login"
+              className="font-semibold hover:underline transition-colors duration-150"
+              style={{ color: "#534AB7" }}
+            >
+              Sign In
+            </a>
+          </p>
+        </div>
+
+        {/* Footer strip — terms */}
+      </div>
+
+      {/* Subtle trust row — mirrors Home Page tone */}
     </div>
   );
 }
