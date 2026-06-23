@@ -192,14 +192,7 @@ function Signup() {
       <div className="w-full max-w-[460px]">
         {/* ── Brand ── */}
         <div className="flex flex-col items-center mb-8">
-          <div
-            className="w-11 h-11 rounded-full flex items-center justify-center mb-4"
-            style={{ background: "linear-gradient(135deg, #fde047, #f59e0b)" }}
-          >
-            <span className="text-purple-900 font-black text-lg leading-none">
-              L
-            </span>
-          </div>
+         
           <span className="text-xl font-bold tracking-tight text-white">
             Lumière<span className="text-yellow-300">Parfum</span>
           </span>
@@ -399,20 +392,7 @@ function Signup() {
                   Sign In
                 </a>
               </p>
-              <p
-                className="text-xs text-white/18 leading-relaxed"
-                style={{ color: "rgba(255,255,255,0.2)" }}
-              >
-                By creating an account you agree to our{" "}
-                <span className="underline underline-offset-2 cursor-pointer hover:text-yellow-300/60 transition-colors">
-                  Terms
-                </span>{" "}
-                and{" "}
-                <span className="underline underline-offset-2 cursor-pointer hover:text-yellow-300/60 transition-colors">
-                  Privacy Policy
-                </span>
-                .
-              </p>
+              
             </div>
           </div>
         </div>
