@@ -7,6 +7,7 @@ import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthProvider";
 import { CartProvider } from "./context/cartProvider.jsx";
 import { CartAnimationProvider } from "./context/animationprovider.jsx";
+import ScrollToTop from "./components/scrolltoTop.jsx";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -14,7 +15,9 @@ root.render(
     <AuthProvider>
       <CartProvider>
         <CartAnimationProvider>
-          <App />
+          <ScrollToTop>
+            <App />
+          </ScrollToTop>
         </CartAnimationProvider>
       </CartProvider>
     </AuthProvider>
