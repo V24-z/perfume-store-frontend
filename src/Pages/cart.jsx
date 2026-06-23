@@ -119,8 +119,8 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
 // ─── ORDER SUMMARY ───
 function OrderSummary({ subtotal, itemCount }) {
   const shipping = subtotal > 1999 ? 0 : 199;
-  const tax = Math.round(subtotal * 0.18);
-  const total = subtotal + shipping + tax;
+  
+  const total = subtotal + shipping ;
   const disabled = itemCount === 0;
 
   return (
@@ -158,10 +158,7 @@ function OrderSummary({ subtotal, itemCount }) {
             </span>
           </div>
 
-          <div className="flex justify-between">
-            <span>GST (18%)</span>
-            <span className="tabular-nums text-neutral-900">₹{fmt(tax)}</span>
-          </div>
+          
         </div>
 
         <div className="border-t border-dashed border-neutral-300 my-5" />
