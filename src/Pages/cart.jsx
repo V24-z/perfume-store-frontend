@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo,useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -287,7 +287,10 @@ export default function Cart() {
 
     loading,
   } = useCart();
-
+   // ✅ Scroll to top when product changes
+ useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   //const USER_ID = user?.id;
 
   // safe array

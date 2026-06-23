@@ -15,23 +15,25 @@ function App() {
 
   return (
     <Suspense rollback={<div>Loading...</div>}>
-      <Routes>
-        <Route path="/*" element={<UserRoutes />} />
+      
+        <Routes>
+          <Route path="/*" element={<UserRoutes />} />
 
-        {!user && (
-          <>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-          </>
-        )}
+          {!user && (
+            <>
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </>
+          )}
 
-        {user && user.role === "admin" && (
-          <Route path="/admin/*" element={<AdminRoutes />} />
-        )}
+          {user && user.role === "admin" && (
+            <Route path="/admin/*" element={<AdminRoutes />} />
+          )}
 
-        {/* Optional: redirect all unknown paths */}
-        <Route path="*" element={user ? <UserRoutes /> : <Login />} />
-      </Routes>
+          {/* Optional: redirect all unknown paths */}
+          <Route path="*" element={user ? <UserRoutes /> : <Login />} />
+        </Routes>
+      
     </Suspense>
   );
 }

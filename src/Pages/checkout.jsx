@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -148,14 +148,17 @@ function Checkout() {
     phone: "",
     address: "",
   });
-
+   // ✅ Scroll to top when product changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
   };
-
+ 
   // Business logic untouched: same validation, same payload, same API call,
   // same alerts, same navigation target.
   const handleCheckout = async () => {

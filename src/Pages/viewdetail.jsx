@@ -19,7 +19,10 @@ function ViewSingleProduct() {
 
   // ✅ ref for animation
   const imgRef = useRef(null);
-
+  // ✅ Scroll to top when product changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
   // ─── FETCH PRODUCT ───
   useEffect(() => {
     const getProduct = async () => {
