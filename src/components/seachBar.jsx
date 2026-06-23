@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -21,19 +20,40 @@ function SearchBar() {
 
   useEffect(() => {
     const timer = setTimeout(async () => {
-      if (!search.trim()) {
+      const query = search.trim();
+
+      if (query.length < 2) {
         setSuggestions([]);
         return;
       }
 
       try {
         const res = await axios.get(
-          `${API_URL}/products/search?q=${search}`
+          `${API_URL}/products/search?q=${encodeURIComponent(query)}`
         );
 
-        setSuggestions(res.data);
+        const filtered = res.data
+          .filter(
+            (product) =>
+              product.name?.toLowerCase().includes(query.toLowerCase()) ||
+              product.brand?.toLowerCase().includes(query.toLowerCase())
+          )
+          .sort((a, b) => {
+            const aExact =
+              a.name?.toLowerCase() === query.toLowerCase() ||
+              a.brand?.toLowerCase() === query.toLowerCase();
+
+            const bExact =
+              b.name?.toLowerCase() === query.toLowerCase() ||
+              b.brand?.toLowerCase() === query.toLowerCase();
+
+            return bExact - aExact;
+          });
+
+        setSuggestions(filtered);
       } catch (err) {
-        console.error(err);
+        console.error("Search Error:", err);
+        setSuggestions([]);
       }
     }, 300);
 
@@ -78,14 +98,6 @@ function SearchBar() {
             background: "rgba(255,255,255,0.10)",
             border: "1px solid rgba(255,255,255,0.20)",
           }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.background =
-              "rgba(255,255,255,0.15)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.background =
-              "rgba(255,255,255,0.10)")
-          }
         >
           <svg
             className="w-4 h-4 flex-shrink-0"
@@ -122,7 +134,6 @@ function SearchBar() {
       </div>
 
       {showSuggestions &&
-        suggestions.length > 0 &&
         createPortal(
           <div
             style={{
@@ -132,39 +143,38 @@ function SearchBar() {
               width: dropdownPos.width,
               zIndex: 999999,
             }}
-            className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden max-h-96 overflow-y-auto"
+            className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
           >
-            {suggestions.map((product) => (
-              <Link
-                key={product.id}
-                to={`/viewdetail/${product.id}`}
-                className="flex items-center gap-3 p-3 hover:bg-gray-100 transition no-underline"
-                onClick={() => {
-                  setSearch("");
-                  setShowSuggestions(false);
-                }}
-              >
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-12 h-12 rounded-lg object-cover"
-                />
+            {search.trim().length >= 3 &&
+            suggestions.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">
+                No products found
+              </div>
+            ) : (
+              suggestions.map((product) => (
+                <Link
+                  key={product.id}
+                  to={`/viewdetail/${product.id}`}
+                  className="flex items-center gap-3 p-3 hover:bg-gray-100 transition no-underline"
+                  onClick={() => {
+                    setSearch("");
+                    setShowSuggestions(false);
+                  }}
+                >
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {product.name}
+                    </p>
 
-                <div>
-                  <p className="font-medium text-gray-900">
-                    {product.name}
-                  </p>
+                    <p className="text-sm text-gray-500">
+                      {product.brand}
+                    </p>
 
-                  <p className="text-sm text-gray-500">
-                    {product.brand}
-                  </p>
-
-                  <p className="text-xs text-purple-600">
-                    ₹{product.price}
-                  </p>
-                </div>
-              </Link>
-            ))}
+                    
+                  </div>
+                </Link>
+              ))
+            )}
           </div>,
           document.body
         )}
