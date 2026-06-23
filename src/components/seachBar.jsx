@@ -9,6 +9,7 @@ function SearchBar() {
   const [search, setSearch] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const wrapperRef = useRef(null);
 
@@ -19,45 +20,45 @@ function SearchBar() {
   });
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const timer = setTimeout(async () => {
       const query = search.trim();
 
       if (query.length < 2) {
         setSuggestions([]);
+        setLoading(false);
         return;
       }
 
+      setLoading(true);
+
       try {
         const res = await axios.get(
-          `${API_URL}/products/search?q=${encodeURIComponent(query)}`
+          `${API_URL}/products/search?q=${encodeURIComponent(query)}`,
+          {
+            signal: controller.signal,
+          }
         );
 
-        const filtered = res.data
-          .filter(
-            (product) =>
-              product.name?.toLowerCase().includes(query.toLowerCase()) ||
-              product.brand?.toLowerCase().includes(query.toLowerCase())
-          )
-          .sort((a, b) => {
-            const aExact =
-              a.name?.toLowerCase() === query.toLowerCase() ||
-              a.brand?.toLowerCase() === query.toLowerCase();
-
-            const bExact =
-              b.name?.toLowerCase() === query.toLowerCase() ||
-              b.brand?.toLowerCase() === query.toLowerCase();
-
-            return bExact - aExact;
-          });
-
-        setSuggestions(filtered);
+        setSuggestions(res.data || []);
       } catch (err) {
-        console.error("Search Error:", err);
-        setSuggestions([]);
+        if (
+          err.name !== "CanceledError" &&
+          err.code !== "ERR_CANCELED"
+        ) {
+          console.error("Search Error:", err);
+          setSuggestions([]);
+        }
+      } finally {
+        setLoading(false);
       }
-    }, 300);
+    }, 150);
 
-    return () => clearTimeout(timer);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
   }, [search]);
 
   const updateDropdownPosition = () => {
@@ -145,8 +146,12 @@ function SearchBar() {
             }}
             className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
           >
-            {search.trim().length >= 3 &&
-            suggestions.length === 0 ? (
+            {loading ? (
+              <div className="p-4 text-center text-gray-500">
+                Searching...
+              </div>
+            ) : search.trim().length >= 2 &&
+              suggestions.length === 0 ? (
               <div className="p-4 text-center text-gray-500">
                 No products found
               </div>
@@ -169,8 +174,6 @@ function SearchBar() {
                     <p className="text-sm text-gray-500">
                       {product.brand}
                     </p>
-
-                    
                   </div>
                 </Link>
               ))
