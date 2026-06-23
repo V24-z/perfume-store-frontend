@@ -6,6 +6,67 @@ import axios from "axios";
 // ─── All logic preserved exactly as-is ───────────────────────────────────────
 const API_URL = import.meta.env.VITE_API_URL;
 
+// ── Eye Icon — same as Signup ─────────────────────────────────────────────
+const EyeIcon = ({ open }) => (
+  <svg
+    className="w-4 h-4"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={1.5}
+    viewBox="0 0 24 24"
+  >
+    {open ? (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+      />
+    ) : (
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"
+      />
+    )}
+  </svg>
+);
+
+// ── Field wrapper — same as Signup ────────────────────────────────────────
+const Field = ({ label, error, children }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-xs font-semibold text-[#1a0533] tracking-wide">
+      {label}
+    </label>
+    {children}
+    {error && (
+      <p className="flex items-center gap-1.5 text-red-500 text-xs font-medium">
+        <svg
+          className="w-3 h-3 shrink-0"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+            clipRule="evenodd"
+          />
+        </svg>
+        {error}
+      </p>
+    )}
+  </div>
+);
+
+// ── Input class helper — same as Signup ───────────────────────────────────
+const inputCls = (hasError) =>
+  `w-full h-11 px-4 rounded-xl text-sm text-[#1a0533] placeholder-gray-400 bg-white outline-none
+   border transition-all duration-200
+   ${
+     hasError
+       ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
+       : "border-slate-200 hover:border-slate-300 focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/10"
+   }`;
+
 function Login() {
   const [error, setError] = useState({});
   const [serverError, setServerError] = useState("");
@@ -13,6 +74,7 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
@@ -35,6 +97,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setError({});
     setMessage("");
     setServerError("");
@@ -45,12 +108,17 @@ function Login() {
       return;
     }
 
+    setLoading(true);
+
     try {
       const { data } = await axios.post(`${API_URL}/login`, form);
+
       login(data);
       setMessage("Logged in successfully");
-      setForm({ email: "", password: "" });
-      console.log(data);
+      setForm({
+        email: "",
+        password: "",
+      });
 
       if (data.role === "admin") {
         navigate("/admin");
@@ -63,111 +131,122 @@ function Login() {
       } else {
         setServerError("Connection error!");
       }
+    } finally {
+      setLoading(false);
     }
   };
   // ─────────────────────────────────────────────────────────────────────────────
 
-  // Shared input class builder — same design token system as Signup
-  const inputClass = (hasError) =>
-    `w-full h-12 px-4 text-sm text-[#111827] placeholder-[#9CA3AF] bg-white border rounded-xl transition-all duration-200 outline-none
-     ${hasError
-       ? "border-[#EF4444] focus:ring-2 focus:ring-red-200"
-       : "border-[#E5E7EB] focus:border-[#FF9900] focus:ring-2 focus:ring-orange-100"
-     }`;
-
   return (
-    /* ── Page shell — matches Signup page background exactly ── */
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center px-4 py-10">
-
-      {/* ── Wordmark / brand bar ── */}
-      <div className="mb-6 flex flex-col items-center gap-1">
-        <span className="text-2xl font-extrabold tracking-tight text-[#131921]">
-          shop<span className="text-[#FF9900]">hub</span>
-        </span>
-        <span className="text-[11px] uppercase tracking-widest text-[#6B7280] font-medium">
-          Premium Marketplace
-        </span>
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 py-12">
+      {/* ── Brand mark — identical to Signup ── */}
+      <div className="flex items-center justify-center gap-3 mb-7">
+        <div
+          className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+          style={{
+            background: "linear-gradient(to right, #1a0533, #2d0a4e, #4a1060)",
+          }}
+        >
+          <span style={{ color: "#fde047", fontSize: 20, lineHeight: 1 }}>
+            ◈
+          </span>
+        </div>
+        <div>
+          <p
+            className="font-bold text-lg m-0 leading-tight"
+            style={{ color: "#1a0533", letterSpacing: "0.12em" }}
+          >
+            LUMIÈRE
+          </p>
+          <p
+            className="m-0 font-medium"
+            style={{
+              color: "rgba(250,204,21,0.85)",
+              fontSize: 10,
+              letterSpacing: "0.22em",
+            }}
+          >
+            PARFUM
+          </p>
+        </div>
       </div>
 
-      {/* ── Auth card ── */}
-      <div className="w-full max-w-[500px] bg-white border border-[#E5E7EB] rounded-2xl shadow-xl shadow-gray-100/70 overflow-hidden">
+      {/* ── Card — identical structure to Signup ── */}
+      <div className="w-full max-w-[460px] bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        {/* Top accent strip */}
+        <div
+          className="h-1 w-full"
+          style={{
+            background: "linear-gradient(to right, #1a0533, #2d0a4e, #4a1060)",
+          }}
+        />
 
-        {/* Amber accent bar */}
-        <div className="h-1 w-full bg-gradient-to-r from-[#FF9900] via-[#FFB84D] to-[#FF9900]" />
-
-        <div className="px-8 py-9 sm:px-10">
-
-          {/* ── Header ── */}
-          <div className="mb-8 text-center">
-            <h1 className="text-2xl font-bold text-[#111827] tracking-tight leading-snug">
+        <div className="px-7 py-8 sm:px-8">
+          {/* Heading */}
+          <div className="mb-6 text-center">
+            <h1 className="text-xl font-bold text-[#1a0533] tracking-tight">
               Welcome Back
             </h1>
-            <p className="mt-2 text-sm text-[#6B7280]">
-              Sign in to access your orders, wishlist, and personalized picks.
+            <p className="mt-1.5 text-sm text-gray-500">
+              Sign in to continue your fragrance journey
             </p>
           </div>
 
-          {/* ── Success banner ── */}
+          {/* Success banner */}
           {message && (
-            <div className="mb-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-[#22C55E] text-sm font-medium">
-              <svg className="w-5 h-5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+            <div className="mb-5 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
+              <svg
+                className="w-4 h-4 shrink-0 text-green-500"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                  clipRule="evenodd"
+                />
               </svg>
               {message}
             </div>
           )}
 
-          {/* ── Server error banner ── */}
+          {/* Server error banner */}
           {serverError && (
-            <div className="mb-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-[#EF4444] text-sm font-medium">
-              <svg className="w-5 h-5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+            <div className="mb-5 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium">
+              <svg
+                className="w-4 h-4 shrink-0"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+                  clipRule="evenodd"
+                />
               </svg>
               {serverError}
             </div>
           )}
 
-          {/* ── Form ── */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-
-            {/* Email */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-[#111827] tracking-wide">
-                Email Address
-              </label>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Field label="Email Address" error={error.email}>
               <input
                 type="email"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
-                placeholder="john@example.com"
-                className={inputClass(!!error.email)}
+                placeholder="isabelle@example.com"
+                className={inputCls(!!error.email)}
               />
-              {error.email && (
-                <p className="flex items-center gap-1 text-[#EF4444] text-xs font-medium mt-0.5">
-                  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
-                  </svg>
-                  {error.email}
-                </p>
-              )}
-            </div>
+            </Field>
 
-            {/* Password */}
+            {/* Password with Forgot link in label row */}
             <div className="flex flex-col gap-1.5">
-              {/* Label row with Forgot Password link */}
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-[#111827] tracking-wide">
+                <label className="text-xs font-semibold text-[#1a0533] tracking-wide">
                   Password
                 </label>
-                {/* Purely visual — no routing logic added, href="#" is a safe placeholder */}
-                <a
-                  href="#"
-                  className="text-xs text-[#6B7280] hover:text-[#FF9900] transition-colors duration-150 font-medium"
-                  tabIndex={-1}
-                >
-                  Forgot password?
-                </a>
               </div>
               <div className="relative">
                 <input
@@ -176,75 +255,100 @@ function Login() {
                   value={form.password}
                   onChange={handleChange}
                   placeholder="Min. 6 characters"
-                  className={`${inputClass(!!error.password)} pr-16`}
+                  className={`${inputCls(!!error.password)} pr-11`}
                 />
-                {/* Show/Hide — functionality unchanged */}
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#6B7280] hover:text-[#FF9900] transition-colors duration-150 px-1 py-0.5"
+                  className="absolute inset-y-0 right-3.5 flex items-center text-gray-400 hover:text-[#534AB7] transition-colors duration-150"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  <EyeIcon open={showPassword} />
                 </button>
               </div>
               {error.password && (
-                <p className="flex items-center gap-1 text-[#EF4444] text-xs font-medium mt-0.5">
-                  <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                <p className="flex items-center gap-1.5 text-red-500 text-xs font-medium">
+                  <svg
+                    className="w-3 h-3 shrink-0"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z"
+                      clipRule="evenodd"
+                    />
                   </svg>
                   {error.password}
                 </p>
               )}
             </div>
 
-            {/* Submit CTA — Amazon-style amber button */}
+            {/* CTA — identical to Signup button */}
             <button
               type="submit"
-              className="w-full h-12 mt-1 bg-[#FF9900] hover:bg-[#FFB84D] active:scale-[0.98] text-[#111827] text-sm font-bold rounded-xl transition-all duration-200 shadow-md shadow-orange-100 tracking-wide"
+              disabled={loading}
+              className={`w-full h-11 mt-1 rounded-full text-sm font-bold tracking-wide transition-all duration-200
+    ${
+      loading
+        ? "opacity-70 cursor-not-allowed"
+        : "hover:brightness-105 hover:scale-[1.01] active:scale-[0.99]"
+    }`}
+              style={{
+                background: "#facc15",
+                color: "#3b0764",
+                boxShadow: "0 2px 12px rgba(250,204,21,0.30)",
+              }}
             >
-              Sign In
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <svg
+                    className="w-4 h-4 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      opacity="0.25"
+                    />
+                    <path
+                      d="M22 12a10 10 0 00-10-10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  Signing In...
+                </div>
+              ) : (
+                "Sign In"
+              )}
             </button>
           </form>
 
-          {/* ── Trust badges ── */}
-          <div className="mt-6 flex items-center justify-center gap-5 text-[#9CA3AF]">
-            {[
-              { icon: "M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z", label: "Secure" },
-              { icon: "M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z", label: "Trusted" },
-              { icon: "M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z", label: "Safe Pay" },
-            ].map(({ icon, label }) => (
-              <div key={label} className="flex items-center gap-1.5 text-xs font-medium">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d={icon} />
-                </svg>
-                {label}
-              </div>
-            ))}
+          {/* Divider */}
+          <div className="my-5 flex items-center gap-3">
+            <div className="flex-1 h-px bg-slate-100" />
+            <span className="text-xs text-gray-400 font-medium">or</span>
+            <div className="flex-1 h-px bg-slate-100" />
           </div>
 
-          {/* ── Divider ── */}
-          <div className="my-6 border-t border-[#E5E7EB]" />
-
-          {/* ── Signup link — Link destination preserved exactly ── */}
-          <p className="text-center text-sm text-[#6B7280]">
+          {/* Create account link */}
+          <p className="text-center text-sm text-gray-500">
             Don't have an account?{" "}
             <Link
-              to={"/signup"}
-              className="font-semibold text-[#FF9900] hover:text-[#FFB84D] transition-colors duration-150 underline underline-offset-2"
+              to="/signup"
+              className="font-semibold hover:underline transition-colors duration-150"
+              style={{ color: "#534AB7" }}
             >
               Create Account
             </Link>
           </p>
         </div>
       </div>
-
-      {/* ── Footer note ── */}
-      <p className="mt-6 text-xs text-[#9CA3AF] text-center max-w-xs">
-        By signing in, you agree to our{" "}
-        <span className="text-[#6B7280] underline cursor-pointer hover:text-[#FF9900] transition-colors">Terms</span>
-        {" "}and{" "}
-        <span className="text-[#6B7280] underline cursor-pointer hover:text-[#FF9900] transition-colors">Privacy Policy</span>.
-      </p>
     </div>
   );
 }
