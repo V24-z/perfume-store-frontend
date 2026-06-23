@@ -213,7 +213,9 @@ function Signup() {
                   <input
                     type="tel"
                     name="phon"
+                    
                     value={form.phon}
+                    maxLength={10}
                     onChange={handleChange}
                     placeholder="XXXXXXXXXX"
                     className={`${inputBase(!!error.phon)} pl-12`}
