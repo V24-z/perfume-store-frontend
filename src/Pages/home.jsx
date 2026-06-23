@@ -1,10 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import { useRef } from "react";
 import { animate } from "motion";
 import useCart from "../context/useCart";
 import useCartAnimation from "../context/usecartAnimation";
+import useWishlist from "../context/useWhishlist";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 import { Link } from "react-router-dom";
@@ -21,6 +23,7 @@ function Home() {
   const { cartPosition } = useCartAnimation();
 
   const imageRefs = useRef({});
+  const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
 
   //==fly to cart animation==
   const flyToCart = (productId) => {
@@ -584,75 +587,98 @@ function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-auto sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 xl:gap-6">
-              {featuredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-all duration-300"
-                >
-                  <div className="relative h-36 sm:h-44 md:h-52 lg:h-60 xl:h-64 bg-slate-100">
-                    <img
-                      ref={(el) => (imageRefs.current[product.id] = el)}
-                      src={product.image_url}
-                      alt={product.name}
-                      className="w-full h-full object-cover"
-                    />
-                    <span
-                      className="absolute top-2 right-2 sm:top-3 sm:right-3 px-1.5 py-0.5 sm:px-2 sm:py-1
+              {featuredProducts.map((product) => {
+                const isWishlisted = wishlistItems.some(
+                  (item) => item.id === product.id,
+                );
+
+                return (
+                  <div
+                    key={product.id}
+                    className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-all duration-300"
+                  >
+                    <div className="relative h-36 sm:h-44 md:h-52 lg:h-60 xl:h-64 bg-slate-100">
+                      <img
+                        ref={(el) => (imageRefs.current[product.id] = el)}
+                        src={product.image_url}
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <span
+                        className="absolute top-2 right-2 sm:top-3 sm:right-3 px-1.5 py-0.5 sm:px-2 sm:py-1
                                      rounded-full text-[9px] sm:text-[10px] font-bold bg-[#534AB7] text-white"
-                    >
-                      FEATURED
-                    </span>
-                  </div>
+                      >
+                        FEATURED
+                      </span>
+                    </div>
 
-                  <div className="p-3 sm:p-4">
-                    <p className="text-[10px] sm:text-xs text-purple-700 font-semibold uppercase">
-                      {product.brand}
-                    </p>
-                    <h3 className="font-bold mt-0.5 sm:mt-1 text-sm sm:text-base text-[#1a0533] leading-snug line-clamp-2">
-                      {product.name}
-                    </h3>
-                    {product.fragrance_type && (
-                      <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">
-                        {product.fragrance_type}
+                    <div className="p-3 sm:p-4">
+                      <p className="text-[10px] sm:text-xs text-purple-700 font-semibold uppercase">
+                        {product.brand}
                       </p>
-                    )}
+                      <h3 className="font-bold mt-0.5 sm:mt-1 text-sm sm:text-base text-[#1a0533] leading-snug line-clamp-2">
+                        {product.name}
+                      </h3>
+                      {product.fragrance_type && (
+                        <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1">
+                          {product.fragrance_type}
+                        </p>
+                      )}
 
-                    <div className="mt-3 sm:mt-4 flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                      {product.discount_price > 0 ? (
-                        <>
+                      <div className="mt-3 sm:mt-4 flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                        {product.discount_price > 0 ? (
+                          <>
+                            <span className="font-bold text-base sm:text-lg text-purple-900">
+                              ₹{product.discount_price}
+                            </span>
+                            <span className="text-xs sm:text-sm text-gray-400 line-through">
+                              ₹{product.price}
+                            </span>
+                          </>
+                        ) : (
                           <span className="font-bold text-base sm:text-lg text-purple-900">
-                            ₹{product.discount_price}
-                          </span>
-                          <span className="text-xs sm:text-sm text-gray-400 line-through">
                             ₹{product.price}
                           </span>
-                        </>
-                      ) : (
-                        <span className="font-bold text-base sm:text-lg text-purple-900">
-                          ₹{product.price}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex gap-2 mt-4">
-                      <button
-                        onClick={() => {
-                          flyToCart(product.id);
-                          addToCart(product);
-                        }}
-                        className="w-12 h-12 flex items-center justify-center rounded-xl bg-purple-100 text-[#534AB7] hover:bg-purple-200 transition"
-                      >
-                        <ShoppingCart size={20} />
-                      </button>
-
-                      <Link to={`/viewdetail/${product.id}`} className="flex-1">
-                        <button className="w-full h-12 rounded-xl bg-[#534AB7] text-white font-semibold hover:bg-[#443da0] transition">
-                          View Detail
+                        )}
+                      </div>
+                      <div className="flex gap-2 mt-4">
+                        <button
+                          onClick={() => {
+                            flyToCart(product.id);
+                            addToCart(product);
+                          }}
+                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-purple-100 text-[#534AB7] hover:bg-purple-200 transition"
+                        >
+                          <ShoppingCart size={20} />
                         </button>
-                      </Link>
+
+                        <Link
+                          to={`/viewdetail/${product.id}`}
+                          className="flex-1"
+                        >
+                          <button className="w-full h-12 rounded-xl bg-[#534AB7] text-white font-semibold hover:bg-[#443da0] transition">
+                            View Detail
+                          </button>
+                        </Link>
+
+                        <button
+                          onClick={() =>
+                            isWishlisted
+                              ? removeFromWishlist(product.id)
+                              : addToWishlist(product)
+                          }
+                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-pink-100 text-pink-600"
+                        >
+                          <Heart
+                            size={20}
+                            fill={isWishlisted ? "currentColor" : "none"}
+                          />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </section>

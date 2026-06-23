@@ -7,15 +7,18 @@ import App from "./App.jsx";
 import { AuthProvider } from "./context/AuthProvider";
 import { CartProvider } from "./context/cartProvider.jsx";
 import { CartAnimationProvider } from "./context/animationprovider.jsx";
+import { WishlistProvider } from "./context/whishlistProvider.jsx";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <BrowserRouter>
     <AuthProvider>
       <CartProvider>
-        <CartAnimationProvider>
-          <App />
-        </CartAnimationProvider>
+        <WishlistProvider>
+          <CartAnimationProvider>
+            <App />
+          </CartAnimationProvider>
+        </WishlistProvider>
       </CartProvider>
     </AuthProvider>
   </BrowserRouter>,

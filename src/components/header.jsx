@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import useCartAnimation from "../context/usecartAnimation";
+import useWishlist from "../context/useWhishlist";
 import Navbar from "./Navbar";
 
 function Header() {
@@ -27,7 +28,7 @@ function Header() {
   const navigate = useNavigate();
 
   const { setCartPosition } = useCartAnimation();
-
+  const { wishlistItems } = useWishlist();
   // ===========================
   // SAVE CART ICON POSITION
   // ===========================
@@ -473,7 +474,7 @@ function Header() {
                   className="absolute -top-1 -right-1 text-white font-bold w-4 h-4 rounded-full flex items-center justify-center"
                   style={{ background: "#f43f5e", fontSize: 9 }}
                 >
-                  2
+                {wishlistItems.length}
                 </span>
               </button>
 
