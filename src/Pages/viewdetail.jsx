@@ -4,6 +4,7 @@ import useCart from "../context/useCart";
 import axios from "axios";
 import { animate } from "motion";
 import useCartAnimation from "../context/usecartAnimation";
+import {Heart} from "lucide-react"
 
 function ViewSingleProduct() {
   const [product, setProduct] = useState(null);
@@ -152,20 +153,26 @@ function ViewSingleProduct() {
       <div className="max-w-6xl mx-auto p-6">
         <div className="grid md:grid-cols-2 gap-10 bg-white p-6 rounded-2xl">
           {/* ─── IMAGE ─── */}
-          <div className="flex justify-center items-center bg-gray-50 rounded-xl p-6 relative">
+          <div
+            className="flex justify-center items-center rounded-xl p-10 relative"
+            style={{ background: "#EEEDFE", minHeight: "360px" }}
+          >
             <img
               ref={imgRef}
               src={product.image_url}
               alt={product.name}
-              className="w-64 h-64 object-contain"
+              className="w-48 h-48 object-contain"
             />
-
-            {/* Wishlist */}
             <button
               onClick={() => setWishlisted(!wishlisted)}
-              className="absolute top-4 right-4 bg-white p-2 rounded-full shadow"
+              className="absolute top-4 right-4 bg-white border border-gray-100 p-2 rounded-full"
             >
-              ❤️
+              <Heart
+                size={16}
+                className={
+                  wishlisted ? "fill-pink-500 text-pink-500" : "text-gray-400"
+                }
+              />
             </button>
           </div>
 
@@ -196,7 +203,6 @@ function ViewSingleProduct() {
                 disabled={product.stock_quantity === 0 || isInCart}
                 className={`px-5 py-3 rounded-xl w-full transition ${isInCart ? "bg-green-100 text-green-700 cursor-not-allowed" : "bg-purple-600 text-white hover:bg-purple-700"}`}
               >
-                
                 {isInCart ? "✓ Added To Cart" : "Add To Cart"}
               </button>
 
