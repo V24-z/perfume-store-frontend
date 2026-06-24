@@ -2,6 +2,9 @@
 //import UserRoutes from "./routes/userRoutes.jsx";
 //import Login from "./components/user/login.jsx";
 //import Signup from "./components/user/signup.jsx";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import { useAuth } from "./context/useAuth.jsx";
 import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
@@ -33,7 +36,7 @@ function App() {
           {/* Optional: redirect all unknown paths */}
           <Route path="*" element={user ? <UserRoutes /> : <Login />} />
         </Routes>
-      
+      <ToastContainer position="top-right" autoClose={2000} />
     </Suspense>
   );
 }

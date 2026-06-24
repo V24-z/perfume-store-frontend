@@ -19,7 +19,7 @@ function Home() {
   const [isPaused, setIsPaused] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
-  const { addToCart } = useCart();
+  const { addToCart, cartItems } = useCart();
   const { cartPosition } = useCartAnimation();
 
   const imageRefs = useRef({});
@@ -591,7 +591,9 @@ function Home() {
                 const isWishlisted = wishlistItems.some(
                   (item) => item.id === product.id,
                 );
-
+                const isInCart = cartItems.some(
+                  (item) => item.product_id === product.id,
+                );
                 return (
                   <div
                     key={product.id}
@@ -643,13 +645,22 @@ function Home() {
                       </div>
                       <div className="flex gap-2 mt-4">
                         <button
+                          disabled={isInCart}
                           onClick={() => {
                             flyToCart(product.id);
                             addToCart(product);
                           }}
-                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-purple-100 text-[#534AB7] hover:bg-purple-200 transition"
+                          className={`w-12 h-12 flex items-center justify-center rounded-xl transition ${
+                            isInCart
+                              ? "bg-green-100 text-green-600 cursor-not-allowed"
+                              : "bg-purple-100 text-[#534AB7] hover:bg-purple-200"
+                          }`}
                         >
-                          <ShoppingCart size={20} />
+                          {isInCart ? (
+                            <span className="font-bold">✓</span>
+                          ) : (
+                            <ShoppingCart size={20} />
+                          )}
                         </button>
 
                         <Link

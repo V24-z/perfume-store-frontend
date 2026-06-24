@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import useCart from "../context/useCart";
 import { useAuth } from "../context/useAuth";
+import { toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -193,7 +194,7 @@ function EmptyCartState({ onContinue }) {
 /* -------------------------------- Checkout -------------------------------- */
 
 function Checkout() {
-  const { cartItems } = useCart();
+  const { cartItems,clearCart } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -219,17 +220,17 @@ function Checkout() {
   // same alerts, same navigation target.
   const handleCheckout = async () => {
     if (!user) {
-      alert("Please login first");
+      toast.error("Please login first");
       return;
     }
 
     if (!formData.phone.trim()) {
-      alert("Phone number is required");
+      toast.info("Phone number is required");
       return;
     }
 
     if (!formData.address.trim()) {
-      alert("Address is required");
+      toast.info("Address is required");
       return;
     }
 
@@ -244,15 +245,15 @@ function Checkout() {
 
       const response = await axios.post(`${API_URL}/orders/checkout`, payload);
 
-      alert(`Order Created Successfully!`);
-
+      toast.success(`Order Created Successfully!`);
+      await clearCart();
       navigate(`/order-success/${response.data.order_id}`);
     } catch (error) {
       console.error("Checkout Error:", error);
 
       const message = error.response?.data?.detail || "Checkout failed";
 
-      alert(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -497,7 +498,7 @@ function Checkout() {
                           </p>
                           <p className="font-mono text-xs text-[#6B7280]">
                             Qty {item.quantity}
-                            {price > 0 ? ` · $${price.toFixed(2)}` : ""}
+                            {price > 0 ? ` · ₹${price.toFixed(2)}` : ""}
                           </p>
                         </div>
                         {price > 0 && (
@@ -525,7 +526,7 @@ function Checkout() {
                   {hasPricing && (
                     <div className="flex justify-between text-[#6B7280]">
                       <dt>Subtotal</dt>
-                      <dd className="text-[#111827]">${subtotal.toFixed(2)}</dd>
+                      <dd className="text-[#111827]">₹{subtotal.toFixed(2)}</dd>
                     </div>
                   )}
                   <div className="flex justify-between text-[#6B7280]">
@@ -539,7 +540,7 @@ function Checkout() {
                     Total
                   </span>
                   <span className="font-mono text-xl font-bold text-[#111827]">
-                    {hasPricing ? `$${subtotal.toFixed(2)}` : "—"}
+                    {hasPricing ? `₹${subtotal.toFixed(2)}` : "—"}
                   </span>
                 </div>
               </div>
