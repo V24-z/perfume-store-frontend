@@ -12,8 +12,7 @@ function ViewSingleProduct() {
   const [wishlisted, setWishlisted] = useState(false);
   const { cartPosition } = useCartAnimation();
   const API_URL = import.meta.env.VITE_API_URL;
-  const { addToCart } = useCart();
-
+  const { addToCart, cartItems } = useCart();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -44,8 +43,23 @@ function ViewSingleProduct() {
   // ─── LOADING UI ───
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-10 h-10 border-4 border-gray-200 border-t-gray-800 rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center">
+        <svg
+          className="animate-spin"
+          width="48"
+          height="48"
+          viewBox="0 0 48 48"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="24" cy="24" r="20" stroke="#CECBF6" strokeWidth="4" />
+          <path
+            d="M 24 4 A 20 20 0 0 1 44 24"
+            stroke="#534AB7"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+        </svg>
       </div>
     );
   }
@@ -123,7 +137,7 @@ function ViewSingleProduct() {
       },
     );
   };
-
+  const isInCart = cartItems.some((item) => item.product_id === product.id);
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ─── BREADCRUMB ─── */}
@@ -174,18 +188,23 @@ function ViewSingleProduct() {
             <div className="mt-8 flex gap-4">
               <button
                 onClick={() => {
-                  flyToCart(); // 🔥 animation
-                  addToCart(product);
+                  if (!isInCart) {
+                    flyToCart();
+                    addToCart(product);
+                  }
                 }}
-                disabled={product.stock_quantity === 0}
-                className="bg-purple-600 text-white px-5 py-3 rounded-xl w-full disabled:opacity-50"
+                disabled={product.stock_quantity === 0 || isInCart}
+                className={`px-5 py-3 rounded-xl w-full transition ${isInCart ? "bg-green-100 text-green-700 cursor-not-allowed" : "bg-purple-600 text-white hover:bg-purple-700"}`}
               >
-                Add To Cart
+                
+                {isInCart ? "✓ Added To Cart" : "Add To Cart"}
               </button>
 
               <button
                 onClick={async () => {
-                  await addToCart(product);
+                  if (!isInCart) {
+                    await addToCart(product);
+                  }
                   navigate("/checkout");
                 }}
                 disabled={product.stock_quantity === 0}

@@ -8,7 +8,7 @@ import {
   ShoppingBag,
   ChevronRight,
   ShieldCheck,
-  Truck,
+  
   ArrowRight,
 } from "lucide-react";
 //import { useAuth } from "../context/useAuth";
@@ -48,8 +48,7 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
     <motion.div
       variants={itemVariants}
       exit={{ opacity: 0, x: -24, transition: { duration: 0.3 } }}
-      layout
-      whileHover={{ y: -3 }}
+      
       transition={{ type: "spring", stiffness: 300, damping: 24 }}
       className="group bg-white border border-neutral-200 rounded-2xl p-4 sm:p-5 flex gap-4 sm:gap-5 shadow-sm hover:shadow-md transition-shadow duration-300"
     >
@@ -83,8 +82,8 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
         <div className="mt-auto flex items-center justify-between pt-3">
           <div className="flex items-center gap-3 rounded-full border border-neutral-200 px-1.5 py-1">
             <motion.button
-              whileTap={{ scale: 0.85 }}
-              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.75 }}
+              whileHover={{ scale: 1.00 }}
               onClick={() => onDecrease(item)}
               aria-label="Decrease quantity"
               className="w-7 h-7 rounded-full flex items-center justify-center text-neutral-600 hover:bg-neutral-900 hover:text-white transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900"
@@ -97,8 +96,8 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
             </span>
 
             <motion.button
-              whileTap={{ scale: 0.85 }}
-              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.75 }}
+              whileHover={{ scale: 1.00 }}
               onClick={() => onIncrease(item)}
               aria-label="Increase quantity"
               className="w-7 h-7 rounded-full flex items-center justify-center text-neutral-600 hover:bg-neutral-900 hover:text-white transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-900"
@@ -190,9 +189,7 @@ function OrderSummary({ subtotal, itemCount }) {
         </Link>
 
         <div className="flex items-center gap-4 mt-5 pt-4 border-t border-neutral-100 text-xs text-neutral-500">
-          <span className="flex items-center gap-1.5">
-            <Truck size={14} /> Free over ₹1,999
-          </span>
+          
           <span className="flex items-center gap-1.5">
             <ShieldCheck size={14} /> Secure checkout
           </span>

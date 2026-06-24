@@ -24,7 +24,10 @@ function Home() {
 
   const imageRefs = useRef({});
   const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
-
+  // ✅ Scroll to top when product changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   //==fly to cart animation==
   const flyToCart = (productId) => {
     const img = imageRefs.current[productId];
@@ -66,43 +69,32 @@ function Home() {
       },
     );
   };
-  useEffect(() => {
-    const fetchNewArrivals = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/products/new-arrivals`);
-        setNewArrivals(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchNewArrivals();
-  }, []);
+
+  //single Effect--------------------------------------------------
 
   useEffect(() => {
-    const getFeaturedProducts = async () => {
+    const fetchHomeData = async () => {
       try {
-        const res = await axios.get(`${API_URL}/products/featured/list`);
-        setFeaturedProducts(res.data.filter((p) => p.is_featured === true));
-      } catch (err) {
-        console.error("Error fetching featured products:", err);
-      }
-    };
-    getFeaturedProducts();
-  }, []);
+        const [newArrivalsRes, featuredRes, bannersRes] = await Promise.all([
+          axios.get(`${API_URL}/products/new-arrivals`),
+          axios.get(`${API_URL}/products/featured/list`),
+          axios.get(`${API_URL}/banners`),
+        ]);
 
-  useEffect(() => {
-    const getBanners = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/banners`);
-        setBanners(res.data);
-      } catch (err) {
-        console.error("Error fetching banners:", err);
+        setNewArrivals(newArrivalsRes.data);
+        setFeaturedProducts(featuredRes.data);
+        setBanners(bannersRes.data);
+      } catch (error) {
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
-    getBanners();
+
+    fetchHomeData();
   }, []);
+
+  //single Effect--------------------------------------------------
 
   useEffect(() => {
     if (banners.length <= 1 || isPaused) return;
@@ -169,20 +161,30 @@ function Home() {
     },
     [goNext, goPrev],
   );
-
-  if (loading)
+  if (loading) {
     return (
-      <div
-        className="flex flex-col items-center justify-center gap-3 min-h-[40vh]"
-        role="status"
-        aria-label="Loading banners"
-      >
-        <div className="w-10 h-10 rounded-full border-2 animate-spin border-[#534AB7] border-t-transparent" />
-        <p className="text-xs tracking-widest uppercase text-[#534AB7]">
-          Loading...
-        </p>
+      <div className="min-h-screen flex items-center justify-center">
+        
+          <svg
+            className="animate-spin"
+            width="48"
+            height="48"
+            viewBox="0 0 48 48"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="24" cy="24" r="20" stroke="#CECBF6" strokeWidth="4" />
+            <path
+              d="M 24 4 A 20 20 0 0 1 44 24"
+              stroke="#534AB7"
+              strokeWidth="4"
+              strokeLinecap="round"
+            />
+          </svg>
+        
       </div>
     );
+  }
 
   return (
     <>
@@ -291,6 +293,7 @@ function Home() {
                       <img
                         key={`img-${i}-${current}`}
                         src={banner.image_url}
+                        loading="lazy"
                         alt=""
                         aria-hidden="true"
                         className="w-full h-full object-cover img-zoom"
@@ -602,6 +605,7 @@ function Home() {
                     <div className="relative h-36 sm:h-44 md:h-52 lg:h-60 xl:h-64 bg-slate-100">
                       <img
                         ref={(el) => (imageRefs.current[product.id] = el)}
+                        loading="lazy"
                         src={product.image_url}
                         alt={product.name}
                         className="w-full h-full object-cover"
@@ -721,6 +725,7 @@ function Home() {
                   <div className="h-36 sm:h-44 md:h-48 lg:h-52 overflow-hidden">
                     <img
                       src={product.image_url}
+                      loading="lazy"
                       alt={product.name}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                     />

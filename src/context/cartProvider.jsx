@@ -101,16 +101,26 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Increase Quantity
+  //Increase Quantity
   const increaseQty = async (item) => {
+    // Update UI immediately
+    setCartItems((prev) =>
+      prev.map((cartItem) =>
+        cartItem.id === item.id
+          ? { ...cartItem, quantity: cartItem.quantity + 1 }
+          : cartItem,
+      ),
+    );
+
     try {
       await axios.put(`${API_URL}/cart/${item.id}`, {
         quantity: item.quantity + 1,
       });
-
-      await fetchCart();
     } catch (error) {
       console.error("Increase Qty Error:", error.response?.data || error);
+
+      // rollback on error
+      fetchCart();
     }
   };
 
@@ -118,27 +128,49 @@ export const CartProvider = ({ children }) => {
   const decreaseQty = async (item) => {
     if (item.quantity <= 1) return;
 
+    // Update UI immediately
+    setCartItems((prev) =>
+      prev.map((cartItem) =>
+        cartItem.id === item.id
+          ? { ...cartItem, quantity: cartItem.quantity - 1 }
+          : cartItem,
+      ),
+    );
+
     try {
       await axios.put(`${API_URL}/cart/${item.id}`, {
         quantity: item.quantity - 1,
       });
-
-      await fetchCart();
     } catch (error) {
       console.error("Decrease Qty Error:", error.response?.data || error);
+
+      // rollback on error
+      fetchCart();
     }
   };
 
   // Remove Item
   const removeFromCart = async (cartId) => {
-    try {
-      await axios.delete(`${API_URL}/cart/${cartId}`);
+  // Save current state for rollback
+  const previousItems = cartItems;
 
-      await fetchCart();
-    } catch (error) {
-      console.error("Remove Item Error:", error.response?.data || error);
-    }
-  };
+  // Remove immediately from UI
+  setCartItems((prev) =>
+    prev.filter((item) => item.id !== cartId)
+  );
+
+  try {
+    await axios.delete(`${API_URL}/cart/${cartId}`);
+  } catch (error) {
+    console.error(
+      "Remove Item Error:",
+      error.response?.data || error
+    );
+
+    // Restore if API fails
+    setCartItems(previousItems);
+  }
+};
 
   // Clear Cart
   const clearCart = async () => {
