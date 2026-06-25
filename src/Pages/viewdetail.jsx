@@ -89,10 +89,10 @@ function ViewSingleProduct() {
   // ─── ANIMATION FUNCTION ───
 
   const flyToCart = () => {
-    console.log("cartPosition:", cartPosition);
+    
 
     if (!imgRef.current || !cartPosition) {
-      console.log("Animation blocked");
+     
       return;
     }
 

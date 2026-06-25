@@ -1,422 +1,325 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { Filter } from "lucide-react";
 
 import useCart from "../context/useCart";
-
-import ProductCard from "../components/shop/productCard";
-import FilterSidebar from "../components/shop/filterSidebar";
-import MobileFilterDrawer from "../components/shop/mobileFilterDrawer";
-import QuickViewModal from "../components/shop/quickViewModal";
-import RecentlyViewed from "../components/shop/recentlyViewed";
+import useWishlist from "../context/useWhishlist";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-function Shop() {
+export default function Shop() {
+  const { addToCart } = useCart();
+
+  const {
+    wishlistItems,
+    addToWishlist,
+    removeFromWishlist,
+  } = useWishlist();
+
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedProduct, setSelectedProduct] =
+    useState(null);
 
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [maxPrice, setMaxPrice] = useState(10000);
-
-  const [loading, setLoading] = useState(true);
-
-  const [wishlist, setWishlist] = useState([]);
-
-  const [quickView, setQuickView] = useState(null);
-
-  const [mobileFilters, setMobileFilters] =
-    useState(false);
-
-  const [recentlyViewed, setRecentlyViewed] =
-    useState([]);
-
-  const { addToCart } = useCart();
-
-  // ==========================
-  // Products
-  // ==========================
-
-  const loadProducts = async () => {
-    try {
-      setLoading(true);
-
-      const res = await axios.get(
-        `${API_URL}/products`
-      );
-
-      setProducts(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ==========================
-  // Categories
-  // ==========================
-
-  const loadCategories = async () => {
-    try {
-      const res = await axios.get(
-        `${API_URL}/categories/active/list`
-      );
-
-      setCategories(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // ==========================
-  // Initial Load
-  // ==========================
+  const [filters, setFilters] = useState({
+    search: "",
+    category_id: "",
+    brand: "",
+    max_price: "",
+    sort: "",
+  });
 
   useEffect(() => {
-    (async () => {
-      await loadProducts();
-      await loadCategories();
-    })();
-  }, []);
-
-  // ==========================
-  // Search Debounce
-  // ==========================
-
-  useEffect(() => {
-    const timer = setTimeout(async () => {
-      if (!search.trim()) {
-        await loadProducts();
-        return;
-      }
-
-      try {
-        const res = await axios.get(
-          `${API_URL}/products/search?q=${search}`
-        );
-
-        setProducts(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [search]);
-
-  // ==========================
-  // Category Change
-  // ==========================
-
-  useEffect(() => {
-    (async () => {
+    const fetchProducts = async () => {
       try {
         setLoading(true);
 
-        const url = selectedCategory
-          ? `${API_URL}/products/category/${selectedCategory}`
-          : `${API_URL}/products`;
+        const activeFilters = Object.fromEntries(
+          Object.entries(filters).filter(([, v]) => v !== "")
+        );
 
-        const res = await axios.get(url);
+        const { data } = await axios.get(
+          `${API_URL}/products`,
+          { params: activeFilters }
+        );
 
-        setProducts(res.data);
-      } catch (err) {
-        console.error(err);
+        setProducts(data);
+      } catch (error) {
+        console.error(error);
       } finally {
         setLoading(false);
       }
-    })();
-  }, [selectedCategory]);
+    };
 
-  // ==========================
-  // Brands
-  // ==========================
+    fetchProducts();
+  }, [filters]);
 
-  const brands = useMemo(() => {
-    return [
-      ...new Set(
-        products
-          .map((p) => p.brand)
-          .filter(Boolean)
-      ),
-    ];
-  }, [products]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get(
+          `${API_URL}/categories`
+        );
 
-  // ==========================
-  // Sorting
-  // ==========================
+        setCategories(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-  const sortedProducts = useMemo(() => {
-    const data = [...products];
+    fetchCategories();
+  }, []);
 
-    if (sort === "low") {
-      data.sort((a, b) => a.price - b.price);
-    }
-
-    if (sort === "high") {
-      data.sort((a, b) => b.price - a.price);
-    }
-
-    return data;
-  }, [products, sort]);
-
-  // ==========================
-  // Final Filters
-  // ==========================
-
-  const filteredProducts = useMemo(() => {
-    return sortedProducts.filter((product) => {
-      const matchBrand =
-        !selectedBrand ||
-        product.brand === selectedBrand;
-
-      const matchPrice =
-        Number(product.price) <= maxPrice;
-
-      return matchBrand && matchPrice;
-    });
-  }, [
-    sortedProducts,
-    selectedBrand,
-    maxPrice,
-  ]);
-
-  // ==========================
-  // Quick View
-  // ==========================
-
-  const openQuickView = (product) => {
-    setQuickView(product);
-
-    setRecentlyViewed((prev) => {
-      const updated = [
-        product,
-        ...prev.filter(
-          (p) => p.id !== product.id
-        ),
-      ];
-
-      return updated.slice(0, 6);
-    });
+  const handleChange = (name, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return (
-    <div className="bg-[#F5F5F6] min-h-screen">
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">
+        Shop
+      </h1>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="grid lg:grid-cols-4 gap-8">
+        {/* FILTERS */}
 
-        {/* Header */}
+        <div className="border rounded-lg p-4 h-fit">
+          <h2 className="font-bold text-lg mb-4">
+            Filters
+          </h2>
 
-        <div className="mb-8">
+          {/* SEARCH */}
 
-          <h1 className="text-4xl font-bold text-[#282C3F]">
-            Shop
-          </h1>
+          <input
+            type="text"
+            placeholder="Search Product"
+            value={filters.search}
+            onChange={(e) =>
+              handleChange(
+                "search",
+                e.target.value
+              )
+            }
+            className="w-full border p-2 rounded mb-4"
+          />
 
-          <p className="text-gray-500 mt-2">
-            Discover premium fragrances
-          </p>
+          {/* CATEGORY */}
 
+          <select
+            value={filters.category_id}
+            onChange={(e) =>
+              handleChange(
+                "category_id",
+                e.target.value
+              )
+            }
+            className="w-full border p-2 rounded mb-4"
+          >
+            <option value="">
+              All Categories
+            </option>
+
+            {categories.map((category) => (
+              <option
+                key={category.id}
+                value={category.id}
+              >
+                {category.name}
+              </option>
+            ))}
+          </select>
+
+          {/* BRAND */}
+
+          <input
+            type="text"
+            placeholder="Brand"
+            value={filters.brand}
+            onChange={(e) =>
+              handleChange(
+                "brand",
+                e.target.value
+              )
+            }
+            className="w-full border p-2 rounded mb-4"
+          />
+
+          {/* MAX PRICE */}
+
+          <input
+            type="number"
+            placeholder="Max Price"
+            value={filters.max_price}
+            onChange={(e) =>
+              handleChange(
+                "max_price",
+                e.target.value
+              )
+            }
+            className="w-full border p-2 rounded mb-4"
+          />
+
+          {/* SORT */}
+
+          <select
+            value={filters.sort}
+            onChange={(e) =>
+              handleChange(
+                "sort",
+                e.target.value
+              )
+            }
+            className="w-full border p-2 rounded"
+          >
+            <option value="">
+              Sort By
+            </option>
+
+            <option value="low">
+              Price Low → High
+            </option>
+
+            <option value="high">
+              Price High → Low
+            </option>
+          </select>
         </div>
 
-        {/* Search */}
+        {/* PRODUCTS */}
 
-        <div className="bg-white rounded-2xl p-4 shadow-sm border mb-6">
+        <div className="lg:col-span-3">
+          {loading ? (
+            <p>Loading Products...</p>
+          ) : products.length === 0 ? (
+            <p>No Products Found</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {products.map((product) => {
+                const isWishlisted =
+                  wishlistItems.some(
+                    (item) =>
+                      item.id === product.id
+                  );
 
-          <div className="flex flex-col lg:flex-row gap-4">
+                return (
+                  <div
+                    key={product.id}
+                    className="border rounded-lg overflow-hidden shadow"
+                  >
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className="w-full h-64 object-cover"
+                    />
 
-            <input
-              type="text"
-              value={search}
-              placeholder="Search perfumes..."
-              onChange={(e) =>
-                setSearch(e.target.value)
+                    <div className="p-4">
+                      <h3 className="font-semibold text-lg">
+                        {product.name}
+                      </h3>
+
+                      <p className="text-gray-500">
+                        {product.brand}
+                      </p>
+
+                      <p className="font-bold mt-2">
+                        ₹{product.price}
+                      </p>
+
+                      <div className="flex gap-2 mt-4">
+                        <button
+                          onClick={() =>
+                            addToCart(product)
+                          }
+                          className="bg-black text-white px-3 py-2 rounded flex-1"
+                        >
+                          Add Cart
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            setSelectedProduct(
+                              product
+                            )
+                          }
+                          className="border px-3 py-2 rounded"
+                        >
+                          View
+                        </button>
+
+                        <button
+                          onClick={() =>
+                            isWishlisted
+                              ? removeFromWishlist(
+                                  product.id
+                                )
+                              : addToWishlist(
+                                  product
+                                )
+                          }
+                          className="border px-3 py-2 rounded"
+                        >
+                          {isWishlisted
+                            ? "❤️"
+                            : "🤍"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* QUICK VIEW MODAL */}
+
+      {selectedProduct && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-lg w-full relative">
+            <button
+              onClick={() =>
+                setSelectedProduct(null)
               }
-              className="flex-1 h-12 px-4 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#FF3F6C]"
+              className="absolute top-3 right-3"
+            >
+              ✕
+            </button>
+
+            <img
+              src={selectedProduct.image_url}
+              alt={selectedProduct.name}
+              className="w-full h-80 object-cover rounded"
             />
 
-            <select
-              value={sort}
-              onChange={(e) =>
-                setSort(e.target.value)
-              }
-              className="h-12 px-4 rounded-xl border border-gray-200"
-            >
-              <option value="">
-                Featured
-              </option>
+            <h2 className="text-2xl font-bold mt-4">
+              {selectedProduct.name}
+            </h2>
 
-              <option value="low">
-                Price Low → High
-              </option>
+            <p className="mt-2 text-gray-600">
+              {selectedProduct.description}
+            </p>
 
-              <option value="high">
-                Price High → Low
-              </option>
-            </select>
+            <p className="text-xl font-bold mt-4">
+              ₹{selectedProduct.price}
+            </p>
 
             <button
               onClick={() =>
-                setMobileFilters(true)
+                addToCart(selectedProduct)
               }
-              className="lg:hidden h-12 px-4 bg-[#FF3F6C] text-white rounded-xl flex items-center gap-2"
+              className="w-full bg-black text-white py-3 rounded mt-4"
             >
-              <Filter size={18} />
-              Filters
+              Add To Cart
             </button>
-
           </div>
-
         </div>
-
-        <div className="grid lg:grid-cols-4 gap-6">
-
-          {/* Sidebar */}
-
-          <aside className="hidden lg:block lg:col-span-1">
-
-            <FilterSidebar
-              categories={categories}
-              selectedCategory={
-                selectedCategory
-              }
-              setSelectedCategory={
-                setSelectedCategory
-              }
-              brands={brands}
-              selectedBrand={
-                selectedBrand
-              }
-              setSelectedBrand={
-                setSelectedBrand
-              }
-              maxPrice={maxPrice}
-              setMaxPrice={setMaxPrice}
-            />
-
-          </aside>
-
-          {/* Products */}
-
-          <section className="lg:col-span-3">
-
-            <div className="flex justify-between mb-5">
-
-              <p className="text-gray-600">
-                {filteredProducts.length} Products
-              </p>
-
-            </div>
-
-            {loading ? (
-
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-
-                {[...Array(6)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="bg-white rounded-2xl h-80 animate-pulse"
-                  />
-                ))}
-
-              </div>
-
-            ) : filteredProducts.length === 0 ? (
-
-              <div className="bg-white rounded-2xl p-12 text-center">
-
-                <h2 className="font-bold text-2xl">
-                  No Products Found
-                </h2>
-
-                <p className="text-gray-500 mt-2">
-                  Try different filters
-                </p>
-
-              </div>
-
-            ) : (
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
-
-                {filteredProducts.map(
-                  (product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      addToCart={addToCart}
-                      wishlist={wishlist}
-                      setWishlist={setWishlist}
-                      openQuickView={
-                        openQuickView
-                      }
-                    />
-                  )
-                )}
-
-              </div>
-
-            )}
-
-          </section>
-
-        </div>
-
-        {/* Recently Viewed */}
-
-        <RecentlyViewed
-          products={recentlyViewed}
-        />
-
-      </div>
-
-      {/* Mobile Drawer */}
-
-      <MobileFilterDrawer
-        open={mobileFilters}
-        onClose={() =>
-          setMobileFilters(false)
-        }
-      >
-
-        <FilterSidebar
-          categories={categories}
-          selectedCategory={
-            selectedCategory
-          }
-          setSelectedCategory={
-            setSelectedCategory
-          }
-          brands={brands}
-          selectedBrand={
-            selectedBrand
-          }
-          setSelectedBrand={
-            setSelectedBrand
-          }
-          maxPrice={maxPrice}
-          setMaxPrice={setMaxPrice}
-        />
-
-      </MobileFilterDrawer>
-
-      {/* Quick View */}
-
-      <QuickViewModal
-        product={quickView}
-        onClose={() =>
-          setQuickView(null)
-        }
-      />
-
+      )}
     </div>
   );
 }
-
-export default Shop;

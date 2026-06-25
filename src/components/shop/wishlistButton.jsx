@@ -1,25 +1,22 @@
 import { Heart } from "lucide-react";
+import useWishlist from "../../context/useWhishlist";
 
-function WishlistButton({
-  product,
-  wishlist,
-  setWishlist,
-}) {
+function WishlistButton({ product }) {
+  const {
+    wishlistItems,
+    addToWishlist,
+    removeFromWishlist,
+  } = useWishlist();
+
+  const isWishlisted = wishlistItems.some(
+    (p) => p.id === product.id
+  );
 
   const toggleWishlist = () => {
-
-    const exists = wishlist.find(
-      (p) => p.id === product.id
-    );
-
-    if (exists) {
-      setWishlist(
-        wishlist.filter(
-          (p) => p.id !== product.id
-        )
-      );
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
     } else {
-      setWishlist([...wishlist, product]);
+      addToWishlist(product);
     }
   };
 
@@ -31,9 +28,7 @@ function WishlistButton({
       <Heart
         size={18}
         className={
-          wishlist.find(
-            (p) => p.id === product.id
-          )
+          isWishlisted
             ? "fill-red-500 text-red-500"
             : "text-gray-500"
         }

@@ -5,8 +5,7 @@ import WishlistButton from "./wishlistButton";
 function ProductCard({
   product,
   addToCart,
-  wishlist,
-  setWishlist,
+  
   openQuickView,
 }) {
 
@@ -21,11 +20,9 @@ function ProductCard({
           className="h-64 w-full object-cover"
         />
 
-        <WishlistButton
-          product={product}
-          wishlist={wishlist}
-          setWishlist={setWishlist}
-        />
+       
+          <WishlistButton product={product} />
+        
 
       </div>
 
