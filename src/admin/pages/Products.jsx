@@ -7,7 +7,7 @@ const initialForm = {
   name: "",
   brand: "",
   description: "",
-  category_name: "",
+  category_id: "",
   price: "",
   discount_price: "",
   stock_quantity: "",
@@ -243,6 +243,7 @@ export default function App() {
     };
 
     setActionLoading(true);
+    
     try {
       if (modal === "edit") {
         axios.put(`${API_BASE_URL}/products/${activeProduct.id}`, payload);
@@ -254,11 +255,14 @@ export default function App() {
       setModal(null);
       setRefreshKey((k) => k + 1);
     } catch (error) {
-      console.error(error);
-      setFormErr(
-        "Error saving record to FastAPI. Please verify server status.",
-      );
-    } finally {
+     
+        setFormErr(
+          error.response?.data?.detail
+            ? JSON.stringify(error.response.data.detail)
+            : "Error saving record."
+        );
+      }
+     finally {
       setActionLoading(false);
     }
   };
@@ -269,12 +273,12 @@ export default function App() {
 
     setActionLoading(true);
     try {
+      
       const payload = {
-        ...activeProduct,
-        stock_quantity: qty,
-        category_name:
-          activeProduct.category?.name || activeProduct.category_name || "",
-      };
+      ...activeProduct,
+      stock_quantity: qty,
+      category_id: activeProduct.category_id,
+    };
 
       try {
         await axios.patch(`${API_BASE_URL}/products/${activeProduct.id}/`, {
@@ -406,7 +410,7 @@ export default function App() {
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.name}>
+                <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
               ))}
