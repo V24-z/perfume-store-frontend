@@ -238,6 +238,8 @@ function Banner() {
                     }`}
                 >
                   Delete
+                {loading ? "Deleting..." : "Delete"}
+
                 </button>
               </div>
             </div>
