@@ -46,20 +46,8 @@ const Header = ({ onToggleSidebar }) => {
             </svg>
           </button>
 
-          {/* Search — hidden on smallest screens */}
-          <div
-            className="hidden sm:flex items-center gap-2 rounded-full px-4 py-2 cursor-pointer transition-all"
-            style={{
-              background: "rgba(255,255,255,0.07)",
-              border: "1px solid rgba(255,255,255,0.12)",
-              minWidth: 180,
-            }}
-          >
-            <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: "rgba(255,255,255,0.35)" }}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>Search anything...</span>
-          </div>
+         
+          
         </div>
 
         {/* Right */}

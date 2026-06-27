@@ -33,10 +33,7 @@ const navSections = [
       
     ],
   },
-  {
-    label: "System",
-    items: [{ to: "/admin/settings", icon: "ti-settings", label: "Settings" }],
-  },
+  
 ];
 
 const Sidebar = ({ onClose }) => {
