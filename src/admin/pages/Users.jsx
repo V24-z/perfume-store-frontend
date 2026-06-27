@@ -141,15 +141,8 @@ function User() {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-          <select
-            className="border px-3 py-2 rounded text-xs"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="Active">Active</option>
-            <option value="Blocked">Blocked</option>
-          </select>
+         
+          
         </div>
 
         {/* Table */}
