@@ -83,9 +83,12 @@ function Banner() {
     try {
       await axios.delete(`${API_URL}/banners/${id}`);
       await fetchBanners();
+      setDeleteId(null);
       toast.success("Banner deleted successfully");
     } catch (error) {
       console.error("Error deleting banner:", error);
+        setDeleteId(null);
+      toast.error("Failed to delete banner");
     }
   };
 
