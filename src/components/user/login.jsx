@@ -61,11 +61,10 @@ const Field = ({ label, error, children }) => (
 const inputCls = (hasError) =>
   `w-full h-11 px-4 rounded-xl text-sm text-[#1a0533] placeholder-gray-400 bg-white outline-none
    border transition-all duration-200
-   ${
-     hasError
-       ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
-       : "border-slate-200 hover:border-slate-300 focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/10"
-   }`;
+   ${hasError
+    ? "border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-100"
+    : "border-slate-200 hover:border-slate-300 focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/10"
+  }`;
 
 function Login() {
   const [error, setError] = useState({});
@@ -113,7 +112,9 @@ function Login() {
     try {
       const { data } = await axios.post(`${API_URL}/login`, form);
 
-      login(data);
+      // Save user and JWT
+      login(data.user, data.access_token);
+
       setMessage("Logged in successfully");
       setForm({
         email: "",
@@ -288,11 +289,10 @@ function Login() {
               type="submit"
               disabled={loading}
               className={`w-full h-11 mt-1 rounded-full text-sm font-bold tracking-wide transition-all duration-200
-    ${
-      loading
-        ? "opacity-70 cursor-not-allowed"
-        : "hover:brightness-105 hover:scale-[1.01] active:scale-[0.99]"
-    }`}
+    ${loading
+                  ? "opacity-70 cursor-not-allowed"
+                  : "hover:brightness-105 hover:scale-[1.01] active:scale-[0.99]"
+                }`}
               style={{
                 background: "#facc15",
                 color: "#3b0764",

@@ -7,16 +7,19 @@ export const AuthProvider = ({ children }) => {
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-  };
+  const login = (userData, token) => {
+  setUser(userData);
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
-  };
+  localStorage.setItem("user", JSON.stringify(userData));
+  localStorage.setItem("token", token);
+};
 
+ const logout = () => {
+  setUser(null);
+
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
+};
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
       {children}
