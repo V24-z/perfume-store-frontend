@@ -16,7 +16,7 @@ const Banner =lazy(()=>import('../admin/pages/Banner.jsx'));
 const Users =lazy(()=>import('../admin/pages/Users.jsx'));
 const Category =lazy(()=>import('../admin/pages/category.jsx'));
 const  AdminRoute=lazy(()=>import('./adminroute.jsx'));
-const AdminCart =lazy(()=>import('../admin/pages/Cart_admin.jsx'))
+
 const Orders =lazy(()=>import('../admin/pages/orders.jsx'))
 
 const AdminRoutes = () => {
