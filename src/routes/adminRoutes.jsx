@@ -37,7 +37,7 @@ const AdminRoutes = () => {
         <Route path="users" element={<Users />} /> 
         <Route path="Banner" element={<Banner />}/>     
           <Route path="category" element={<Category />}/>      
-        <Route path="cart_admin" element={<AdminCart />}/>      
+            
          <Route path="orders" element={<Orders />}/>      
 
 
