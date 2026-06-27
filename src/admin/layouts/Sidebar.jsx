@@ -11,17 +11,17 @@ const navSections = [
         icon: "ti-box",
         label: "Products",
       
-        badgeType: "yellow",
+        
       },
       {
         to: "/admin/orders",
         icon: "ti-shopping-cart",
         label: "Orders",
         
-        badgeType: "red",
+        
       },
       { to: "/admin/users", icon: "ti-users", label: "Users" },
-      { to: "/admin/cart_admin", icon: "ti-users", label: "user_Cart" },
+      
      
     ],
   },
@@ -30,8 +30,7 @@ const navSections = [
     items: [
       { to: "/admin/category", icon: "ti-category", label: "Categories" },
       { to: "/admin/banner", icon: "ti-photo", label: "Banner" },
-      { to: "/admin/coupons", icon: "ti-discount", label: "Coupons" },
-      { to: "/admin/analytics", icon: "ti-chart-bar", label: "Analytics" },
+      
     ],
   },
   {
