@@ -3,9 +3,19 @@ import { AuthContext } from "./AuthContext.jsx";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem("user");
-    return savedUser ? JSON.parse(savedUser) : null;
-  });
+  const savedUser = localStorage.getItem("user");
+
+  if (!savedUser || savedUser === "undefined") {
+    return null;
+  }
+
+  try {
+    return JSON.parse(savedUser);
+  } catch {
+    localStorage.removeItem("user");
+    return null;
+  }
+});
 
   const login = (userData, token) => {
   setUser(userData);
