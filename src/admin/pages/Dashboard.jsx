@@ -327,7 +327,7 @@ export default function LumiereDashboard() {
           <div className="flex gap-2 flex-wrap">
             {[
               { label: "+ Add Product", href: "/admin/products", bg: C.ink,    fg: "#fff" },
-              { label: "+ Add Banner",  href: "/admin/banners",  bg: C.purpleL, fg: C.purple },
+              { label: "+ Add Banner",  href: "/admin/banner",  bg: C.purpleL, fg: C.purple },
               { label: "View Orders",   href: "/admin/orders",   bg: C.amberL,  fg: "#854F0B" },
             ].map(btn => (
               <a
