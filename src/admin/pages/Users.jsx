@@ -79,7 +79,12 @@ function User() {
 
   // ── Fetch users from FastAPI ──
   useEffect(() => {
-    fetch(`${API_BASE_URL}/users`)
+    const token = localStorage.getItem("token");
+    fetch(`${API_BASE_URL}/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         setUsers(data.data || []);
@@ -141,8 +146,8 @@ function User() {
             onChange={(e) => setSearch(e.target.value)}
           />
 
-         
-          
+
+
         </div>
 
         {/* Table */}
@@ -164,7 +169,7 @@ function User() {
 
               return (
                 <tr key={u.id} className="border-t hover:bg-gray-50">
-                  
+
                   {/* User */}
                   <td className="p-3 flex items-center gap-2">
                     <div
