@@ -57,11 +57,11 @@ function Banner() {
       if (editId) {
         await axios.put(`${API_URL}/banners/${editId}`, formData);
 
-        alert("Banner updated successfully");
+        toast.success("Banner updated successfully");
       } else {
         await axios.post(`${API_URL}/banners`, formData);
 
-        alert("Banner added successfully");
+        toast.success("Banner added successfully");
       }
 
       setFormData(initialForm);
