@@ -216,7 +216,7 @@ export default function LumiereDashboard() {
     axios.get(`${API_URL}/products/`).then(r => setProducts(r.data)).catch(console.error).finally(() => setDone("products"));
     axios.get(`${API_URL}/orders/all`).then(r => setOrders(r.data)).catch(console.error).finally(() => setDone("orders"));
     axios.get(`${API_URL}/users`).then(r => setUsers(r.data?.data || r.data || [])).catch(console.error).finally(() => setDone("users"));
-    axios.get(`${API_URL}/banners`).then(r => setBanners(r.data)).catch(console.error).finally(() => setDone("banners"));
+    axios.get(`${API_URL}/banner`).then(r => setBanners(r.data)).catch(console.error).finally(() => setDone("banners"));
   }, []);
 
    Object.values(loading).some(Boolean);
