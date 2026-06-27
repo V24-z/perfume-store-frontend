@@ -111,7 +111,7 @@ function Login() {
 
     try {
       const { data } = await axios.post(`${API_URL}/login`, form);
-
+      console.log("Login response:", data);
       // Save user and JWT
       login(data.user, data.access_token);
 
