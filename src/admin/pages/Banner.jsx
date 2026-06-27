@@ -20,7 +20,7 @@ function Banner() {
   const [deleteId, setDeleteId] = useState(null);
   const fetchBanners = async () => {
     try {
-      const res = await axios.get(`${API_URL}/banners` );
+      const res = await axios.get(`${API_URL}/banners`);
       setBanners(res.data || []);
     } catch (error) {
       console.error("Error fetching banners:", error);
@@ -78,7 +78,7 @@ function Banner() {
   };
 
   const handleDelete = async (id) => {
-    
+
 
     try {
       await axios.delete(`${API_URL}/banners/${id}`);
@@ -228,7 +228,11 @@ function Banner() {
 
                 <button
                   onClick={() => setDeleteId(banner.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded"
+                  disabled={deleteId !== null}
+                  className={`px-3 py-1 rounded text-white ${deleteId !== null
+                      ? "bg-red-300 cursor-not-allowed"
+                      : "bg-red-500 hover:bg-red-600"
+                    }`}
                 >
                   Delete
                 </button>
@@ -237,41 +241,41 @@ function Banner() {
           ))
         )}
       </div>
-     
-          {deleteId && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-6 w-96 shadow-xl">
-              <h2 className="text-xl font-semibold mb-2">
-                Delete Banner
-              </h2>
 
-              <p className="text-gray-600 mb-6">
-                Are you sure you want to delete this banner?
-                This action cannot be undone.
-              </p>
+      {deleteId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-96 shadow-xl">
+            <h2 className="text-xl font-semibold mb-2">
+              Delete Banner
+            </h2>
 
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setDeleteId(null)}
-                  className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-                >
-                  Cancel
-                </button>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this banner?
+              This action cannot be undone.
+            </p>
 
-                <button
-                  onClick={() => handleDelete(deleteId)}
-                  className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
-                >
-                  Delete
-                </button>
-              </div>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeleteId(null)}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={() => handleDelete(deleteId)}
+                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
+              >
+                Delete
+              </button>
             </div>
           </div>
-        )}
-       
+        </div>
+      )}
+
     </div>
 
-    
+
   );
 }
 
