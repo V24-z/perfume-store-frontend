@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const initialForm = {
@@ -85,6 +86,7 @@ function Banner() {
     try {
       await axios.delete(`${API_URL}/banners/${id}`);
       await fetchBanners();
+      toast.success("Banner deleted successfully");
     } catch (error) {
       console.error("Error deleting banner:", error);
     }
