@@ -205,7 +205,7 @@ const Contact = () => {
                       Email Address
                     </label>
                     <input
-                      type="email"
+                      type="text"
                       id="email"
                       name="email"
                       value={formData.email}
@@ -254,6 +254,7 @@ const Contact = () => {
                     Message Description
                   </label>
                   <textarea
+                  type="text"
                     id="message"
                     name="message"
                     rows="5"
