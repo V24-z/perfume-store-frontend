@@ -45,12 +45,13 @@ function UserRoutes() {
           <Route path="/viewdetail/:id" element={<ViewSingleProduct />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/success" element={<OrderSuccess />} />
+          <Route path="/order" element={<Order />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/wishlist" element={<Wishlist />} />
         </Route>
         <Route path="/Profile" element={<Profile />} />
-        <Route path="/order/:orderId" element={<Order />} />      </Routes>
+        <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+      </Routes>
     </Suspense>
   );
 }
