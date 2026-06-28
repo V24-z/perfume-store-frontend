@@ -21,7 +21,7 @@ const navSections = [
         
       },
       { to: "/admin/users", icon: "ti-users", label: "Users" },
-      
+      { to: "/admin/createAdmin", icon: "ti-user-plus", label: "Create Admin" }
      
     ],
   },

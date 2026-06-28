@@ -16,7 +16,7 @@ const Banner =lazy(()=>import('../admin/pages/Banner.jsx'));
 const Users =lazy(()=>import('../admin/pages/Users.jsx'));
 const Category =lazy(()=>import('../admin/pages/category.jsx'));
 const  AdminRoute=lazy(()=>import('./adminroute.jsx'));
-
+const CreateAdmin =lazy(()=>import('../admin/pages/createAdmin.jsx'));
 const Orders =lazy(()=>import('../admin/pages/orders.jsx'))
 
 const AdminRoutes = () => {
@@ -39,6 +39,7 @@ const AdminRoutes = () => {
           <Route path="category" element={<Category />}/>      
             
          <Route path="orders" element={<Orders />}/>      
+        <Route path="createAdmin" element={<CreateAdmin />}/>      
 
 
       </Route>
