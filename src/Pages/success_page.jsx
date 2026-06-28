@@ -35,12 +35,7 @@ function OrderSuccess() {
 
         {/* Order Info Card */}
         <div className="mt-6 bg-slate-50/60 rounded-2xl p-4 border border-slate-100 text-xs font-medium text-slate-500 space-y-3">
-          <div className="flex items-center justify-between">
-            <span>Order Status</span>
-            <span className="inline-flex items-center rounded-md bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 ring-1 ring-inset ring-emerald-600/10 uppercase tracking-wide">
-              Confirmed
-            </span>
-          </div>
+          
 
           <div className="flex items-center justify-between">
             <span>Estimated Delivery</span>

@@ -132,12 +132,6 @@ function Signup() {
     setLoading(true);
     try {
       await axios.post(`${API_URL}/signin`, form);
-      axios
-        .post("https://task-ocr.app.n8n.cloud/webhook/user-registration", {
-          name: form.name,
-          email: form.email,
-        })
-        .catch(console.error);
       setMessage("Account created successfully");
       setForm({ name: "", email: "", phon: "", password: "" });
       setTimeout(() => {
@@ -155,11 +149,9 @@ function Signup() {
   };
 
   return (
-    /* Page background — matches site body: light slate */
     <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center px-4 py-12">
       {/* ── Brand mark ── */}
       <div className="flex items-center justify-center gap-3 mb-7">
-        {/* Logo */}
         <div
           className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
           style={{
@@ -177,7 +169,6 @@ function Signup() {
           </span>
         </div>
 
-        {/* Brand Name */}
         <div>
           <p
             className="font-bold text-lg m-0 leading-tight"
@@ -204,7 +195,6 @@ function Signup() {
 
       {/* ── Card ── */}
       <div className="w-full max-w-[460px] bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        {/* Thin brand-color top strip — same purple gradient as header */}
         <div
           className="h-1 w-full"
           style={{
@@ -213,7 +203,6 @@ function Signup() {
         />
 
         <div className="px-7 py-8 sm:px-8">
-          {/* Heading */}
           <div className="mb-6 text-center">
             <h1 className="text-xl font-bold text-[#1a0533] tracking-tight">
               Create Your Account
@@ -223,7 +212,6 @@ function Signup() {
             </p>
           </div>
 
-          {/* Success banner */}
           {message && (
             <div className="mb-5 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm font-medium">
               <svg
@@ -241,7 +229,6 @@ function Signup() {
             </div>
           )}
 
-          {/* Server error banner */}
           {serverError && (
             <div className="mb-5 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm font-medium">
               <svg
@@ -259,7 +246,6 @@ function Signup() {
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <Field label="Full Name" error={error.name}>
               <input
@@ -285,7 +271,6 @@ function Signup() {
 
             <Field label="Phone Number" error={error.phon}>
               <div className="relative">
-                {/* +91 prefix */}
                 <span className="absolute inset-y-0 left-4 flex items-center text-sm font-medium text-[#1a0533] pointer-events-none select-none">
                   +91
                 </span>
@@ -324,7 +309,6 @@ function Signup() {
               </div>
             </Field>
 
-            {/* CTA — gold button matching header "Sign Up" button */}
             <button
               type="submit"
               disabled={loading}
@@ -373,14 +357,12 @@ function Signup() {
             </button>
           </form>
 
-          {/* Divider */}
           <div className="my-5 flex items-center gap-3">
             <div className="flex-1 h-px bg-slate-100" />
             <span className="text-xs text-gray-400 font-medium">or</span>
             <div className="flex-1 h-px bg-slate-100" />
           </div>
 
-          {/* Sign In link */}
           <p className="text-center text-sm text-gray-500">
             Already have an account?{" "}
             <Link
@@ -392,11 +374,7 @@ function Signup() {
             </Link>
           </p>
         </div>
-
-        {/* Footer strip — terms */}
       </div>
-
-      {/* Subtle trust row — mirrors Home Page tone */}
     </div>
   );
 }
