@@ -4,7 +4,8 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function CreateAdmin() {
-  const token = localStorage.getItem("token");
+  // FIXED: Changed key from "token" to "access_token" to successfully match session storage keys
+  const token = localStorage.getItem("access_token");
 
   const initialState = {
     name: "",
@@ -223,7 +224,7 @@ export default function CreateAdmin() {
                   className={`w-full text-sm bg-white border rounded-xl p-3 shadow-sm focus:outline-none focus:ring-4 transition-all ${
                     errors.phon
                       ? "border-red-400 focus:ring-red-500/10 focus:border-red-500"
-                      : "border-slate-200 focus:ring-violet-500/10 focus:border-violet-500"
+                      : "border-slate-200 focus:ring-violet-500 focus:ring-2 focus:ring-purple-600/10"
                   }`}
                 />
                 {errors.phon && (
@@ -303,27 +304,22 @@ export default function CreateAdmin() {
                   <tbody className="divide-y divide-slate-100">
                     {admins.map((admin, index) => (
                       <tr key={admin.id} className="hover:bg-slate-50/30 transition-colors duration-150">
-                        {/* Index Count */}
                         <td className="p-3 font-mono font-bold text-slate-400">
                           {String(index + 1).padStart(2, '0')}
                         </td>
 
-                        {/* Name */}
                         <td className="p-3 font-bold text-slate-800">
                           {admin.name}
                         </td>
 
-                        {/* Email */}
                         <td className="p-3 text-slate-600 font-medium">
                           {admin.email}
                         </td>
 
-                        {/* Phone */}
                         <td className="p-3 font-mono text-slate-500">
                           {admin.phon}
                         </td>
 
-                        {/* Local Timestamp */}
                         <td className="p-3 text-slate-400 font-medium text-right">
                           {admin.registerd
                             ? new Date(admin.registerd).toLocaleDateString("en-IN", {

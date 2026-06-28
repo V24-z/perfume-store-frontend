@@ -3,6 +3,12 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// HELPER: Safely generate headers containing the stored bearer token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("access_token"); 
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+};
+
 // ─── Status Badge Variant Styling Mapping ─────────────────────────────────────
 const STATUS_STYLES = {
   delivered:  "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
@@ -52,10 +58,12 @@ function Orders() {
   useEffect(() => {
     const loadOrders = async () => {
       try {
-        const res = await axios.get(`${API_URL}/orders/all`);
+        setLoading(true);
+        // FIXED: Appended security wrapper configuration to authorize global order query fetching
+        const res = await axios.get(`${API_URL}/orders/all`, getAuthHeaders());
         setOrders(res.data);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching system orders:", err);
       } finally {
         setLoading(false);
       }
@@ -68,9 +76,10 @@ function Orders() {
     try {
       setUpdatingId(orderId);
 
+      // FIXED: Attached getAuthHeaders() wrapper to authorize order status status payload mutations
       await axios.put(`${API_URL}/orders/${orderId}`, {
         status,
-      });
+      }, getAuthHeaders());
 
       setOrders((prev) =>
         prev.map((order) =>
@@ -78,7 +87,7 @@ function Orders() {
         ),
       );
     } catch (err) {
-      console.error(err);
+      console.error("Error updating order state:", err);
     } finally {
       setUpdatingId(null);
     }

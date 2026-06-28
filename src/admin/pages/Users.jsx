@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
+
 const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 // ── Avatar Colors ──
 const avatarColors = [
   { bg: "#eeedfe", text: "#534AB7" },
@@ -79,7 +81,8 @@ function User() {
 
   // ── Fetch users from FastAPI ──
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    // FIXED: Shifted storage key from "token" to "access_token" to keep header parsing synchronized
+    const token = localStorage.getItem("access_token");
     fetch(`${API_BASE_URL}/users`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -100,7 +103,7 @@ function User() {
     phone: u.phon,
     role: u.role || "User",
     reg: u.registerd,
-    status: u.role === "Admin" ? "Active" : "Active", // backend has no status so default
+    status: u.role === "Admin" ? "Active" : "Active", 
   }));
 
   // ── Filter logic ──
@@ -145,9 +148,6 @@ function User() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-
-
-
         </div>
 
         {/* Table */}
@@ -196,7 +196,15 @@ function User() {
                   </td>
 
                   {/* Registered */}
-                  <td>{u.reg}</td>
+                  <td>
+                    {u.reg
+                      ? new Date(u.reg).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "—"}
+                  </td>
 
                   {/* Actions */}
                   <td className="flex gap-2 p-2">

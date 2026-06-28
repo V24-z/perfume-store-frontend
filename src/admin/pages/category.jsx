@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+// HELPER: Safely generate headers containing the stored bearer token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("access_token"); 
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+};
+
 function Category() {
-  const API_URL = import.meta.env.VITE_API_URL;
   const [categories, setCategories] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -35,7 +42,8 @@ function Category() {
     e.preventDefault();
 
     try {
-      await axios.post(`${API_URL}/categories`, formData);
+      // FIXED: Appended security wrapper configuration to authorize POST requests
+      await axios.post(`${API_URL}/categories`, formData, getAuthHeaders());
 
       const res = await axios.get(`${API_URL}/categories`);
       setCategories(res.data);
@@ -49,18 +57,21 @@ function Category() {
       alert("Category Added Successfully");
     } catch (error) {
       console.error("Error adding category:", error);
+      alert(error.response?.data?.detail || "Failed to add category");
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${API_URL}/categories/${id}`);
+      // FIXED: Attached getAuthHeaders() wrapper to authorize category deletions
+      await axios.delete(`${API_URL}/categories/${id}`, getAuthHeaders());
 
       setCategories((prev) =>
         prev.filter((category) => category.id !== id)
       );
     } catch (error) {
       console.error("Error deleting category:", error);
+      alert(error.response?.data?.detail || "Failed to delete category");
     }
   };
 
@@ -132,7 +143,7 @@ function Category() {
                 type="submit"
                 className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold px-6 py-2.5 rounded-xl shadow-sm transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg xmlns="http://www.w3.org/2000/xl" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
                 Add Category

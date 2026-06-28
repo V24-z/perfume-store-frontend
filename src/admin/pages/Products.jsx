@@ -18,6 +18,12 @@ const initialForm = {
   is_featured: false,
 };
 
+// HELPER: Safely generate headers containing the stored bearer token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("access_token"); 
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+};
+
 function StockBadge({ stock }) {
   const stockNum = Number(stock);
   if (stockNum === 0) {
@@ -96,23 +102,19 @@ function Modal({ title, onClose, children }) {
 }
 
 export default function App() {
-  // Main live database records
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
 
-  // Table UI states
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Modal interactions
-  const [modal, setModal] = useState(null); // "add" | "edit" | "stock" | "delete"
+  const [modal, setModal] = useState(null); 
   const [activeProduct, setActiveProduct] = useState(null);
   const [formData, setFormData] = useState(initialForm);
   const [stockQty, setStockQty] = useState("");
 
-  // Feedback & network state
   const [actionLoading, setActionLoading] = useState(false);
   const [formErr, setFormErr] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
@@ -178,7 +180,7 @@ export default function App() {
       name: product.name || "",
       brand: product.brand || "",
       description: product.description || product.discription || "",
-      category_id: product.category?.id || product.category_id || "", // ✅ FIX
+      category_id: product.category?.id || product.category_id || "", 
       price: product.price || "",
       discount_price: product.discount_price || "",
       stock_quantity: product.stock_quantity || "",
@@ -246,23 +248,23 @@ export default function App() {
     
     try {
       if (modal === "edit") {
-        axios.put(`${API_BASE_URL}/products/${activeProduct.id}`, payload);
+        // FIXED: Appended security wrapper config to authorize PUT requests
+        await axios.put(`${API_BASE_URL}/products/${activeProduct.id}`, payload, getAuthHeaders());
         triggerMessage(`"${payload.name}" updated successfully!`);
       } else {
-        await axios.post(`${API_BASE_URL}/products/`, payload);
+        // FIXED: Appended security wrapper config to authorize POST requests
+        await axios.post(`${API_BASE_URL}/products/`, payload, getAuthHeaders());
         triggerMessage(`"${payload.name}" successfully created!`);
       }
       setModal(null);
       setRefreshKey((k) => k + 1);
     } catch (error) {
-     
         setFormErr(
           error.response?.data?.detail
             ? JSON.stringify(error.response.data.detail)
             : "Error saving record."
         );
-      }
-     finally {
+      } finally {
       setActionLoading(false);
     }
   };
@@ -273,22 +275,22 @@ export default function App() {
 
     setActionLoading(true);
     try {
-      
       const payload = {
-      ...activeProduct,
-      stock_quantity: qty,
-      category_id: activeProduct.category_id,
-    };
+        ...activeProduct,
+        stock_quantity: qty,
+        category_id: activeProduct.category_id,
+      };
 
+      // FIXED: Added getAuthHeaders() to authorize the direct stock updates
       try {
         await axios.patch(`${API_BASE_URL}/products/${activeProduct.id}/`, {
           stock_quantity: qty,
-        });
+        }, getAuthHeaders());
       } catch (patchErr) {
         await axios.put(
           `${API_BASE_URL}/products/${activeProduct.id}/`,
           payload,
-          patchErr,
+          getAuthHeaders()
         );
       }
 
@@ -306,7 +308,8 @@ export default function App() {
   const handleDeleteProduct = async () => {
     setActionLoading(true);
     try {
-      await axios.delete(`${API_BASE_URL}/products/${activeProduct.id}/`);
+      // FIXED: Attached getAuthHeaders() wrapper to authorize product deletions
+      await axios.delete(`${API_BASE_URL}/products/${activeProduct.id}/`, getAuthHeaders());
       triggerMessage(`"${activeProduct.name}" removed from catalogue.`);
       setModal(null);
       setRefreshKey((k) => k + 1);
@@ -318,8 +321,6 @@ export default function App() {
     }
   };
 
-  // Stats computation directly from API products
-
   const lowStockCount = products.filter(
     (p) => Number(p.stock_quantity) <= 5 && Number(p.stock_quantity) > 0,
   ).length;
@@ -330,7 +331,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Floating notifications */}
         {successMsg && (
           <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl animate-bounce border border-purple-500/30">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
@@ -338,7 +338,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Dashboard Actions and Main Headers */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
           <div>
             <h1 className="text-xl font-bold m-0" style={{ color: "#1a0533" }}>
@@ -370,7 +369,6 @@ export default function App() {
           </button>
         </div>
 
-        {/* Interactive Filter Bar & Database Grid */}
         <div
           className="bg-white rounded-2xl overflow-hidden shadow-sm"
           style={{ border: "1px solid #f0edf5" }}
@@ -379,7 +377,6 @@ export default function App() {
             className="flex flex-col md:flex-row gap-3 p-4 bg-slate-50/50"
             style={{ borderBottom: "1px solid #f0edf5" }}
           >
-            {/* Real-time search */}
             <div className="flex items-center gap-2.5 flex-1 rounded-xl px-4 py-2.5 bg-white border border-slate-200 shadow-sm focus-within:ring-2 focus-within:ring-purple-600/25 transition-all">
               <svg
                 className="w-4 h-4 flex-shrink-0 text-slate-400"
@@ -402,7 +399,6 @@ export default function App() {
               />
             </div>
 
-            {/* Live Category select */}
             <select
               value={catFilter}
               onChange={(e) => setCatFilter(e.target.value)}
@@ -417,7 +413,6 @@ export default function App() {
             </select>
           </div>
 
-          {}
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-xs">
               <thead>
@@ -574,7 +569,6 @@ export default function App() {
                           <StockBadge stock={p.stock_quantity} />
                         </td>
 
-                        {/* Interactive operations */}
                         <td className="py-4 px-4">
                           <div className="flex items-center justify-center gap-1.5">
                             <button
@@ -646,7 +640,6 @@ export default function App() {
             </table>
           </div>
 
-          {/* Quick status report footer */}
           <div
             className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50"
             style={{ borderTop: "1px solid #f0edf5" }}
@@ -669,7 +662,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* ── STREAMING_CHUNK: ADD & EDIT FORM DIALOG ── */}
+      {/* ── ADD & EDIT FORM DIALOG ── */}
       {(modal === "add" || modal === "edit") && (
         <Modal
           title={
@@ -722,10 +715,12 @@ export default function App() {
                 <label className={labelCls}>Category Group *</label>
                 <select
                   value={formData.category_id}
+                  className={inputCls}
                   onChange={(e) =>
                     setFormData({ ...formData, category_id: e.target.value })
                   }
                 >
+                  <option value="">Select Category</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
@@ -864,7 +859,7 @@ export default function App() {
         </Modal>
       )}
 
-      {/* ── STREAMING_CHUNK: STOCK ADJUSTER MODAL ── */}
+      {/* ── STOCK ADJUSTER MODAL ── */}
       {modal === "stock" && (
         <Modal title="Quick Stock Adjustment" onClose={() => setModal(null)}>
           <div className="space-y-4">
@@ -907,7 +902,7 @@ export default function App() {
         </Modal>
       )}
 
-      {/* ── STREAMING_CHUNK: VERIFY DELETION DIALOG ── */}
+      {/* ── VERIFY DELETION DIALOG ── */}
       {modal === "delete" && (
         <Modal title="Verify Permanent Deletion" onClose={() => setModal(null)}>
           <div className="text-center">

@@ -3,6 +3,12 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+// HELPER: Safely generate headers containing the stored bearer token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("access_token"); 
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+};
+
 // ─── Refined Helper Formatting ────────────────────────────────────────────────
 const fmt = (n) => new Intl.NumberFormat("en-IN").format(n ?? 0);
 const fmtRupee = (n) => `₹${fmt(n)}`;
@@ -143,7 +149,7 @@ function Sparkline({ points = [], color = "#f59e0b" }) {
   );
 }
 
-// ─── Redesigned Main Dashboard Dashboard ──────────────────────────────────────
+// ─── Main Console Dashboard ──────────────────────────────────────
 export default function Dashboard() {
   const [products,  setProducts]  = useState([]);
   const [orders,    setOrders]    = useState([]);
@@ -153,27 +159,34 @@ export default function Dashboard() {
   const setDone = (key) => setLoading(l => ({ ...l, [key]: false }));
 
   useEffect(() => {
+    // Products table query remains public
     axios.get(`${API_URL}/products/`).then(r => setProducts(r.data)).catch(console.error).finally(() => setDone("products"));
-    axios.get(`${API_URL}/orders/all`).then(r => setOrders(r.data)).catch(console.error).finally(() => setDone("orders"));
-    axios.get(`${API_URL}/users`).then(r => setUsers(r.data?.data || r.data || [])).catch(console.error).finally(() => setDone("users"));
+    
+    // FIXED: Appended authorized headers wrapper to securely execute order tracking lookups
+    axios.get(`${API_URL}/orders/all`, getAuthHeaders()).then(r => setOrders(r.data)).catch(console.error).finally(() => setDone("orders"));
+    
+    // FIXED: Appended authorized headers wrapper to securely query user register logs
+    axios.get(`${API_URL}/users`, getAuthHeaders()).then(r => setUsers(r.data?.data || r.data || [])).catch(console.error).finally(() => setDone("users"));
+    
     axios.get(`${API_URL}/banner`).then(r => { /* logical placeholder matching original schema execution */ }).catch(console.error).finally(() => setDone("banners"));
   }, []);
 
-  // ── Unaltered Processing Logic ──
   const stats = useMemo(() => {
-    const featured   = products.filter(p => p.is_featured).length;
-    const lowStock   = products.filter(p => Number(p.stock_quantity) > 0 && Number(p.stock_quantity) <= 5);
-    const outOfStock = products.filter(p => Number(p.stock_quantity) === 0).length;
-    const latest     = [...products].sort((a, b) => b.id - a.id).slice(0, 5);
+    const featuredItems = products.filter(p => p.is_featured).length;
+    const lowStock = products.filter(
+      (p) => Number(p.stock_quantity) <= 5 && Number(p.stock_quantity) > 0,
+    );
+    const outOfStock = products.filter((p) => Number(p.stock_quantity) === 0).length;
+    const latestItems = [...products].sort((a, b) => b.id - a.id).slice(0, 4);
 
-    const catMap = {};
-    products.forEach(p => {
-      const cat = p.category?.name || p.category_name || "Other";
-      catMap[cat] = (catMap[cat] || 0) + 1;
+    const categoriesMap = {};
+    products.forEach((p) => {
+      const catName = p.category?.name || "Unassigned";
+      categoriesMap[catName] = (categoriesMap[catName] || 0) + 1;
     });
-    const categories = Object.entries(catMap).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    const categoriesArray = Object.entries(categoriesMap).sort((a, b) => b[1] - a[1]);
 
-    return { featured, lowStock, outOfStock, latest, categories };
+    return { featured: featuredItems, lowStock, outOfStock, latest: latestItems, categories: categoriesArray };
   }, [products]);
 
   const orderStats = useMemo(() => {
@@ -198,7 +211,6 @@ export default function Dashboard() {
     });
     const sparkPoints = Object.values(monthlyMap).slice(-6);
 
-    // Dynamic clean Hex array assignments strictly mapped to local statuses
     const statusDistrib = [
       { label: "Delivered",  value: byStatus("delivered"),  color: "#059669" },
       { label: "Pending",    value: byStatus("pending"),    color: "#d97706" },
@@ -217,13 +229,11 @@ export default function Dashboard() {
     };
   }, [orders]);
 
-  const [mountTime] = useState(() => Date.now());
   const userStats = useMemo(() => {
     const normalized = users.map(u => ({ ...u, role: u.role || "user" }));
     return { total: normalized.length };
   }, [users]);
 
-  // ── Redesigned Functional Setup Blocks ──
   const kpiCards = [
     { label: "Total Perfumes", value: fmt(products.length), sub: `${stats.featured} featured items`, subColorClass: "text-violet-600", icon: "🧴", loading: loading.products },
     { label: "Total Orders", value: fmt(orderStats.total), sub: `↑ ${orderStats.pending} pending checkout`, subColorClass: "text-amber-700", icon: "🛒", loading: loading.orders },
@@ -395,7 +405,7 @@ export default function Dashboard() {
               <p className="text-xs text-slate-400 text-center py-6">No catalog definitions tracked</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {stats.latest.map((p, i) => (
+                {stats.latest.map((p) => (
                   <div key={p.id} className="flex items-center gap-3 rounded-xl border border-slate-100 p-3 bg-slate-50/40">
                     <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 bg-white border border-slate-100 flex items-center justify-center shadow-inner">
                       {p.image_url ? (

@@ -11,6 +11,12 @@ const initialForm = {
   image_url: "",
 };
 
+// HELPER: Safely generate headers containing the stored bearer token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("access_token"); 
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+};
+
 function Banner() {
   const [banners, setBanners] = useState([]);
   const [formData, setFormData] = useState(initialForm);
@@ -18,6 +24,7 @@ function Banner() {
   const [loading, setLoading] = useState(false);
   const [editId, setEditId] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+
   const fetchBanners = async () => {
     try {
       const res = await axios.get(`${API_URL}/banners`);
@@ -39,6 +46,7 @@ function Banner() {
       [e.target.name]: e.target.value,
     }));
   };
+
   const handleEdit = (banner) => {
     setEditId(banner.id);
 
@@ -50,6 +58,7 @@ function Banner() {
       image_url: banner.image_url || "",
     });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -57,38 +66,40 @@ function Banner() {
       setLoading(true);
 
       if (editId) {
-        await axios.put(`${API_URL}/banners/${editId}`, formData);
-
+        // FIXED: Appended security wrapper config to authorize PUT requests
+        await axios.put(`${API_URL}/banners/${editId}`, formData, getAuthHeaders());
         toast.success("Banner updated successfully");
       } else {
-        await axios.post(`${API_URL}/banners`, formData);
-
+        // FIXED: Appended security wrapper config to authorize POST requests
+        await axios.post(`${API_URL}/banners`, formData, getAuthHeaders());
         toast.success("Banner added successfully");
       }
 
       setFormData(initialForm);
       setEditId(null);
-
       await fetchBanners();
     } catch (error) {
       console.error(error);
+      toast.error(error.response?.data?.detail || "Failed to save banner");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-
-
     try {
-      await axios.delete(`${API_URL}/banners/${id}`);
+      setLoading(true);
+      // FIXED: Attached getAuthHeaders() wrapper to authorize banner deletions
+      await axios.delete(`${API_URL}/banners/${id}`, getAuthHeaders());
       await fetchBanners();
       setDeleteId(null);
       toast.success("Banner deleted successfully");
     } catch (error) {
       console.error("Error deleting banner:", error);
-        setDeleteId(null);
+      setDeleteId(null);
       toast.error("Failed to delete banner");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -163,7 +174,7 @@ function Banner() {
               disabled={loading}
               className="bg-indigo-600 text-white px-5 py-2 rounded"
             >
-              {loading ? "Saving..." : editId ? "Update Banner" : "Add Banner"}
+              {loading && !deleteId ? "Saving..." : editId ? "Update Banner" : "Add Banner"}
             </button>
 
             {editId && (
@@ -231,14 +242,13 @@ function Banner() {
 
                 <button
                   onClick={() => setDeleteId(banner.id)}
-                  disabled={deleteId !== null}
-                  className={`px-3 py-1 rounded text-white ${deleteId !== null
+                  disabled={loading} // FIXED: Prevents locking out other buttons unless an active server request is processing
+                  className={`px-3 py-1 rounded text-white ${loading
                       ? "bg-red-300 cursor-not-allowed"
                       : "bg-red-500 hover:bg-red-600"
                     }`}
                 >
                   Delete
-
                 </button>
               </div>
             </div>
@@ -246,6 +256,7 @@ function Banner() {
         )}
       </div>
 
+      {/* Confirmation Modal */}
       {deleteId && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-96 shadow-xl">
@@ -271,17 +282,13 @@ function Banner() {
                 disabled={loading}
                 className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"
               >
-              {loading ? "Deleting..." : "Delete"}
-
+                {loading ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
-
-
   );
 }
 
