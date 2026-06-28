@@ -13,6 +13,7 @@ const Checkout = lazy(() => import("../Pages/checkout.jsx"));
 const OrderSuccess = lazy(() => import("../Pages/success_page.jsx"));
 const Order = lazy(() => import("../Pages/order.jsx"));
 const Shop = lazy(() => import("../Pages/shop.jsx"));
+const Wishlist = lazy(() => import("../Pages/wishlist.jsx"));
 
 function UserRoutes() {
   return (
@@ -46,6 +47,7 @@ function UserRoutes() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order" element={<Order />} />
           <Route path="/shop" element={<Shop />} />
+          <Route path="/wishlist" element={<Wishlist />} />
         </Route>
         <Route path="/Profile" element={<Profile />} />
         <Route path="/order-success/:orderId" element={<OrderSuccess />} />
