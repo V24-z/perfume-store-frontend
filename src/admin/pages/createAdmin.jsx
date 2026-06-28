@@ -258,7 +258,7 @@ export default function CreateAdmin() {
               {/* Action Button */}
               <button
                 disabled={loading}
-                className="w-full text-xs font-bold uppercase tracking-wider bg-slate-900 text-white rounded-xl py-3.5 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-sm mt-2 border-0"
+                className="w-full text-xs font-bold uppercase tracking-wider bg-blue-600 text-white rounded-xl py-3.5 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-sm mt-2 border-0"
               >
                 {loading ? "Registering Keys..." : "Create Admin Account"}
               </button>
