@@ -48,9 +48,11 @@ function UserRoutes() {
           <Route path="/order" element={<Order />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/Profile" element={<Profile />} />
+          <Route path="/order-success/:orderId" element={<OrderSuccess />} />
         </Route>
-        <Route path="/Profile" element={<Profile />} />
-        <Route path="/order-success/:orderId" element={<OrderSuccess />} />
+        
+        
       </Routes>
     </Suspense>
   );

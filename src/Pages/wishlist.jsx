@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Heart, Trash2, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -7,6 +8,21 @@ import useCart from "../context/useCart";
 export default function Wishlist() {
   const { wishlistItems, removeFromWishlist } = useWishlist();
   const { addToCart, cartItems = [] } = useCart();
+
+  // Track item-level processing states independently using the product ID
+  const [processingId, setProcessingId] = useState(null);
+
+  const handleAddToCartClick = async (product) => {
+    if (processingId) return;
+    try {
+      setProcessingId(product.id);
+      await addToCart(product);
+    } catch (err) {
+      console.error("Failed to add variant to cart:", err);
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   if (wishlistItems.length === 0) {
     return (
@@ -52,6 +68,7 @@ export default function Wishlist() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {wishlistItems.map((product) => {
             const isInCart = cartItems.some((item) => item.product_id === product.id || item.id === product.id);
+            const isButtonLoading = processingId === product.id;
 
             return (
               <div
@@ -89,15 +106,20 @@ export default function Wishlist() {
                     {/* ACTION CONTROLS */}
                     <div className="flex gap-2 pt-0.5">
                       <button
-                        disabled={isInCart}
-                        onClick={() => addToCart(product)}
-                        className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 disabled:scale-100 ${
+                        disabled={isInCart || processingId !== null}
+                        onClick={() => handleAddToCartClick(product)}
+                        className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 disabled:scale-100 disabled:opacity-60 cursor-pointer ${
                           isInCart
                             ? "bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-inset ring-emerald-600/10 cursor-not-allowed"
                             : "bg-slate-900 text-white hover:bg-slate-800"
                         }`}
                       >
-                        {isInCart ? (
+                        {isButtonLoading ? (
+                          <>
+                            <div className="w-3 h-3 border-2 border-slate-300 border-t-white rounded-full animate-spin" />
+                            Processing...
+                          </>
+                        ) : isInCart ? (
                           "In Cart ✓"
                         ) : (
                           <>
@@ -108,8 +130,9 @@ export default function Wishlist() {
                       </button>
 
                       <button
+                        disabled={processingId !== null}
                         onClick={() => removeFromWishlist(product.id)}
-                        className="w-11 h-11 rounded-xl bg-rose-50 border border-rose-100/50 text-rose-500 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center shadow-sm transition-colors active:scale-95"
+                        className="w-11 h-11 rounded-xl bg-rose-50 border border-rose-100/50 text-rose-500 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center shadow-sm transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
                         title="Remove from wishlist"
                       >
                         <Trash2 size={15} />
