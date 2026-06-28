@@ -1,6 +1,6 @@
 import { CheckCircle, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import { useEffect } from "react";
 function OrderSuccess() {
    useEffect(() => {
     window.scrollTo(0, 0);
