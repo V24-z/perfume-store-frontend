@@ -6,7 +6,7 @@ import useCart from "../context/useCart";
 
 export default function Wishlist() {
   const { wishlistItems, removeFromWishlist } = useWishlist();
-  const { addToCart } = useCart();
+  const { addToCart, cartItems = [] } = useCart();
 
   if (wishlistItems.length === 0) {
     return (
@@ -50,61 +50,76 @@ export default function Wishlist() {
 
         {/* ══ PRODUCT GRID ══ */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {wishlistItems.map((product) => (
-            <div
-              key={product.id}
-              className="group bg-white rounded-2xl overflow-hidden border border-slate-200/80 hover:shadow-xl hover:border-slate-300/60 transition-all duration-300 flex flex-col h-full"
-            >
-              {/* IMAGE WINDOW */}
-              <div className="relative aspect-[4/5] w-full bg-slate-100 overflow-hidden shrink-0">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
+          {wishlistItems.map((product) => {
+            const isInCart = cartItems.some((item) => item.product_id === product.id || item.id === product.id);
 
-              {/* CARD DATA */}
-              <div className="p-4 flex flex-col flex-1 justify-between space-y-4">
-                <div className="space-y-1">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-violet-600">
-                    {product.brand}
-                  </p>
-                  <h3 className="font-bold text-sm text-[#1a0533] leading-snug line-clamp-2">
-                    {product.name}
-                  </h3>
+            return (
+              <div
+                key={product.id}
+                className="group bg-white rounded-2xl overflow-hidden border border-slate-200/80 hover:shadow-xl hover:border-slate-300/60 transition-all duration-300 flex flex-col h-full"
+              >
+                {/* IMAGE WINDOW */}
+                <div className="relative aspect-[4/5] w-full bg-slate-100 overflow-hidden shrink-0">
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
                 </div>
 
-                <div className="space-y-3 pt-1">
-                  <p className="text-base font-extrabold text-[#1a0533]">
-                    ₹{new Intl.NumberFormat("en-IN").format(
-                      product.discount_price > 0 ? product.discount_price : product.price
-                    )}
-                  </p>
+                {/* CARD DATA */}
+                <div className="p-4 flex flex-col flex-1 justify-between space-y-4">
+                  <div className="space-y-1">
+                    <p className="text-[10px] uppercase font-bold tracking-widest text-violet-600">
+                      {product.brand}
+                    </p>
+                    <h3 className="font-bold text-sm text-[#1a0533] leading-snug line-clamp-2">
+                      {product.name}
+                    </h3>
+                  </div>
 
-                  {/* ACTION CONTROLS */}
-                  <div className="flex gap-2 pt-0.5">
-                    <button
-                      onClick={() => addToCart(product)}
-                      className="flex-1 text-xs font-bold uppercase tracking-wider bg-slate-900 text-white rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm hover:bg-slate-800 transition-all active:scale-95"
-                    >
-                      <ShoppingCart size={14} />
-                      Add to Cart
-                    </button>
+                  <div className="space-y-3 pt-1">
+                    <p className="text-base font-extrabold text-[#1a0533]">
+                      ₹{new Intl.NumberFormat("en-IN").format(
+                        product.discount_price > 0 ? product.discount_price : product.price
+                      )}
+                    </p>
 
-                    <button
-                      onClick={() => removeFromWishlist(product.id)}
-                      className="w-11 h-11 rounded-xl bg-rose-50 border border-rose-100/50 text-rose-500 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center shadow-sm transition-colors active:scale-95"
-                      title="Remove from wishlist"
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                    {/* ACTION CONTROLS */}
+                    <div className="flex gap-2 pt-0.5">
+                      <button
+                        disabled={isInCart}
+                        onClick={() => addToCart(product)}
+                        className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 disabled:scale-100 ${
+                          isInCart
+                            ? "bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-inset ring-emerald-600/10 cursor-not-allowed"
+                            : "bg-slate-900 text-white hover:bg-slate-800"
+                        }`}
+                      >
+                        {isInCart ? (
+                          "In Cart ✓"
+                        ) : (
+                          <>
+                            <ShoppingCart size={14} />
+                            Add to Cart
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => removeFromWishlist(product.id)}
+                        className="w-11 h-11 rounded-xl bg-rose-50 border border-rose-100/50 text-rose-500 hover:bg-rose-100 hover:text-rose-600 flex items-center justify-center shadow-sm transition-colors active:scale-95"
+                        title="Remove from wishlist"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
       </div>

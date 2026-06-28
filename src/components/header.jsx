@@ -125,7 +125,7 @@ function Header() {
             👤 View profile
           </Link>
           <Link
-            to="/order"
+            to={`/order/${orderId}`}
             onClick={() => setDropdownOpen(false)}
             className="flex items-center gap-2 px-3 py-2 sm:py-2.5 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition no-underline"
           >
