@@ -24,10 +24,15 @@ function Home() {
 
   const imageRefs = useRef({});
   const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
+  
+  // Track item-level processing states independently using the product ID
+  const [processingId, setProcessingId] = useState(null);
+
   // ✅ Scroll to top when product changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   //==fly to cart animation==
   const flyToCart = (productId) => {
     const img = imageRefs.current[productId];
@@ -68,6 +73,19 @@ function Home() {
         onComplete: () => clone.remove(),
       },
     );
+  };
+
+  const handleAddToCart = async (product) => {
+    if (processingId) return;
+    try {
+      setProcessingId(product.id);
+      flyToCart(product.id);
+      await addToCart(product);
+    } catch (err) {
+      console.error("Cart addition failed:", err);
+    } finally {
+      setProcessingId(null);
+    }
   };
 
   //single Effect--------------------------------------------------
@@ -122,14 +140,6 @@ function Home() {
     };
   }, [current, banners.length, isPaused]);
 
-  //const goTo = useCallback(
-  //  (i) => {
-  //   setDirection(i > current ? "next" : "prev");
-  //   setCurrent(i);
-  // },
-  //[current],
-  //);
-
   const goPrev = useCallback(() => {
     setDirection("prev");
     setCurrent((p) => (p - 1 + banners.length) % banners.length);
@@ -161,27 +171,26 @@ function Home() {
     },
     [goNext, goPrev],
   );
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        
-          <svg
-            className="animate-spin"
-            width="48"
-            height="48"
-            viewBox="0 0 48 48"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="24" cy="24" r="20" stroke="#CECBF6" strokeWidth="4" />
-            <path
-              d="M 24 4 A 20 20 0 0 1 44 24"
-              stroke="#534AB7"
-              strokeWidth="4"
-              strokeLinecap="round"
-            />
-          </svg>
-        
+        <svg
+          className="animate-spin"
+          width="48"
+          height="48"
+          viewBox="0 0 48 48"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="24" cy="24" r="20" stroke="#CECBF6" strokeWidth="4" />
+          <path
+            d="M 24 4 A 20 20 0 0 1 44 24"
+            stroke="#534AB7"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+        </svg>
       </div>
     );
   }
@@ -453,37 +462,6 @@ function Home() {
                   </>
                 )}
 
-                {/* Dot indicators 
-                {banners.length > 1 && (
-                  <div
-                    role="tablist"
-                    aria-label="Slide navigation"
-                    className="absolute bottom-2 sm:bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-1 sm:gap-1.5 z-10"
-                  >
-                    {banners.map((b, i) => (
-                      <button
-                        key={i}
-                        role="tab"
-                        aria-selected={i === current}
-                        aria-label={`Go to slide ${i + 1}: ${b.title}`}
-                        onClick={() => goTo(i)}
-                        className="slide-ctrl rounded-full border-0 cursor-pointer transition-all duration-300"
-                        style={{
-                          width:
-                            i === current
-                              ? "clamp(14px,2.5vw,20px)"
-                              : "clamp(4px,0.8vw,6px)",
-                          height: "clamp(4px,0.8vw,6px)",
-                          background:
-                            i === current
-                              ? "#fde047"
-                              : "rgba(255,255,255,0.35)",
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}*/}
-
                 {/* Progress bar */}
                 <div
                   aria-hidden="true"
@@ -494,79 +472,6 @@ function Home() {
                   }}
                 />
               </div>
-
-              {/* Thumbnail strip — sm+ only 
-              {banners.length > 1 && (
-                <div
-                  role="list"
-                  aria-label="Slide thumbnails"
-                  className="hidden sm:flex gap-2 sm:gap-2.5"
-                >
-                  {banners.map((banner, i) => (
-                    <button
-                      key={banner.id}
-                      role="listitem"
-                      onClick={() => goTo(i)}
-                      aria-label={`Jump to slide ${i + 1}: ${banner.title}`}
-                      aria-current={i === current ? "true" : undefined}
-                      className={`slide-ctrl flex-1 min-w-0 relative rounded-xl overflow-hidden cursor-pointer border-0
-                                  transition-all duration-300 h-12 sm:h-14 md:h-[72px]
-                                  ${
-                                    i === current
-                                      ? "border-2 border-[#534AB7] opacity-100 shadow-[0_0_0_3px_rgba(83,74,183,0.2)]"
-                                      : "border-2 border-transparent opacity-60 hover:opacity-90 hover:scale-[1.03]"
-                                  }`}
-                    >
-                      {banner.image_url ? (
-                        <img
-                          src={banner.image_url}
-                          alt={banner.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-[#1a0533]" />
-                      )}
-                      <div
-                        aria-hidden="true"
-                        className="absolute inset-0 flex items-end px-1.5 sm:px-2 pb-1 sm:pb-1.5"
-                        style={{
-                          background:
-                            "linear-gradient(transparent 20%,rgba(26,5,51,0.82))",
-                        }}
-                      >
-                        <p className="text-white truncate w-full text-left leading-tight font-medium text-[9px] sm:text-[10px]">
-                          {banner.title}
-                        </p>
-                      </div>
-                      {i === current && (
-                        <div
-                          aria-hidden="true"
-                          className="absolute bottom-0 left-0 w-full h-0.5 bg-[#fde047]"
-                        />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}*/}
-
-              {/* Mobile dot strip — xs only 
-              {banners.length > 1 && (
-                <div className="flex sm:hidden gap-1.5 justify-center pt-1">
-                  {banners.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => goTo(i)}
-                      aria-label={`Slide ${i + 1}`}
-                      className="rounded-full border-0 cursor-pointer transition-all duration-300"
-                      style={{
-                        width: i === current ? 18 : 6,
-                        height: 6,
-                        background: i === current ? "#534AB7" : "#e5e0f0",
-                      }}
-                    />
-                  ))}
-                </div>
-              )}*/}
             </div>
           )}
         </section>
@@ -597,6 +502,8 @@ function Home() {
                 const isInCart = cartItems.some(
                   (item) => item.product_id === product.id,
                 );
+                const isButtonLoading = processingId === product.id;
+
                 return (
                   <div
                     key={product.id}
@@ -649,18 +556,17 @@ function Home() {
                       </div>
                       <div className="flex gap-2 mt-4">
                         <button
-                          disabled={isInCart}
-                          onClick={() => {
-                            flyToCart(product.id);
-                            addToCart(product);
-                          }}
-                          className={`w-12 h-12 flex items-center justify-center rounded-xl transition ${
+                          disabled={isInCart || processingId !== null}
+                          onClick={() => handleAddToCart(product)}
+                          className={`w-12 h-12 flex items-center justify-center rounded-xl transition cursor-pointer ${
                             isInCart
                               ? "bg-green-100 text-green-600 cursor-not-allowed"
                               : "bg-purple-100 text-[#534AB7] hover:bg-purple-200"
                           }`}
                         >
-                          {isInCart ? (
+                          {isButtonLoading ? (
+                            <div className="w-4 h-4 border-2 border-[#534AB7] border-t-transparent rounded-full animate-spin" />
+                          ) : isInCart ? (
                             <span className="font-bold">✓</span>
                           ) : (
                             <ShoppingCart size={20} />
@@ -671,7 +577,7 @@ function Home() {
                           to={`/viewdetail/${product.id}`}
                           className="flex-1"
                         >
-                          <button className="w-full h-12 rounded-xl bg-[#534AB7] text-white font-semibold hover:bg-[#443da0] transition">
+                          <button className="w-full h-12 rounded-xl bg-[#534AB7] text-white font-semibold hover:bg-[#443da0] transition cursor-pointer">
                             View Detail
                           </button>
                         </Link>
@@ -682,7 +588,7 @@ function Home() {
                               ? removeFromWishlist(product.id)
                               : addToWishlist(product)
                           }
-                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-pink-100 text-pink-600"
+                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-pink-100 text-pink-600 cursor-pointer"
                         >
                           <Heart
                             size={20}

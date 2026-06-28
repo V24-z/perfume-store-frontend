@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { ShoppingCart, Heart, Eye, X, Search, SlidersHorizontal } from "lucide-react";
+import { ShoppingCart, Heart, Eye, Search, SlidersHorizontal } from "lucide-react";
+import { animate } from "motion";
+import { Link } from "react-router-dom";
 
 import useCart from "../context/useCart";
+import useCartAnimation from "../context/usecartAnimation";
 import useWishlist from "../context/useWhishlist";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Shop() {
   const { addToCart, cartItems = [] } = useCart();
+  const { cartPosition } = useCartAnimation();
 
   const {
     wishlistItems,
@@ -18,8 +22,11 @@ export default function Shop() {
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Dynamic single button async tracking state
+  const [processingId, setProcessingId] = useState(null);
+  const imageRefs = useRef({});
 
   const [filters, setFilters] = useState({
     search: "",
@@ -28,6 +35,63 @@ export default function Shop() {
     max_price: "",
     sort: "",
   });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // ─── Fly to Cart Animation Sync Sequence ───────────────────────────────────
+  const flyToCart = (productId) => {
+    const img = imageRefs.current[productId];
+    if (!img || !cartPosition) return;
+
+    const rect = img.getBoundingClientRect();
+    const clone = img.cloneNode(true);
+
+    clone.style.position = "fixed";
+    clone.style.left = `${rect.left}px`;
+    clone.style.top = `${rect.top}px`;
+    clone.style.width = `${rect.width}px`;
+    clone.style.height = `${rect.height}px`;
+    clone.style.zIndex = "999999";
+    clone.style.pointerEvents = "none";
+
+    document.body.appendChild(clone);
+
+    const startX = rect.left + rect.width / 2;
+    const startY = rect.top + rect.height / 2;
+
+    const dx = cartPosition.x - startX;
+    const dy = cartPosition.y - startY;
+
+    animate(
+      clone,
+      {
+        x: [0, dx],
+        y: [0, dy],
+        scale: [1, 0.8, 0.3],
+        opacity: [1, 1, 0],
+      },
+      {
+        duration: 0.8,
+        easing: "ease-in-out",
+        onComplete: () => clone.remove(),
+      },
+    );
+  };
+
+  const handleAddToCart = async (product) => {
+    if (processingId) return;
+    try {
+      setProcessingId(product.id);
+      flyToCart(product.id);
+      await addToCart(product);
+    } catch (err) {
+      console.error("Cart addition execution failed:", err);
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -200,7 +264,8 @@ export default function Shop() {
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {products.map((product) => {
                   const isWishlisted = wishlistItems.some((item) => item.id === product.id);
-                  const isInCart = cartItems.some((item) => item.product_id === product.id);
+                  const isInCart = cartItems.some((item) => item.product_id === product.id || item.id === product.id);
+                  const isButtonLoading = processingId === product.id;
 
                   return (
                     <div
@@ -210,6 +275,7 @@ export default function Shop() {
                       {/* IMAGE AREA */}
                       <div className="relative aspect-[4/5] w-full bg-slate-100 overflow-hidden shrink-0">
                         <img
+                          ref={(el) => (imageRefs.current[product.id] = el)}
                           src={product.image_url}
                           alt={product.name}
                           loading="lazy"
@@ -217,8 +283,9 @@ export default function Shop() {
                         />
                         {/* ABSOLUTE FLOATING QUICK WISHLIST BUTTON */}
                         <button
+                          disabled={processingId !== null}
                           onClick={() => isWishlisted ? removeFromWishlist(product.id) : addToWishlist(product)}
-                          className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all duration-200 transform active:scale-90 ${
+                          className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all duration-200 transform active:scale-90 disabled:opacity-50 cursor-pointer ${
                             isWishlisted 
                               ? "bg-rose-50 border-rose-100 text-rose-500" 
                               : "bg-white/80 border-slate-100 text-slate-400 hover:text-rose-500 hover:bg-white"
@@ -247,15 +314,19 @@ export default function Shop() {
                           {/* ACTION BUTTON WRAPPER */}
                           <div className="flex gap-2 w-full pt-1">
                             <button
-                              disabled={isInCart}
-                              onClick={() => addToCart(product)}
-                              className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 disabled:scale-100 ${
+                              disabled={isInCart || processingId !== null}
+                              onClick={() => handleAddToCart(product)}
+                              className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 disabled:scale-100 disabled:opacity-60 cursor-pointer ${
                                 isInCart
                                   ? "bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-inset ring-emerald-600/10 cursor-not-allowed"
                                   : "bg-slate-900 text-white hover:bg-slate-800"
                               }`}
                             >
-                              {isInCart ? "In Cart ✓" : (
+                              {isButtonLoading ? (
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              ) : isInCart ? (
+                                "In Cart ✓"
+                              ) : (
                                 <>
                                   <ShoppingCart size={14} />
                                   Add Cart
@@ -263,13 +334,13 @@ export default function Shop() {
                               )}
                             </button>
 
-                            <button
-                              onClick={() => setSelectedProduct(product)}
-                              className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50/80 shadow-sm transition-colors"
+                            <Link
+                              to={`/viewdetail/${product.id}`}
+                              className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50/80 shadow-sm transition-colors flex items-center justify-center"
                               title="Quick View"
                             >
                               <Eye size={15} />
-                            </button>
+                            </Link>
                           </div>
                         </div>
                       </div>
@@ -281,57 +352,6 @@ export default function Shop() {
           </div>
         </div>
       </div>
-
-      {/* ══ MODAL DETAIL QUICKVIEW DIALOG OVERLAY ══ */}
-      {selectedProduct && (
-        <div className="fixed inset-0 bg-[#1a0533]/40 backdrop-blur-sm flex justify-center items-center z-50 p-4 transition-all animate-fade-in">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full relative border border-slate-100 shadow-2xl space-y-5 animate-scale-up">
-            <button
-              onClick={() => setSelectedProduct(null)}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-50 border border-slate-200/60 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-colors shadow-sm"
-            >
-              <X size={16} />
-            </button>
-
-            <div className="aspect-[4/5] w-full rounded-xl overflow-hidden bg-slate-50 border border-slate-100">
-              <img
-                src={selectedProduct.image_url}
-                alt={selectedProduct.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <span className="text-[9px] uppercase tracking-widest font-extrabold bg-violet-50 text-violet-700 px-2 py-0.5 rounded border border-violet-100">
-                {selectedProduct.brand}
-              </span>
-              <h2 className="text-xl font-black text-[#1a0533] tracking-tight mt-1">
-                {selectedProduct.name}
-              </h2>
-              <p className="text-xs text-slate-500 leading-relaxed pt-1">
-                {selectedProduct.description || "A pristine selection from the curated Lumière line, optimizing long-lasting base formulation properties."}
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between pt-2">
-              <div className="space-y-0.5">
-                <p className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Price Matrix</p>
-                <p className="text-lg font-black text-[#1a0533]">
-                  ₹{new Intl.NumberFormat("en-IN").format(selectedProduct.price)}
-                </p>
-              </div>
-
-              <button
-                onClick={() => addToCart(selectedProduct)}
-                className="bg-slate-900 text-white text-xs font-bold uppercase tracking-wider px-5 py-3 rounded-xl hover:bg-slate-800 border-0 shadow-md active:scale-95 transition-all flex items-center gap-2"
-              >
-                <ShoppingCart size={14} />
-                Secure to Cart
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

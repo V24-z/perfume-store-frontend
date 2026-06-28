@@ -1,5 +1,6 @@
 import { useAuth } from "../../context/useAuth.jsx"; // your hook
 import { useNavigate } from "react-router-dom";
+import { User, Mail, Phone, ArrowLeft, LogOut } from "lucide-react";
 
 function Profile() {
   const { user, logout } = useAuth();
@@ -12,98 +13,97 @@ function Profile() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500">
-        <p className="text-white text-lg font-medium">You are not logged in.</p>
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+        <div className="w-8 h-8 border-4 border-slate-200 border-t-violet-600 rounded-full animate-spin mb-3" />
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Verifying Session...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-6 relative overflow-hidden">
-      {/* Animated background blobs */}
-      <div className="absolute w-72 h-72 bg-white/10 rounded-full -top-16 -left-16 animate-pulse" />
-      <div className="absolute w-96 h-96 bg-white/10 rounded-full -bottom-24 -right-24 animate-pulse delay-700" />
-      <div
-        className="absolute w-52 h-52 bg-pink-300/20 rounded-full top-1/2 left-10 animate-bounce"
-        style={{ animationDuration: "4s" }}
-      />
-      {/* blob 1 */}
-      <div
-        className="absolute w-72 h-72 bg-white/10 rounded-full -top-16 -left-16"
-        style={{ animation: "pulse 3s ease-in-out infinite" }}
-      />
+    <div className="min-h-screen flex flex-col items-center justify-center text-slate-900 antialiased font-sans p-4 relative overflow-hidden bg-slate-50/50">
+      {/* Premium background ambient aura blur objects */}
+      <div className="absolute right-0 top-0 w-80 h-80 bg-gradient-to-br from-violet-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute left-0 bottom-0 w-96 h-96 bg-gradient-to-tr from-fuchsia-500/5 to-transparent rounded-full blur-3xl pointer-events-none" />
 
-      {/* blob 2 */}
-      <div
-        className="absolute w-96 h-96 bg-white/10 rounded-full -bottom-24 -right-24"
-        style={{ animation: "pulse 4s ease-in-out infinite reverse" }}
-      />
-
-      {/* blob 3 */}
-      <div
-        className="absolute w-52 h-52 bg-pink-300/20 rounded-full top-1/2 left-10"
-        style={{ animation: "bounce 4s ease-in-out infinite" }}
-      />
-      {/* Glass card */}
-      <div className="relative z-10 w-full max-w-md backdrop-blur-xl bg-white/20 border border-white/30 rounded-3xl p-8 shadow-2xl text-center animate-fadeIn">
-        {/* Back arrow */}
+      {/* Luxury Profile Content Container Card */}
+      <div className="relative w-full max-w-md bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 text-center shadow-sm">
+        
+        {/* Back navigation button trigger */}
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 flex items-center gap-1.5 text-white/70 hover:text-white text-sm font-medium transition-all hover:gap-2.5"
+          className="absolute top-5 left-5 flex items-center gap-1 text-slate-400 hover:text-slate-800 text-xs font-bold uppercase tracking-wider transition-colors border-0 bg-transparent cursor-pointer"
         >
-          <span className="text-lg leading-none">←</span>
+          <ArrowLeft size={14} />
           <span>Back</span>
         </button>
-        {/* Avatar */}
+
+        {/* Brand context ribbon banner mark */}
+        <div className="flex items-center justify-center gap-1.5 mt-4 mb-5">
+          <span className="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-violet-600 to-fuchsia-600" />
+          <p className="text-[10px] uppercase tracking-widest font-bold text-violet-600">Lumière Account</p>
+        </div>
+
+        {/* Monogram profile avatar initial glyph wrapper */}
         <div className="flex justify-center mb-5">
-          <div className="w-24 h-24 rounded-full bg-white/30 border-4 border-white/50 flex items-center justify-center text-4xl font-bold text-white shadow-lg backdrop-blur-sm">
+          <div className="w-20 h-20 rounded-full bg-slate-900 border-4 border-white flex items-center justify-center text-2xl font-black text-white shadow-md">
             {user.email ? user.email.charAt(0).toUpperCase() : "U"}
           </div>
         </div>
 
-        {/* Title */}
-        <h2 className="text-2xl font-bold text-white mb-1 tracking-wide">
-          My Profile
+        {/* Identity block titles */}
+        <h2 className="text-xl font-black text-[#1a0533] tracking-tight">
+          My Profile Dashboard
         </h2>
-        <p className="text-white/60 text-sm mb-6">Account details</p>
+        <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mt-1 mb-6">Secured Registry Details</p>
 
-        {/* Info rows */}
-        <div className="space-y-3 mb-6 text-left">
+        {/* Information entry lists block rows grid */}
+        <div className="space-y-3.5 mb-6 text-left">
+          {/* Full Name */}
           {user.name && (
-            <div className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-xl px-4 py-3 backdrop-blur-sm transition hover:bg-white/20">
-              <span className="text-white/50 text-xs uppercase tracking-widest w-12 font-medium">
-                Name
-              </span>
-              <span className="text-white font-semibold">{user.name}</span>
+            <div className="flex items-center gap-3 bg-slate-50/60 border border-slate-200/60 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50">
+              <User size={15} className="text-violet-600 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="block text-[9px] uppercase font-bold tracking-wider text-slate-400">Full Name</span>
+                <span className="block text-sm font-bold text-slate-800 truncate mt-0.5">{user.name}</span>
+              </div>
             </div>
           )}
+
+          {/* Email Address */}
           {user.email && (
-            <div className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-xl px-4 py-3 backdrop-blur-sm transition hover:bg-white/20">
-              <span className="text-white/50 text-xs uppercase tracking-widest w-12 font-medium">
-                Email
-              </span>
-              <span className="text-white/90 text-sm">{user.email}</span>
+            <div className="flex items-center gap-3 bg-slate-50/60 border border-slate-200/60 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50">
+              <Mail size={15} className="text-violet-600 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="block text-[9px] uppercase font-bold tracking-wider text-slate-400">Email Address</span>
+                <span className="block text-sm font-bold text-slate-800 truncate mt-0.5">{user.email}</span>
+              </div>
             </div>
           )}
-           {user.phon && (
-            <div className="flex items-center gap-3 bg-white/10 border border-white/20 rounded-xl px-4 py-3 backdrop-blur-sm transition hover:bg-white/20">
-              <span className="text-white/50 text-xs uppercase tracking-widest w-12 font-medium">
-                Phone no
-              </span>
-              <span className="text-white/90 text-sm">{user.phon}</span>
+
+          {/* Phone Number Contact */}
+          {user.phon && (
+            <div className="flex items-center gap-3 bg-slate-50/60 border border-slate-200/60 rounded-xl px-4 py-3 transition-colors hover:bg-slate-50">
+              <Phone size={15} className="text-violet-600 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <span className="block text-[9px] uppercase font-bold tracking-wider text-slate-400">Phone Contact</span>
+                <span className="block text-sm font-bold text-slate-800 font-mono mt-0.5">{user.phon}</span>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Logout button */}
+        {/* Safe account destruction token session termination trigger */}
         <button
           onClick={handleLogout}
-          className="w-full py-2.5 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white font-semibold tracking-wide transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
+          className="w-full flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider bg-slate-950 text-white rounded-xl py-3.5 hover:bg-slate-850 shadow-sm active:scale-95 transition-all border-0 cursor-pointer"
         >
-          Logout
+          <LogOut size={14} />
+          <span>Logout Session</span>
         </button>
       </div>
     </div>
   );
 }
+
 export default Profile;
