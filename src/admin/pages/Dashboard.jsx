@@ -168,7 +168,7 @@ export default function Dashboard() {
     // FIXED: Appended authorized headers wrapper to securely query user register logs
     axios.get(`${API_URL}/users`, getAuthHeaders()).then(r => setUsers(r.data?.data || r.data || [])).catch(console.error).finally(() => setDone("users"));
     
-    axios.get(`${API_URL}/banner`).then(r => { /* logical placeholder matching original schema execution */ }).catch(console.error).finally(() => setDone("banners"));
+    axios.get(`${API_URL}/banners`, getAuthHeaders()).then(r => { /* logical placeholder matching original schema execution */ }).catch(console.error).finally(() => setDone("banners"));
   }, []);
 
   const stats = useMemo(() => {
