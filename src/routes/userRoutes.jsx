@@ -45,7 +45,7 @@ function UserRoutes() {
           <Route path="/viewdetail/:id" element={<ViewSingleProduct />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/order" element={<Order />} />
+          <Route path="/order/:orderId" element={<Order />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/wishlist" element={<Wishlist />} />
         </Route>
