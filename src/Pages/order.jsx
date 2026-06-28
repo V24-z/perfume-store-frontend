@@ -93,13 +93,13 @@ const steps = ["pending", "confirmed", "processing", "shipped", "delivered"];
       <div className="border rounded-xl p-4">
         <h2 className="font-semibold mb-3">Items</h2>
 
-        {order.items?.map((item, i) => (
-          <div key={i} className="flex justify-between py-2 border-b">
+        {order.order_items?.map((item)  => (
+          <div key={item.id} className="flex justify-between py-2 border-b">
             <div>
-              <p>{item.product_name}</p>
-              <p className="text-sm text-gray-500">Qty: {item.qty}</p>
+              <p>{item.products?.name}</p>   
+               <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
             </div>
-            <p>₹{item.price * item.qty}</p>
+            <p>₹{item.price * item.quantity}</p>
           </div>
         ))}
       </div>
