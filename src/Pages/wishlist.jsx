@@ -11,7 +11,9 @@ export default function Wishlist() {
 
   // Track item-level processing states independently using the product ID
   const [processingId, setProcessingId] = useState(null);
-
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   const handleAddToCartClick = async (product) => {
     if (processingId) return;
     try {
