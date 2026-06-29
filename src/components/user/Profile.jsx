@@ -1,6 +1,7 @@
 import { useAuth } from "../../context/useAuth.jsx"; // your hook
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Phone, ArrowLeft, LogOut } from "lucide-react";
+import { useEffect } from "react";
 
 function Profile() {
   const { user, logout } = useAuth();
@@ -10,7 +11,9 @@ function Profile() {
     logout();
     navigate("/login");
   };
-
+  useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   if (!user) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
