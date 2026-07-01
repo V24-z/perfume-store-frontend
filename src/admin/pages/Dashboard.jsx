@@ -1,32 +1,33 @@
 import { useEffect, useState, useMemo } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 // HELPER: Safely generate headers containing the stored bearer token
 const getAuthHeaders = () => {
-  const token = localStorage.getItem("access_token"); 
+  const token = localStorage.getItem("access_token");
   return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 };
 
 // ─── Refined Helper Formatting ────────────────────────────────────────────────
 const fmt = (n) => new Intl.NumberFormat("en-IN").format(n ?? 0);
 const fmtRupee = (n) => `₹${fmt(n)}`;
-const fmtDate  = (s) => s ? new Date(s).toLocaleDateString("en-IN", { day:"2-digit", month:"short", year:"numeric" }) : "—";
+const fmtDate = (s) => s ? new Date(s).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
 // ─── Shimmer Loading Skeleton ─────────────────────────────────────────────────
 function Skeleton({ className = "" }) {
   return <div className={`rounded-lg bg-slate-200 animate-pulse ${className}`} />;
 }
 
-// ─── Status Badge mapping cleanly to standard tailwind classes ─────────────
+// ─── Status Badge ──────────────────────────────────────────────────────────
 const STATUS_STYLES = {
-  delivered:  "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
-  shipped:    "bg-sky-50 text-sky-700 ring-sky-600/10",
-  pending:    "bg-amber-50 text-amber-800 ring-amber-600/10",
+  delivered: "bg-emerald-50 text-emerald-700 ring-emerald-600/10",
+  shipped: "bg-sky-50 text-sky-700 ring-sky-600/10",
+  pending: "bg-amber-50 text-amber-800 ring-amber-600/10",
   processing: "bg-violet-50 text-violet-700 ring-violet-600/10",
-  confirmed:  "bg-green-50 text-green-700 ring-green-600/10",
-  cancelled:  "bg-red-50 text-red-700 ring-red-600/10",
+  confirmed: "bg-green-50 text-green-700 ring-green-600/10",
+  cancelled: "bg-red-50 text-red-700 ring-red-600/10",
 };
 
 function StatusBadge({ status = "" }) {
@@ -68,9 +69,9 @@ function MiniBar({ label, value, max, tailwindBg }) {
         <span className="font-bold text-slate-900">{value}</span>
       </div>
       <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
-        <div 
-          className={`h-full rounded-full transition-all duration-500 ${tailwindBg || "bg-violet-600"}`} 
-          style={{ width: `${pct}%` }} 
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${tailwindBg || "bg-violet-600"}`}
+          style={{ width: `${pct}%` }}
         />
       </div>
     </div>
@@ -110,7 +111,7 @@ function StatusDonut({ data }) {
           <span className="text-[9px] font-bold text-slate-400 tracking-wider mt-0.5">TOTAL</span>
         </div>
       </div>
-      
+
       <div className="space-y-2 flex-1">
         {data.map(s => (
           <div key={s.label} className="flex items-center justify-between text-xs">
@@ -134,7 +135,7 @@ function Sparkline({ points = [], color = "#f59e0b" }) {
   const xs = points.map((_, i) => pad + (i / (points.length - 1)) * (W - pad * 2));
   const ys = points.map(v => H - pad - ((v / max) * (H - pad * 2)));
   const d = xs.map((x, i) => `${i === 0 ? "M" : "L"}${x},${ys[i]}`).join(" ");
-  const fill = `${d} L${xs[xs.length-1]},${H} L${xs[0]},${H} Z`;
+  const fill = `${d} L${xs[xs.length - 1]},${H} L${xs[0]},${H} Z`;
   return (
     <svg width={W} height={H} className="overflow-visible">
       <defs>
@@ -151,24 +152,24 @@ function Sparkline({ points = [], color = "#f59e0b" }) {
 
 // ─── Main Console Dashboard ──────────────────────────────────────
 export default function Dashboard() {
-  const [products,  setProducts]  = useState([]);
-  const [orders,    setOrders]    = useState([]);
-  const [users,     setUsers]     = useState([]);
-  const [loading,   setLoading]   = useState({ products: true, orders: true, users: true, banners: true });
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState({ products: true, orders: true, users: true, banners: true });
 
   const setDone = (key) => setLoading(l => ({ ...l, [key]: false }));
 
   useEffect(() => {
     // Products table query remains public
     axios.get(`${API_URL}/products/`).then(r => setProducts(r.data)).catch(console.error).finally(() => setDone("products"));
-    
-    // FIXED: Appended authorized headers wrapper to securely execute order tracking lookups
+
+    // Authorized headers applied for secure order tracking
     axios.get(`${API_URL}/orders/all`, getAuthHeaders()).then(r => setOrders(r.data)).catch(console.error).finally(() => setDone("orders"));
-    
-    // FIXED: Appended authorized headers wrapper to securely query user register logs
+
+    // Authorized headers applied for secure user lookup
     axios.get(`${API_URL}/users`, getAuthHeaders()).then(r => setUsers(r.data?.data || r.data || [])).catch(console.error).finally(() => setDone("users"));
-    
-    axios.get(`${API_URL}/banners`, getAuthHeaders()).then(r => { /* logical placeholder matching original schema execution */ }).catch(console.error).finally(() => setDone("banners"));
+
+    axios.get(`${API_URL}/banners`, getAuthHeaders()).then().catch(console.error).finally(() => setDone("banners"));
   }, []);
 
   const stats = useMemo(() => {
@@ -212,11 +213,11 @@ export default function Dashboard() {
     const sparkPoints = Object.values(monthlyMap).slice(-6);
 
     const statusDistrib = [
-      { label: "Delivered",  value: byStatus("delivered"),  color: "#059669" },
-      { label: "Pending",    value: byStatus("pending"),    color: "#d97706" },
+      { label: "Delivered", value: byStatus("delivered"), color: "#059669" },
+      { label: "Pending", value: byStatus("pending"), color: "#d97706" },
       { label: "Processing", value: byStatus("processing"), color: "#7c3aed" },
-      { label: "Shipped",    value: byStatus("shipped"),    color: "#0284c7" },
-      { label: "Cancelled",  value: byStatus("cancelled"),  color: "#dc2626" },
+      { label: "Shipped", value: byStatus("shipped"), color: "#0284c7" },
+      { label: "Cancelled", value: byStatus("cancelled"), color: "#dc2626" },
     ].filter(s => s.value > 0);
 
     return {
@@ -259,15 +260,15 @@ export default function Dashboard() {
           </div>
 
           <div className="flex gap-2.5 items-center flex-wrap">
-            <a href="/admin/products" className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-slate-900 text-white shadow-sm hover:bg-slate-800 transition-all border-0">
+            <Link to="/admin/products" className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-slate-900 text-white shadow-sm hover:bg-slate-800 transition-all border-0">
               + Add Product
-            </a>
-            <a href="/admin/banner" className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-white text-slate-700 border border-slate-200 shadow-sm hover:bg-slate-50 transition-all">
+            </Link>
+            <Link to="/admin/banner" className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-white text-slate-700 border border-slate-200 shadow-sm hover:bg-slate-50 transition-all">
               + Add Banner
-            </a>
-            <a href="/admin/orders" className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-violet-50 text-violet-700 hover:bg-violet-100 transition-all">
+            </Link>
+            <Link to="/admin/orders" className="text-xs font-semibold px-4 py-2.5 rounded-lg bg-violet-50 text-violet-700 hover:bg-violet-100 transition-all">
               View Orders
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -305,7 +306,7 @@ export default function Dashboard() {
 
         {/* ══ TWO-COLUMN ACTION CONTENT ══ */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
+
           {/* Recent Orders Listing Table */}
           <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200/80 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-5">
