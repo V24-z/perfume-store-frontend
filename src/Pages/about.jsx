@@ -1,6 +1,10 @@
 import hero from '../../public/about.png';
-
+import { useEffect } from 'react';
 const About = () => {
+   // ✅ Scroll to top when product changes
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
   return (
     <section className="container mx-auto px-6 py-16">
       {/* Header */}
