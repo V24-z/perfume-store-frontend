@@ -1,9 +1,17 @@
 import { useAuth } from "../../context/useAuth";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom"; // Added useNavigate
 
 const Header = ({ onToggleSidebar }) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth(); // FIXED: Added logout
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    localStorage.removeItem("access_token"); // Ensure token is cleared
+    navigate("/login");
+  };
+
   const page = location.pathname.split("/").filter(Boolean).pop();
   const pageLabel = page ? page.charAt(0).toUpperCase() + page.slice(1) : "Dashboard";
   const today = new Date().toLocaleDateString("en-US", {
@@ -32,7 +40,6 @@ const Header = ({ onToggleSidebar }) => {
       >
         {/* Left */}
         <div className="flex items-center gap-2 md:gap-3">
-
           {/* Hamburger — always visible */}
           <button
             onClick={onToggleSidebar}
@@ -45,28 +52,17 @@ const Header = ({ onToggleSidebar }) => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-
-         
-          
         </div>
 
         {/* Right */}
         <div className="flex items-center gap-1.5 md:gap-2">
-
-         
-           
-          
-
-         
-
-          
-
           {/* Divider — hidden on mobile */}
           <div className="hidden md:block w-px h-6 mx-1" style={{ background: "rgba(255,255,255,0.1)" }} />
 
-          {/* User pill */}
+          {/* User pill — FIXED: Added onClick to trigger logout */}
           <div
             className="flex items-center gap-2 rounded-full cursor-pointer transition-all"
+            onClick={handleLogout}
             style={{
               border: "1px solid rgba(255,255,255,0.1)",
               padding: "5px 10px 5px 5px",
