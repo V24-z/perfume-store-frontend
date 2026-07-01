@@ -1,40 +1,47 @@
-//import hero from "C:/my-app/FRONTEND/public/about.jpg";
-import hero from '../../public/about.jpg'
-const About=()=> {
+import hero from '../../public/about.jpg';
+
+const About = () => {
   return (
-    <>
-      <h1 className="flex justify-center relative  p-6 m-6 text-3xl font-bold mb-4 text-gray-800 tracking-wide">
-        <span className="underline m-3 underline-offset-8 decoration-4 decoration-red-300 ">
-          OUR HISTORY{" "}
-        </span>
+    <section className="container mx-auto px-6 py-16">
+      {/* Header */}
+      <h1 className="text-center text-3xl md:text-4xl font-bold mb-16 text-gray-800 tracking-wide">
+        <span className="border-b-4 border-red-300 pb-2">OUR HISTORY</span>
       </h1>
 
-      <div className="flex items-center min-h-screen">
-        <div className="flex w-1/2 justify-center">
-          <img src={hero} alt=" hero" className="w-140 h-full object-cover" />
+      <div className="flex flex-col md:flex-row items-center gap-12">
+        {/* Image Section - Fixed size issue */}
+        <div className="w-full md:w-1/2">
+          <img
+            src={hero}
+            alt="Lumière Perfume Story"
+            className="w-full h-[400px] md:h-[550px] object-cover rounded-2xl shadow-xl transition-transform duration-500 hover:scale-105"
+          />
         </div>
-        <div className="w-1/2 flex flex-col justify-center px-16 py-20 text-gray-600">
-          <p className="text-center items-center object-cover leading-relaxed">
-            <span className="relative px-2 py-2">
+
+        {/* Text Section - Better readability */}
+        <div className="w-full md:w-1/2 relative p-8">
+          {/* Decorative Corner Frames */}
+          <div className="absolute top-0 left-0 h-16 w-16 border-t-4 border-l-4 border-red-300 rounded-tl-xl" />
+          <div className="absolute bottom-0 right-0 h-16 w-16 border-b-4 border-r-4 border-red-300 rounded-br-xl" />
+
+          <div className="space-y-6 text-gray-600 leading-relaxed text-lg">
+            <p>
               At Lumière Perfume, we believe fragrance is more than a scent—it's a reflection of your personality, emotions, and unforgettable moments. Inspired by the French word "Lumière," meaning light, our brand is dedicated to illuminating confidence, elegance, and individuality through every fragrance we create.
-
-Our carefully crafted perfumes blend premium ingredients with timeless artistry to deliver long-lasting, captivating scents that leave a lasting impression. Whether you seek a fresh everyday fragrance, a bold signature scent, or a luxurious gift, Lumière offers a collection designed to complement every mood and occasion.
-
-We are committed to quality, sophistication, and authenticity. Every bottle represents our passion for creating fragrances that inspire confidence, evoke memories, and celebrate the beauty of self-expression.
-
-At Lumière, we don't just create perfumes—we create experiences that shine with elegance and leave a trail of unforgettable moments.
-
-Lumière Perfume – Illuminate Your Presence. ✨
-              <span className="absolute -top-3 -left-3  h-12  w-12 border-t-2 border-l-2  border-red-300  "></span>
-             <span className="absolute right-19  -bottom-6   h-10  w-10 border-b-2 border-r-2  border-red-300  "></span>
-
-           
-            </span>
-          </p>
+            </p>
+            <p>
+              Our carefully crafted perfumes blend premium ingredients with timeless artistry to deliver long-lasting, captivating scents that leave a lasting impression. Whether you seek a fresh everyday fragrance, a bold signature scent, or a luxurious gift, Lumière offers a collection designed to complement every mood and occasion.
+            </p>
+            <p>
+              We are committed to quality, sophistication, and authenticity. Every bottle represents our passion for creating fragrances that inspire confidence, evoke memories, and celebrate the beauty of self-expression.
+            </p>
+            <p className="font-semibold italic text-gray-800">
+              Lumière Perfume – Illuminate Your Presence. ✨
+            </p>
+          </div>
         </div>
       </div>
-    </>
+    </section>
   );
-}
+};
 
 export default About;

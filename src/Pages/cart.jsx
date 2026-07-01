@@ -119,31 +119,31 @@ function OrderSummary({ subtotal, itemCount }) {
 
   return (
     <>
-      {/* Desktop / Tablet Summary Card Container */}
+      {/* Desktop / Tablet Summary Card Container - Applied custom font styling here */}
       <motion.div
         variants={fadeVariants}
         initial="hidden"
         animate="visible"
-        className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 lg:sticky lg:top-6 shadow-sm"
+        className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 lg:sticky lg:top-6 shadow-sm font-['Inter',sans-serif]"
       >
-        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
           Order Valuation
         </p>
-        <h2 className="font-black text-base text-[#1a0533] mb-5 tracking-tight">
+        <h2 className="font-extrabold text-base text-[#1a0533] mb-5 tracking-tight">
           {itemCount} {itemCount === 1 ? "item" : "items"} in your bag
         </h2>
 
         <div className="space-y-3.5 text-xs font-medium text-slate-500">
           <div className="flex justify-between items-center">
             <span>Bag Subtotal</span>
-            <span className="tabular-nums font-bold text-slate-800">
+            <span className="tabular-nums font-semibold text-slate-800">
               ₹{fmt(subtotal)}
             </span>
           </div>
 
           <div className="flex justify-between items-center">
             <span>Shipping Fees</span>
-            <span className="tabular-nums font-bold text-slate-800">
+            <span className="tabular-nums font-semibold text-slate-800">
               {shipping === 0 ? (
                 <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Free</span>
               ) : (
@@ -157,7 +157,7 @@ function OrderSummary({ subtotal, itemCount }) {
 
         <div className="flex items-center justify-between bg-[#1a0533] text-white rounded-xl px-4 py-3.5 shadow-inner">
           <span className="text-xs uppercase font-bold tracking-wider text-slate-300">Total Due</span>
-          <span className="text-lg font-black tabular-nums">
+          <span className="text-lg font-black tracking-tight tabular-nums">
             ₹{fmt(total)}
           </span>
         </div>

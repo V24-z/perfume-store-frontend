@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import useCartAnimation from "../context/usecartAnimation";
 import useWishlist from "../context/useWhishlist";
 import Navbar from "./Navbar";
-import { ShoppingBag, Heart, User, LogOut, Package, UserCheck, X } from "lucide-react";
+import { ShoppingBag, Heart, User, LogOut, Package,  X } from "lucide-react";
 
 function Header() {
   const { cartItems } = useCart();

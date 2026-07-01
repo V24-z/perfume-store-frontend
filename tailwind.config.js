@@ -3,6 +3,13 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      
+      fontFamily: {
+        // Define your custom font here
+        sans: ['"Inter"', 'sans-serif'], 
+        // Or for a more technical/monospaced feel:
+        display: ['"Geist Sans"', 'sans-serif'],
+      },
       keyframes: {
         fadeIn: {
           "0%": { opacity: "0", transform: "translateY(20px)" },

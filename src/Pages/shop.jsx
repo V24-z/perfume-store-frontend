@@ -159,7 +159,7 @@ export default function Shop() {
           {/* ══ FILTERS SIDEBAR ══ */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm space-y-5 lg:sticky lg:top-6">
             <div className="flex items-center gap-2 pb-3 border-b border-slate-100">
-              <SlidersHorizontal size={16} className="text-violet-600" />
+              <SlidersHorizontal size={16} className="text-violet-600 flex-shrink-0" />
               <h2 className="font-bold text-sm tracking-tight text-[#1a0533]">Filter Boutique</h2>
             </div>
 
@@ -172,9 +172,9 @@ export default function Shop() {
                   placeholder="Search fragrances..."
                   value={filters.search}
                   onChange={(e) => handleChange("search", e.target.value)}
-                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2.5 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
+                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3 py-3 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
                 />
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 flex-shrink-0" />
               </div>
             </div>
 
@@ -185,7 +185,7 @@ export default function Shop() {
                 <select
                   value={filters.category_id}
                   onChange={(e) => handleChange("category_id", e.target.value)}
-                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 appearance-none cursor-pointer text-slate-700 font-medium transition-all"
+                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 appearance-none cursor-pointer text-slate-700 font-medium transition-all"
                 >
                   <option value="">All Categories</option>
                   {categories.map((category) => (
@@ -194,7 +194,7 @@ export default function Shop() {
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400 border-l border-slate-200/60 my-2">
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
                   <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
                   </svg>
@@ -210,7 +210,7 @@ export default function Shop() {
                 placeholder="e.g. Chanel, Dior"
                 value={filters.brand}
                 onChange={(e) => handleChange("brand", e.target.value)}
-                className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
+                className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
               />
             </div>
 
@@ -222,7 +222,7 @@ export default function Shop() {
                 placeholder="Enter max price"
                 value={filters.max_price}
                 onChange={(e) => handleChange("max_price", e.target.value)}
-                className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
+                className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
               />
             </div>
 
@@ -233,13 +233,13 @@ export default function Shop() {
                 <select
                   value={filters.sort}
                   onChange={(e) => handleChange("sort", e.target.value)}
-                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 appearance-none cursor-pointer text-slate-700 font-medium transition-all"
+                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-3 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 appearance-none cursor-pointer text-slate-700 font-medium transition-all"
                 >
                   <option value="">Default sorting</option>
                   <option value="low">Price: Low → High</option>
                   <option value="high">Price: High → Low</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400 border-l border-slate-200/60 my-2">
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
                   <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
                   </svg>
@@ -291,7 +291,7 @@ export default function Shop() {
                               : "bg-white/80 border-slate-100 text-slate-400 hover:text-rose-500 hover:bg-white"
                           }`}
                         >
-                          <Heart size={16} fill={isWishlisted ? "currentColor" : "none"} />
+                          <Heart size={16} fill={isWishlisted ? "currentColor" : "none"} className="flex-shrink-0" />
                         </button>
                       </div>
 
@@ -323,12 +323,12 @@ export default function Shop() {
                               }`}
                             >
                               {isButtonLoading ? (
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin flex-shrink-0" />
                               ) : isInCart ? (
                                 "In Cart ✓"
                               ) : (
                                 <>
-                                  <ShoppingCart size={14} />
+                                  <ShoppingCart size={14} className="flex-shrink-0" />
                                   Add Cart
                                 </>
                               )}
@@ -339,7 +339,7 @@ export default function Shop() {
                               className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50/80 shadow-sm transition-colors flex items-center justify-center"
                               title="Quick View"
                             >
-                              <Eye size={15} />
+                              <Eye size={15} className="flex-shrink-0" />
                             </Link>
                           </div>
                         </div>
