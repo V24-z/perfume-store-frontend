@@ -167,14 +167,17 @@ export default function Shop() {
             <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-wider font-bold text-slate-400">Search</label>
               <div className="relative">
+                {/* FIXED: Wrapped the icon in an absolute flex container for perfect centering */}
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search size={14} className="text-slate-400 flex-shrink-0" />
+                </div>
                 <input
                   type="text"
                   placeholder="Search fragrances..."
                   value={filters.search}
                   onChange={(e) => handleChange("search", e.target.value)}
-                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3 py-3 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
+                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-3 focus:outline-none focus:ring-4 focus:ring-violet-500/10 focus:border-violet-500 transition-all"
                 />
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 flex-shrink-0" />
               </div>
             </div>
 
@@ -194,7 +197,7 @@ export default function Shop() {
                     </option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                   <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
                   </svg>
@@ -239,7 +242,7 @@ export default function Shop() {
                   <option value="low">Price: Low → High</option>
                   <option value="high">Price: High → Low</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-slate-400">
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
                   <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                     <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
                   </svg>
