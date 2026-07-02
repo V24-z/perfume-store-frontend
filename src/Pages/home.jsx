@@ -545,11 +545,19 @@ function Home() {
                           ) : (
                             <ShoppingCart size={20} />
                           )}
-                        
+                           {isInCart && (
+                          <span className="text-[10px] font-bold text-green-600 flex items-center">
+                            Qty: {cartItem.quantity}
+                          </span>
+                        )}
+                        </button>
 
                         {/* Display quantity if in cart */}
-                        {cartItems.length > 0 && <span className="absolute -top-1 -right-1 text-white font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-sm" style={{ background: "#f43f5e", fontSize: 8 }}>{cartItems.length}</span>}
-                        </button>
+                        {isInCart && (
+                          <span className="text-[10px] font-bold text-green-600 flex items-center">
+                            Qty: {cartItem.quantity}
+                          </span>
+                        )}
 
                         <Link
                           to={`/viewdetail/${product.id}`}
