@@ -546,18 +546,13 @@ function Home() {
                             <ShoppingCart size={20} />
                           )}
                            {isInCart && (
-                          <span className="text-[10px] font-bold text-green-600 flex items-center">
-                            Qty: {cartItem.quantity}
+                          <span className="-top-3 right-4 text-[10px] font-bold border rounded-sm border-white text-green-600 flex items-center">
+                           {cartItem.quantity}
                           </span>
                         )}
                         </button>
 
-                        {/* Display quantity if in cart */}
-                        {isInCart && (
-                          <span className="text-[10px] font-bold text-green-600 flex items-center">
-                            Qty: {cartItem.quantity}
-                          </span>
-                        )}
+                        
 
                         <Link
                           to={`/viewdetail/${product.id}`}
