@@ -8,10 +8,11 @@ import useCart from "../context/useCart";
 import useCartAnimation from "../context/usecartAnimation";
 import useWishlist from "../context/useWhishlist";
 
-const API_URL = import.meta.env.VITE_API_URL;
+// Safely access environment variables to prevent esbuild target warnings
+const API_URL = (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) || "";
 
 export default function Shop() {
-  const { addToCart, cartItems = [] } = useCart();
+  const { addToCart, cartItems = [], increaseQty } = useCart();
   const { cartPosition } = useCartAnimation();
 
   const {
@@ -167,7 +168,6 @@ export default function Shop() {
             <div className="space-y-1.5">
               <label className="block text-[10px] uppercase tracking-wider font-bold text-slate-400">Search</label>
               <div className="relative">
-                {/* FIXED: Wrapped the icon in an absolute flex container for perfect centering */}
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search size={14} className="text-slate-400 flex-shrink-0" />
                 </div>
@@ -267,7 +267,8 @@ export default function Shop() {
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
                 {products.map((product) => {
                   const isWishlisted = wishlistItems.some((item) => item.id === product.id);
-                  const isInCart = cartItems.some((item) => item.product_id === product.id || item.id === product.id);
+                  const cartItem = cartItems.find((item) => item.product_id === product.id || item.id === product.id);
+                  const isInCart = !!cartItem;
                   const isButtonLoading = processingId === product.id;
 
                   return (
@@ -317,18 +318,18 @@ export default function Shop() {
                           {/* ACTION BUTTON WRAPPER */}
                           <div className="flex gap-2 w-full pt-1">
                             <button
-                              disabled={isInCart || processingId !== null}
-                              onClick={() => handleAddToCart(product)}
-                              className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 disabled:scale-100 disabled:opacity-60 cursor-pointer ${
+                              disabled={isButtonLoading}
+                              onClick={() => isInCart && increaseQty ? increaseQty(cartItem) : handleAddToCart(product)}
+                              className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 disabled:opacity-60 cursor-pointer ${
                                 isInCart
-                                  ? "bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-inset ring-emerald-600/10 cursor-not-allowed"
+                                  ? "bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-inset ring-emerald-600/10"
                                   : "bg-slate-900 text-white hover:bg-slate-800"
                               }`}
                             >
                               {isButtonLoading ? (
-                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin flex-shrink-0" />
                               ) : isInCart ? (
-                                "In Cart ✓"
+                                `In Cart (${cartItem.quantity}) ✓`
                               ) : (
                                 <>
                                   <ShoppingCart size={14} className="flex-shrink-0" />

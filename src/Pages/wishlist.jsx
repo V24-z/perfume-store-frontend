@@ -7,18 +7,26 @@ import useCart from "../context/useCart";
 
 export default function Wishlist() {
   const { wishlistItems, removeFromWishlist } = useWishlist();
-  const { addToCart, cartItems = [] } = useCart();
+  const { addToCart, cartItems = [], increaseQty } = useCart();
 
   // Track item-level processing states independently using the product ID
   const [processingId, setProcessingId] = useState(null);
+  
   useEffect(() => {
-      window.scrollTo(0, 0);
-    }, []);
+    window.scrollTo(0, 0);
+  }, []);
+
   const handleAddToCartClick = async (product) => {
     if (processingId) return;
     try {
       setProcessingId(product.id);
-      await addToCart(product);
+      const cartItem = cartItems.find(item => item.product_id === product.id || item.id === product.id);
+      
+      if (cartItem && increaseQty) {
+        await increaseQty(cartItem);
+      } else {
+        await addToCart(product);
+      }
     } catch (err) {
       console.error("Failed to add variant to cart:", err);
     } finally {
@@ -75,7 +83,8 @@ export default function Wishlist() {
         {/* ══ PRODUCT GRID ══ */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
           {wishlistItems.map((product) => {
-            const isInCart = cartItems.some((item) => item.product_id === product.id || item.id === product.id);
+            const cartItem = cartItems.find((item) => item.product_id === product.id || item.id === product.id);
+            const isInCart = !!cartItem;
             const isButtonLoading = processingId === product.id;
 
             return (
@@ -123,21 +132,21 @@ export default function Wishlist() {
 
                     {/* ACTION CONTROLS */}
                     <button
-                      disabled={isInCart || processingId !== null}
+                      disabled={isButtonLoading}
                       onClick={() => handleAddToCartClick(product)}
-                      className={`w-full text-xs font-semibold uppercase tracking-wider rounded-xl py-3 px-4 flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 disabled:scale-100 disabled:opacity-60 cursor-pointer ${
+                      className={`w-full text-xs font-semibold uppercase tracking-wider rounded-xl py-3 px-4 flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 disabled:opacity-60 cursor-pointer ${
                         isInCart
-                          ? "bg-slate-50 text-slate-400 font-medium border border-slate-200/60 cursor-not-allowed shadow-none"
+                          ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 ring-1 ring-inset ring-emerald-600/20"
                           : "bg-slate-900 text-white hover:bg-slate-800"
                       }`}
                     >
                       {isButtonLoading ? (
                         <>
-                          <div className="w-3.5 h-3.5 border-2 border-slate-400 border-t-white rounded-full animate-spin" />
+                          <div className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin" />
                           <span>Processing...</span>
                         </>
                       ) : isInCart ? (
-                        <span>Added to Cart ✓</span>
+                        <span>In Cart ({cartItem.quantity}) ✓</span>
                       ) : (
                         <>
                           <ShoppingCart size={13} strokeWidth={2.5} />

@@ -3,7 +3,8 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { createPortal } from "react-dom";
 
-const API_URL = import.meta.env.VITE_API_URL;
+// Using a fallback for environment variables to avoid esbuild warnings
+const API_URL = (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) || "";
 
 function SearchBar() {
   const [search, setSearch] = useState("");
@@ -13,10 +14,8 @@ function SearchBar() {
   const wrapperRef = useRef(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
 
-  // 1. Separate state reset into its own effect to avoid cascading logic in the fetch effect
   useEffect(() => {
     if (search.trim().length < 2) {
-      // Use a timeout to push this out of the synchronous render phase
       const timer = setTimeout(() => {
         setSuggestions([]);
         setLoading(false);
@@ -25,7 +24,6 @@ function SearchBar() {
     }
   }, [search]);
 
-  // 2. Fetch effect now only handles valid queries
   useEffect(() => {
     if (search.trim().length < 2) return;
 
@@ -55,15 +53,16 @@ function SearchBar() {
       clearTimeout(timer);
     };
   }, [search]);
-
-  // ... (rest of your positioning logic remains the same)
   
   const updateDropdownPosition = () => {
     if (!wrapperRef.current) return;
     const rect = wrapperRef.current.getBoundingClientRect();
+    
+    // FIXED: Because this portal is rendered via `position: fixed`, we ONLY need rect.bottom 
+    // and rect.left. Adding window.scrollY causes the dropdown to fly away when scrolled.
     setDropdownPos({
-      top: rect.bottom + window.scrollY + 8,
-      left: rect.left + window.scrollX,
+      top: rect.bottom + 8,
+      left: rect.left,
       width: rect.width,
     });
   };
@@ -83,7 +82,7 @@ function SearchBar() {
   return (
     <div ref={wrapperRef} className="relative w-56 lg:w-72">
       <div className="flex items-center gap-2 rounded-full px-4 py-2 border border-white/20 bg-white/10">
-        <svg className="w-4 h-4 text-white/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4 text-white/50 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         <input
@@ -102,23 +101,26 @@ function SearchBar() {
           style={{ position: "fixed", top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width, zIndex: 999999 }}
           className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
         >
-          {loading ? (
-            <div className="p-4 text-center text-gray-500 text-sm">Searching...</div>
-          ) : search.trim().length >= 2 && suggestions.length === 0 ? (
-            <div className="p-4 text-center text-gray-500 text-sm">No products found</div>
-          ) : suggestions.length > 0 ? (
-            suggestions.map((product) => (
-              <Link
-                key={product.id}
-                to={`/viewdetail/${product.id}`}
-                className="block p-3 hover:bg-gray-50 transition no-underline"
-                onClick={() => { setSearch(""); setShowSuggestions(false); }}
-              >
-                <p className="font-medium text-gray-900 text-sm">{product.name}</p>
-                <p className="text-xs text-gray-500">{product.brand}</p>
-              </Link>
-            ))
-          ) : null}
+          {/* Added Fixed Max-Height to dropdown itself to make it internally scrollable */}
+          <div className="max-h-[60vh] overflow-y-auto">
+            {loading ? (
+              <div className="p-4 text-center text-gray-500 text-sm">Searching...</div>
+            ) : search.trim().length >= 2 && suggestions.length === 0 ? (
+              <div className="p-4 text-center text-gray-500 text-sm">No products found</div>
+            ) : suggestions.length > 0 ? (
+              suggestions.map((product) => (
+                <Link
+                  key={product.id}
+                  to={`/viewdetail/${product.id}`}
+                  className="block p-3 hover:bg-gray-50 transition no-underline border-b border-gray-50 last:border-0"
+                  onClick={() => { setSearch(""); setShowSuggestions(false); }}
+                >
+                  <p className="font-medium text-gray-900 text-sm">{product.name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{product.brand}</p>
+                </Link>
+              ))
+            ) : null}
+          </div>
         </div>,
         document.body
       )}
