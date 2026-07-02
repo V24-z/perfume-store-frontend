@@ -1,15 +1,14 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { ShoppingCart, Heart } from "lucide-react";
-import { useRef } from "react";
 import { animate } from "motion";
+import { Link } from "react-router-dom";
 import useCart from "../context/useCart";
 import useCartAnimation from "../context/usecartAnimation";
 import useWishlist from "../context/useWhishlist";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-import { Link } from "react-router-dom";
 function Home() {
   const [banners, setBanners] = useState([]);
   const [current, setCurrent] = useState(0);
@@ -25,22 +24,17 @@ function Home() {
   const imageRefs = useRef({});
   const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
   
-  // Track item-level processing states independently using the product ID
   const [processingId, setProcessingId] = useState(null);
 
-  // ✅ Scroll to top when product changes
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  //==fly to cart animation==
   const flyToCart = (productId) => {
     const img = imageRefs.current[productId];
-
     if (!img || !cartPosition) return;
 
     const rect = img.getBoundingClientRect();
-
     const clone = img.cloneNode(true);
 
     clone.style.position = "fixed";
@@ -88,8 +82,6 @@ function Home() {
     }
   };
 
-  //single Effect--------------------------------------------------
-
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
@@ -111,8 +103,6 @@ function Home() {
 
     fetchHomeData();
   }, []);
-
-  //single Effect--------------------------------------------------
 
   useEffect(() => {
     if (banners.length <= 1 || isPaused) return;
@@ -215,7 +205,7 @@ function Home() {
           to   { opacity:1; transform:scale(1); }
         }
         @keyframes pulseGlow {
-          0%,100% { box-shadow:0 0 0 0   rgba(253,224,71,0.45); }
+          0%,100% { box-shadow:0 0 0 0  rgba(253,224,71,0.45); }
           50%      { box-shadow:0 0 0 8px rgba(253,224,71,0); }
         }
         .slide-next { animation:slideInRight 0.55s cubic-bezier(.22,.68,0,1.1) both; }
@@ -241,11 +231,7 @@ function Home() {
         }
       `}</style>
 
-      {/* ── Page wrapper — centres content, consistent horizontal padding ── */}
       <main className="w-full max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-4 sm:py-6 md:py-8 space-y-8 sm:space-y-10 md:space-y-12">
-        {/* ════════════════════════════════
-            BANNER CAROUSEL
-        ════════════════════════════════ */}
         <section aria-label="Featured banners">
           {banners.length === 0 ? (
             <div
@@ -272,7 +258,6 @@ function Home() {
             </div>
           ) : (
             <div className="space-y-2 sm:space-y-3">
-              {/* Main carousel */}
               <div
                 role="region"
                 aria-label="Banner carousel"
@@ -308,8 +293,6 @@ function Home() {
                         className="w-full h-full object-cover img-zoom"
                       />
                     )}
-
-                    {/* Gradient overlays — arbitrary color stops, must stay inline */}
                     <div
                       className="absolute inset-0"
                       aria-hidden="true"
@@ -326,11 +309,9 @@ function Home() {
                           "linear-gradient(to top,rgba(26,5,51,0.65) 0%,transparent 55%)",
                       }}
                     />
-
-                    {/* Slide content — max-width via inline (no Tailwind equiv for min()) */}
                     <div
                       className="absolute top-1/2 left-0 -translate-y-1/2 w-full
-                                 px-4 sm:px-8 md:px-12 lg:px-16"
+                                  px-4 sm:px-8 md:px-12 lg:px-16"
                       style={{ maxWidth: "min(580px, 65%)" }}
                     >
                       <p
@@ -342,7 +323,7 @@ function Home() {
                       <h2
                         key={`title-${i}`}
                         className="c-title text-white leading-tight mb-1.5 sm:mb-2 font-semibold
-                                   text-base sm:text-2xl md:text-3xl lg:text-4xl"
+                                    text-base sm:text-2xl md:text-3xl lg:text-4xl"
                       >
                         {banner.title}
                       </h2>
@@ -350,7 +331,7 @@ function Home() {
                         <p
                           key={`sub-${i}`}
                           className="c-sub mb-3 sm:mb-5 leading-relaxed text-white/65
-                                     text-[11px] sm:text-xs md:text-sm"
+                                      text-[11px] sm:text-xs md:text-sm"
                         >
                           {banner.subtitle}
                         </p>
@@ -360,10 +341,10 @@ function Home() {
                           key={`btn-${i}`}
                           href={banner.button_link || "#"}
                           className="c-btn glow-btn inline-flex items-center gap-1.5 rounded-full no-underline font-semibold
-                                     transition-all hover:scale-105 active:scale-95
-                                     bg-[#fde047] text-[#1a0533]
-                                     text-[10px] sm:text-xs
-                                     px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5"
+                                      transition-all hover:scale-105 active:scale-95
+                                      bg-[#fde047] text-[#1a0533]
+                                      text-[10px] sm:text-xs
+                                      px-3 py-1.5 sm:px-4 sm:py-2 md:px-5 md:py-2.5"
                         >
                           {banner.button_text}
                           <svg
@@ -383,8 +364,6 @@ function Home() {
                         </a>
                       )}
                     </div>
-
-                    {/* Counter badge */}
                     <div
                       aria-hidden="true"
                       className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4
@@ -396,8 +375,6 @@ function Home() {
                     </div>
                   </div>
                 ))}
-
-                {/* Pause indicator */}
                 {isPaused && banners.length > 1 && (
                   <div
                     aria-hidden="true"
@@ -407,8 +384,6 @@ function Home() {
                     ⏸ Paused
                   </div>
                 )}
-
-                {/* Prev / Next buttons */}
                 {banners.length > 1 && (
                   <>
                     <button
@@ -461,8 +436,6 @@ function Home() {
                     </button>
                   </>
                 )}
-
-                {/* Progress bar */}
                 <div
                   aria-hidden="true"
                   className="absolute bottom-0 left-0 h-0.5 z-10 transition-[width] duration-100 linear"
@@ -476,9 +449,6 @@ function Home() {
           )}
         </section>
 
-        {/* ════════════════════════════════
-            FEATURED PERFUMES
-        ════════════════════════════════ */}
         <section aria-label="Featured Perfumes">
           <div className="mb-4 sm:mb-6">
             <h2 className="text-xl sm:text-2xl font-bold text-[#1a0533]">
@@ -519,7 +489,7 @@ function Home() {
                       />
                       <span
                         className="absolute top-2 right-2 sm:top-3 sm:right-3 px-1.5 py-0.5 sm:px-2 sm:py-1
-                                     rounded-full text-[9px] sm:text-[10px] font-bold bg-[#534AB7] text-white"
+                                      rounded-full text-[9px] sm:text-[10px] font-bold bg-[#534AB7] text-white"
                       >
                         FEATURED
                       </span>
@@ -555,23 +525,23 @@ function Home() {
                         )}
                       </div>
                       <div className="flex gap-2 mt-4">
-                        <button
-                          disabled={isInCart || processingId !== null}
-                          onClick={() => handleAddToCart(product)}
-                          className={`w-12 h-12 flex items-center justify-center rounded-xl transition cursor-pointer ${
-                            isInCart
-                              ? "bg-green-100 text-green-600 cursor-not-allowed"
-                              : "bg-purple-100 text-[#534AB7] hover:bg-purple-200"
-                          }`}
-                        >
-                          {isButtonLoading ? (
-                            <div className="w-4 h-4 border-2 border-[#534AB7] border-t-transparent rounded-full animate-spin" />
-                          ) : isInCart ? (
-                            <span className="font-bold">✓</span>
-                          ) : (
-                            <ShoppingCart size={20} />
-                          )}
-                        </button>
+                        {isInCart ? (
+                          <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-400 font-bold text-xs uppercase tracking-widest cursor-default">
+                            In Cart
+                          </div>
+                        ) : (
+                          <button
+                            disabled={isButtonLoading}
+                            onClick={() => handleAddToCart(product)}
+                            className="w-12 h-12 flex items-center justify-center rounded-xl bg-purple-100 text-[#534AB7] hover:bg-purple-200 transition cursor-pointer"
+                          >
+                            {isButtonLoading ? (
+                              <div className="w-4 h-4 border-2 border-[#534AB7] border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <ShoppingCart size={20} />
+                            )}
+                          </button>
+                        )}
 
                         <Link
                           to={`/viewdetail/${product.id}`}
@@ -604,9 +574,6 @@ function Home() {
           )}
         </section>
 
-        {/* ════════════════════════════════
-            NEW ARRIVALS
-        ════════════════════════════════ */}
         <section aria-label="New Arrivals">
           <div className="mb-4 sm:mb-6 md:mb-8">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1a0533]">

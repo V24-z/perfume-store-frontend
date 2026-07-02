@@ -1,18 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef } from "react";
 import useCart from "../context/useCart";
 import axios from "axios";
 import { animate } from "motion";
 import useCartAnimation from "../context/usecartAnimation";
 import { Heart } from "lucide-react";
-import { WishlistContext } from "./whishlistContext"; // Ensure correct path
+import useWishlist from "../context/useWhishlist";
 
 function ViewSingleProduct() {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  const { wishlistItems, addToWishlist, removeFromWishlist } = useContext(WishlistContext);
+  const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
   const { cartPosition } = useCartAnimation();
   const API_URL = import.meta.env.VITE_API_URL;
   const { addToCart, cartItems } = useCart();
