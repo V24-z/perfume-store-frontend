@@ -209,15 +209,20 @@ function Checkout() {
         phone_number: formData.phone,
       };
 
-      // FIXED: Retrieve the token and pass it in the Authorization headers
+      // FIXED: Retrieve the token saved in AuthProvider
       const token = localStorage.getItem("access_token");
 
+      if (!token) {
+        toast.error("Session expired. Please login again.");
+        return;
+      }
+
+      // FIXED: Attach token in Bearer format required by FastAPI dependency
       const response = await axios.post(`${API_URL}/orders/checkout`, payload, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-
       toast.success(`Order Created Successfully!`);
       await clearCart();
       navigate(`/order-success/${response.data.order_id}`);
