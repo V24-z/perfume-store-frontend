@@ -546,7 +546,7 @@ function Home() {
                             <ShoppingCart size={20} />
                           )}
                            {isInCart && (
-                          <span className="-top-3 right-4 text-[10px] font-bold border rounded-sm border-white text-green-600 flex items-center">
+                          <span className="-top-1 right-1 text-[10px] font-bold border w-4 h-4 rounded-full border-white text-green-600 flex items-center justify-center" style={{ background: "#f43f5e", fontSize: 8 }}>
                            {cartItem.quantity}
                           </span>
                         )}
