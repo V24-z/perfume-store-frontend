@@ -13,13 +13,11 @@ export const CartProvider = ({ children }) => {
   const { user } = useAuth();
   const USER_ID = user?.id;
 
-  // Fetch Cart
+  // Fetch Cart from database
   const fetchCart = async () => {
     if (!USER_ID) return;
-
     try {
       const { data } = await axios.get(`${API_URL}/cart/${USER_ID}`);
-
       setCartItems(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Fetch Cart Error:", error);
@@ -28,35 +26,22 @@ export const CartProvider = ({ children }) => {
 
   // Load cart on refresh/login
   useEffect(() => {
-    if (!USER_ID) {
-      return;
-    }
-
+    if (!USER_ID) return;
     let mounted = true;
 
     const loadCart = async () => {
       try {
         setLoading(true);
-
         const { data } = await axios.get(`${API_URL}/cart/${USER_ID}`);
-
-        if (mounted) {
-          setCartItems(Array.isArray(data) ? data : []);
-        }
+        if (mounted) setCartItems(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Load Cart Error:", error);
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        if (mounted) setLoading(false);
       }
     };
-
     loadCart();
-
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
   }, [USER_ID]);
 
   // Add To Cart
@@ -66,50 +51,39 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    // Prevent duplicate cart entries
-    const exists = cartItems.some((item) => item.product_id === product.id);
+    // Check if it exists in local state
+    const existingItem = cartItems.find((item) => item.product_id === product.id);
 
-    if (exists) {
+    if (existingItem) {
+      // If it exists, call increaseQty using the real database ID
+      await increaseQty(existingItem);
       return;
     }
 
-    // Optimistic UI update
-    const tempItem = {
-      id: `temp-${product.id}`,
-      product_id: product.id,
-      quantity: 1,
-      products: product,
-    };
-
-    setCartItems((prev) => [...prev, tempItem]);
-
     try {
+      // Post to DB and refresh from DB to get the real item ID
       await axios.post(`${API_URL}/cart/`, {
         user_id: USER_ID,
         product_id: product.id,
         quantity: 1,
       });
-
       await fetchCart();
+      toast.success("Added to bag!");
     } catch (error) {
-      console.error("Add To Cart Error:", error.response?.data || error);
-
-      // rollback
-      setCartItems((prev) =>
-        prev.filter((item) => item.product_id !== product.id),
-      );
+      console.error("Add To Cart Error:", error);
+      toast.error("Failed to add to cart");
     }
   };
 
-  //Increase Quantity
+  // Increase Quantity
   const increaseQty = async (item) => {
-    // Update UI immediately
+    // Optimistic UI update
     setCartItems((prev) =>
       prev.map((cartItem) =>
         cartItem.id === item.id
           ? { ...cartItem, quantity: cartItem.quantity + 1 }
-          : cartItem,
-      ),
+          : cartItem
+      )
     );
 
     try {
@@ -117,10 +91,8 @@ export const CartProvider = ({ children }) => {
         quantity: item.quantity + 1,
       });
     } catch (error) {
-      console.error("Increase Qty Error:", error.response?.data || error);
-
-      // rollback on error
-      fetchCart();
+      console.error("Increase Qty Error:", error);
+      fetchCart(); // Rollback to server state on error
     }
   };
 
@@ -128,13 +100,12 @@ export const CartProvider = ({ children }) => {
   const decreaseQty = async (item) => {
     if (item.quantity <= 1) return;
 
-    // Update UI immediately
     setCartItems((prev) =>
       prev.map((cartItem) =>
         cartItem.id === item.id
           ? { ...cartItem, quantity: cartItem.quantity - 1 }
-          : cartItem,
-      ),
+          : cartItem
+      )
     );
 
     try {
@@ -142,46 +113,31 @@ export const CartProvider = ({ children }) => {
         quantity: item.quantity - 1,
       });
     } catch (error) {
-      console.error("Decrease Qty Error:", error.response?.data || error);
-
-      // rollback on error
+      console.error("Decrease Qty Error:", error);
       fetchCart();
     }
   };
 
   // Remove Item
   const removeFromCart = async (cartId) => {
-  // Save current state for rollback
-  const previousItems = cartItems;
-
-  // Remove immediately from UI
-  setCartItems((prev) =>
-    prev.filter((item) => item.id !== cartId)
-  );
-
-  try {
-    await axios.delete(`${API_URL}/cart/${cartId}`);
-  } catch (error) {
-    console.error(
-      "Remove Item Error:",
-      error.response?.data || error
-    );
-
-    // Restore if API fails
-    setCartItems(previousItems);
-  }
-};
-
-  // Clear Cart
-  const clearCart = async () => {
-    if (!USER_ID) return;
+    const previousItems = cartItems;
+    setCartItems((prev) => prev.filter((item) => item.id !== cartId));
 
     try {
-      await axios.delete(`${API_URL}/cart/clear/${USER_ID}`);
+      await axios.delete(`${API_URL}/cart/${cartId}`);
+    } catch (error) {
+      console.error("Remove Item Error:", error);
+      setCartItems(previousItems);
+    }
+  };
 
+  const clearCart = async () => {
+    if (!USER_ID) return;
+    try {
+      await axios.delete(`${API_URL}/cart/clear/${USER_ID}`);
       setCartItems([]);
     } catch (error) {
-      console.error("Clear Cart Error:", error.response?.data || error);
+      console.error("Clear Cart Error:", error);
     }
   };
 

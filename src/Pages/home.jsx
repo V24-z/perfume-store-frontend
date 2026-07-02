@@ -18,12 +18,12 @@ function Home() {
   const [isPaused, setIsPaused] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
-  const { addToCart, cartItems } = useCart();
+  const { addToCart, cartItems, increaseQty } = useCart();
   const { cartPosition } = useCartAnimation();
 
   const imageRefs = useRef({});
   const { wishlistItems, addToWishlist, removeFromWishlist } = useWishlist();
-  
+
   const [processingId, setProcessingId] = useState(null);
 
   useEffect(() => {
@@ -469,9 +469,10 @@ function Home() {
                 const isWishlisted = wishlistItems.some(
                   (item) => item.id === product.id,
                 );
-                const isInCart = cartItems.some(
+                const cartItem = cartItems.find(
                   (item) => item.product_id === product.id,
                 );
+                const isInCart = !!cartItem;
                 const isButtonLoading = processingId === product.id;
 
                 return (
@@ -525,22 +526,32 @@ function Home() {
                         )}
                       </div>
                       <div className="flex gap-2 mt-4">
-                        {isInCart ? (
-                          <div className="w-12 h-12 flex items-center justify-center rounded-xl bg-slate-50 border border-slate-200 text-slate-400 font-bold text-xs uppercase tracking-widest cursor-default">
-                            In Cart
-                          </div>
-                        ) : (
-                          <button
-                            disabled={isButtonLoading}
-                            onClick={() => handleAddToCart(product)}
-                            className="w-12 h-12 flex items-center justify-center rounded-xl bg-purple-100 text-[#534AB7] hover:bg-purple-200 transition cursor-pointer"
-                          >
-                            {isButtonLoading ? (
-                              <div className="w-4 h-4 border-2 border-[#534AB7] border-t-transparent rounded-full animate-spin" />
-                            ) : (
-                              <ShoppingCart size={20} />
-                            )}
-                          </button>
+                        {/* NEW BUTTON LOGIC */}
+                        <button
+                          disabled={isButtonLoading}
+                          onClick={() =>
+                            isInCart
+                              ? increaseQty(cartItem)
+                              : handleAddToCart(product)
+                          }
+                          className={`w-12 h-12 flex items-center justify-center rounded-xl transition cursor-pointer ${
+                            isInCart
+                              ? "bg-green-100 text-green-600"
+                              : "bg-purple-100 text-[#534AB7] hover:bg-purple-200"
+                          }`}
+                        >
+                          {isButtonLoading ? (
+                            <div className="w-4 h-4 border-2 border-[#534AB7] border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <ShoppingCart size={20} />
+                          )}
+                        </button>
+
+                        {/* Display quantity if in cart */}
+                        {isInCart && (
+                          <span className="text-[10px] font-bold text-green-600 flex items-center">
+                            Qty: {cartItem.quantity}
+                          </span>
                         )}
 
                         <Link
