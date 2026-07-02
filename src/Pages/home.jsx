@@ -534,7 +534,7 @@ function Home() {
                               ? increaseQty(cartItem)
                               : handleAddToCart(product)
                           }
-                          className={`w-12 h-12 flex items-center justify-center rounded-xl transition cursor-pointer ${
+                          className={` w-12 h-12 flex items-center justify-center rounded-xl transition cursor-pointer relative ${
                             isInCart
                               ? "bg-green-100 text-green-600"
                               : "bg-purple-100 text-[#534AB7] hover:bg-purple-200"
@@ -546,7 +546,7 @@ function Home() {
                             <ShoppingCart size={20} />
                           )}
                            {isInCart && (
-                          <span className="-top-1 right-1 text-[10px] font-bold border w-4 h-4 rounded-full border-white text-green-600 flex items-center justify-center" style={{ background: "#f43f5e", fontSize: 8 }}>
+                          <span className="absolute -top-1 right-1 text-[10px] font-bold border w-4 h-4 rounded-full border-white text-gray-200 flex items-center justify-center" style={{ background: "#14532d", fontSize: 8 }}>
                            {cartItem.quantity}
                           </span>
                         )}
