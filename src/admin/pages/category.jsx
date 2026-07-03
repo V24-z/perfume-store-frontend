@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -54,10 +55,10 @@ function Category() {
         image_url: "",
       });
 
-      alert("Category Added Successfully");
+      toast.success("Category Added Successfully");
     } catch (error) {
       console.error("Error adding category:", error);
-      alert(error.response?.data?.detail || "Failed to add category");
+      toast.error(error.response?.data?.detail || "Failed to add category");
     }
   };
 
@@ -71,7 +72,7 @@ function Category() {
       );
     } catch (error) {
       console.error("Error deleting category:", error);
-      alert(error.response?.data?.detail || "Failed to delete category");
+      toast.error(error.response?.data?.detail || "Failed to delete category");
     }
   };
 

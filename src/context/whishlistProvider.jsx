@@ -1,34 +1,31 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { WishlistContext } from "./whishlistContext";
-
+import { toast } from "react-toastify";
 
 export const WishlistProvider = ({ children }) => {
   const [wishlistItems, setWishlistItems] = useState(() => {
-  const saved = localStorage.getItem("wishlist");
-
-  return saved ? JSON.parse(saved) : [];
-});
+    const saved = localStorage.getItem("wishlist");
+    return saved ? JSON.parse(saved) : [];
+  });
 
   const addToWishlist = (product) => {
+    if (product.stock_quantity <= 0) {
+      toast.error("Out of stock");
+      return;
+    }
     setWishlistItems((prev) => {
       const exists = prev.find((p) => p.id === product.id);
-
       if (exists) return prev;
-
       return [...prev, product];
     });
   };
 
-useEffect(() => {
-  localStorage.setItem(
-    "wishlist",
-    JSON.stringify(wishlistItems)
-  );
-}, [wishlistItems]);
+  useEffect(() => {
+    localStorage.setItem("wishlist", JSON.stringify(wishlistItems));
+  }, [wishlistItems]);
+
   const removeFromWishlist = (id) => {
-    setWishlistItems((prev) =>
-      prev.filter((item) => item.id !== id)
-    );
+    setWishlistItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (

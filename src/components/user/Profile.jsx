@@ -1,6 +1,6 @@
 import { useAuth } from "../../context/useAuth.jsx"; // your hook
 import { useNavigate } from "react-router-dom";
-import { User, Mail, Phone, ArrowLeft, LogOut } from "lucide-react";
+import { User, Mail, Phone,  LogOut } from "lucide-react";
 import { useEffect } from "react";
 
 function Profile() {
@@ -38,14 +38,7 @@ function Profile() {
       <div className="relative w-full max-w-md bg-white rounded-3xl border border-slate-200/80 p-6 sm:p-8 text-center shadow-sm">
         
         {/* Back navigation button trigger */}
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute top-5 left-5 flex items-center gap-1 text-slate-400 hover:text-slate-800 text-xs font-bold uppercase tracking-wider transition-colors border-0 bg-transparent cursor-pointer"
-        >
-          <ArrowLeft size={14} />
-          <span>Back</span>
-        </button>
-
+        
         {/* Brand context ribbon banner mark */}
         <div className="flex items-center justify-center gap-1.5 mt-4 mb-5">
           <span className="w-1.5 h-3.5 rounded-full bg-gradient-to-b from-violet-600 to-fuchsia-600" />

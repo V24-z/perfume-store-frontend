@@ -41,43 +41,71 @@ export const CartProvider = ({ children }) => {
       }
     };
     loadCart();
-    return () => { mounted = false; };
+
+    return () => {
+      mounted = false;
+    };
   }, [USER_ID]);
 
-  // Add To Cart
+  // Add to Cart (Optimized for instant UI update)
   const addToCart = async (product) => {
     if (!USER_ID) {
-      toast.error("Please login first");
+      toast.error("Please login to add items to cart");
+      return;
+    }
+    
+    if (product.stock_quantity <= 0) {
+      toast.error("Out of stock");
       return;
     }
 
-    // Check if it exists in local state
     const existingItem = cartItems.find((item) => item.product_id === product.id);
 
     if (existingItem) {
-      // If it exists, call increaseQty using the real database ID
+      if (existingItem.quantity >= (product.stock_quantity || existingItem.products?.stock_quantity)) {
+        toast.error("Stock not available more");
+        return;
+      }
       await increaseQty(existingItem);
       return;
     }
 
     try {
-      // Post to DB and refresh from DB to get the real item ID
-      await axios.post(`${API_URL}/cart/`, {
+      const payload = {
         user_id: USER_ID,
         product_id: product.id,
         quantity: 1,
-      });
-      await fetchCart();
-      toast.success("Added to bag!");
+      };
+      // Use returned data to update state directly avoiding a slow secondary fetch request
+      const { data } = await axios.post(`${API_URL}/cart`, payload);
+      
+      if (data && data.data && data.data.length > 0) {
+        const insertedItem = data.data[0];
+        setCartItems((prev) => [...prev, {
+            id: insertedItem.id,
+            product_id: insertedItem.product_id,
+            quantity: insertedItem.quantity,
+            user_id: insertedItem.user_id,
+            products: product
+        }]);
+      } else {
+        await fetchCart();
+      }
+      toast.success("Added to cart");
     } catch (error) {
-      console.error("Add To Cart Error:", error);
-      toast.error("Failed to add to cart");
+      console.error("Add to Cart Error:", error);
+      toast.error("Failed to add item to cart");
     }
   };
 
-  // Increase Quantity
+  // Increase Quantity (Added Stock Verification)
   const increaseQty = async (item) => {
-    // Optimistic UI update
+    const stock = item.products?.stock_quantity || 0;
+    if (item.quantity >= stock) {
+      toast.error("Stock not available more");
+      return;
+    }
+
     setCartItems((prev) =>
       prev.map((cartItem) =>
         cartItem.id === item.id
@@ -114,7 +142,7 @@ export const CartProvider = ({ children }) => {
       });
     } catch (error) {
       console.error("Decrease Qty Error:", error);
-      fetchCart();
+      fetchCart(); // Rollback to server state on error
     }
   };
 
@@ -146,7 +174,6 @@ export const CartProvider = ({ children }) => {
       value={{
         cartItems,
         loading,
-        fetchCart,
         addToCart,
         increaseQty,
         decreaseQty,

@@ -5,11 +5,16 @@ const navSections = [
   {
     label: "Main",
     items: [
-      { to: "/admin/", icon: "ti-layout-dashboard", label: "Dashboard", end: true },
+      {
+        to: "/admin/",
+        icon: "ti-layout-dashboard",
+        label: "Dashboard",
+        end: true,
+      },
       { to: "/admin/products", icon: "ti-box", label: "Products" },
       { to: "/admin/orders", icon: "ti-shopping-cart", label: "Orders" },
       { to: "/admin/users", icon: "ti-users", label: "Users" },
-      { to: "/admin/createAdmin", icon: "ti-user-plus", label: "Create Admin" }
+      { to: "/admin/createAdmin", icon: "ti-user-plus", label: "Create Admin" },
     ],
   },
   {
@@ -50,11 +55,12 @@ const Sidebar = ({ onClose }) => {
               border: "1px solid rgba(250,204,21,0.3)",
             }}
           >
-            <i
-              className="ti ti-droplet"
-              style={{ fontSize: 17, color: "#fde047" }}
-              aria-hidden="true"
-            />
+            <span
+              style={{ color: "#fde047", fontSize: 16, lineHeight: 1 }}
+              className="animate-pulse"
+            >
+              ◈
+            </span>
           </div>
           <div>
             <p className="m-0 font-bold text-white tracking-widest text-sm">
@@ -78,8 +84,18 @@ const Sidebar = ({ onClose }) => {
             color: "rgba(255,255,255,0.5)",
           }}
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -97,11 +113,13 @@ const Sidebar = ({ onClose }) => {
               <NavLink
                 key={to}
                 to={to}
-                end={end} 
+                end={end}
                 onClick={onClose}
                 className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium mb-0.5 no-underline transition-all"
                 style={({ isActive }) => ({
-                  background: isActive ? "rgba(250,204,21,0.12)" : "transparent",
+                  background: isActive
+                    ? "rgba(250,204,21,0.12)"
+                    : "transparent",
                   color: isActive ? "#fde047" : "rgba(255,255,255,0.55)",
                 })}
               >
@@ -116,8 +134,14 @@ const Sidebar = ({ onClose }) => {
                     className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                     style={
                       badgeType === "red"
-                        ? { background: "rgba(239,68,68,0.2)", color: "#f87171" }
-                        : { background: "rgba(250,204,21,0.15)", color: "#fde047" }
+                        ? {
+                            background: "rgba(239,68,68,0.2)",
+                            color: "#f87171",
+                          }
+                        : {
+                            background: "rgba(250,204,21,0.15)",
+                            color: "#fde047",
+                          }
                     }
                   >
                     {badge}
@@ -138,8 +162,13 @@ const Sidebar = ({ onClose }) => {
             {user?.email ? user.email.charAt(0).toUpperCase() : "A"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-xs font-medium m-0 truncate">{user?.name || "Admin"}</p>
-            <p className="text-[10px] m-0 truncate" style={{ color: "rgba(255,255,255,0.3)" }}>
+            <p className="text-white text-xs font-medium m-0 truncate">
+              {user?.name || "Admin"}
+            </p>
+            <p
+              className="text-[10px] m-0 truncate"
+              style={{ color: "rgba(255,255,255,0.3)" }}
+            >
               {user?.email || "admin@lumiere.com"}
             </p>
           </div>
@@ -149,7 +178,11 @@ const Sidebar = ({ onClose }) => {
             className="flex-shrink-0 cursor-pointer border-0 bg-transparent p-0 transition-colors"
             style={{ color: "rgba(255,255,255,0.3)" }}
           >
-            <i className="ti ti-logout" style={{ fontSize: 17 }} aria-hidden="true" />
+            <i
+              className="ti ti-logout"
+              style={{ fontSize: 17, color: "white" }}
+              aria-hidden="true"
+            />
           </button>
         </div>
       </div>

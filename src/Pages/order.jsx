@@ -235,12 +235,7 @@ function Order() {
                 </div>
 
                 {/* Payment Status */}
-                <div className="flex flex-col justify-center sm:pl-4 pt-3 sm:pt-0">
-                  <span className="text-[9px] uppercase tracking-wider font-bold text-slate-400">Billing Status</span>
-                  <span className="text-xs font-bold text-emerald-400 capitalize mt-0.5">
-                    ● {order.payment_status}
-                  </span>
-                </div>
+                
 
                 {/* Payment Method */}
                 <div className="flex flex-col justify-center sm:pl-4 pt-3 sm:pt-0">

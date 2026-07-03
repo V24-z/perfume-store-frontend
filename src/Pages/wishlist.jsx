@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Heart, Trash2, ShoppingCart, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import { toast } from "react-toastify";
 import useWishlist from "../context/useWhishlist";
 import useCart from "../context/useCart";
 
@@ -17,12 +17,21 @@ export default function Wishlist() {
   }, []);
 
   const handleAddToCartClick = async (product) => {
-    if (processingId) return;
+    if (processingId === product.id) return;
+    if (product.stock_quantity <= 0) {
+      toast.error("Out of stock");
+      return;
+    }
+    
     try {
       setProcessingId(product.id);
       const cartItem = cartItems.find(item => item.product_id === product.id || item.id === product.id);
       
-      if (cartItem && increaseQty) {
+      if (cartItem) {
+        if (cartItem.quantity >= product.stock_quantity) {
+          toast.error("Stock not available more");
+          return;
+        }
         await increaseQty(cartItem);
       } else {
         await addToCart(product);
@@ -30,6 +39,7 @@ export default function Wishlist() {
     } catch (err) {
       console.error("Failed to add variant to cart:", err);
     } finally {
+      // Fixed: Removes the loading spinner ONLY after API process correctly finishes
       setProcessingId(null);
     }
   };
@@ -84,17 +94,26 @@ export default function Wishlist() {
                 key={product.id} 
                 className="group bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col relative"
               >
-                {/* REMOVE BUTTON */}
+                {/* BADGE TOP RIGHT */}
+                <div className="absolute top-2.5 right-2.5 z-10">
+                  {product.stock_quantity > 0 ? (
+                    <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm pointer-events-none">In Stock</span>
+                  ) : (
+                    <span className="bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm pointer-events-none">Out of Stock</span>
+                  )}
+                </div>
+
+                {/* REMOVE BUTTON TOP LEFT */}
                 <button
                   onClick={() => removeFromWishlist(product.id)}
-                  className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur border border-slate-100 text-slate-400 flex items-center justify-center hover:text-rose-500 hover:border-rose-100 hover:bg-rose-50 transition-colors shadow-sm cursor-pointer"
+                  className="absolute top-2.5 left-2.5 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur border border-slate-100 text-slate-400 flex items-center justify-center hover:text-rose-500 hover:border-rose-100 hover:bg-rose-50 transition-colors shadow-sm cursor-pointer"
                   title="Remove from wishlist"
                 >
                   <Trash2 size={13} />
                 </button>
 
                 {/* IMAGE AREA */}
-                <Link to={`/viewdetail/${product.id}`} className="block relative aspect-[4/5] bg-slate-100 overflow-hidden shrink-0">
+                <Link to={`/viewdetail/${product.id}`} className="block relative aspect-[4/5] bg-slate-100 overflow-hidden shrink-0 mt-5">
                   <img
                     src={product.image_url}
                     alt={product.name}
@@ -123,10 +142,12 @@ export default function Wishlist() {
 
                     {/* ACTION CONTROLS */}
                     <button
-                      disabled={isButtonLoading}
+                      disabled={isButtonLoading || product.stock_quantity <= 0}
                       onClick={() => handleAddToCartClick(product)}
                       className={`w-full text-xs font-semibold uppercase tracking-wider rounded-xl py-3 px-4 flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 disabled:opacity-60 cursor-pointer ${
-                        isInCart
+                        product.stock_quantity <= 0 
+                          ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                          : isInCart
                           ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 ring-1 ring-inset ring-emerald-600/20"
                           : "bg-slate-900 text-white hover:bg-slate-800"
                       }`}

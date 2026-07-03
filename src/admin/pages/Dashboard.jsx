@@ -419,9 +419,7 @@ export default function Dashboard() {
                       <p className="text-xs font-bold text-slate-800 truncate m-0">{p.name}</p>
                       <p className="text-[11px] text-slate-400 truncate m-0">{p.brand || "Lumière"} · <span className="font-semibold text-slate-700">{fmtRupee(p.discount_price || p.price)}</span></p>
                     </div>
-                    {p.is_featured && (
-                      <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-amber-50 border border-amber-200 text-amber-700 shrink-0">STAR</span>
-                    )}
+                    
                   </div>
                 ))}
               </div>
