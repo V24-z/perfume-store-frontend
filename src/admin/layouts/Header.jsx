@@ -1,4 +1,4 @@
-import { useState } from "react"; // Added useState
+import { useState } from "react"; 
 import { useAuth } from "../../context/useAuth";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -6,11 +6,13 @@ const Header = ({ onToggleSidebar }) => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Added dropdown state
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); 
 
   const handleLogout = () => {
     logout();
     localStorage.removeItem("access_token");
+    // FIXED: Clear refresh token on logout
+    localStorage.removeItem("refresh_token"); 
     navigate("/login");
   };
 
@@ -52,13 +54,13 @@ const Header = ({ onToggleSidebar }) => {
         </div>
 
         {/* Right */}
-        <div className="flex items-center gap-1.5 md:gap-2 relative"> {/* Added relative for dropdown */}
+        <div className="flex items-center gap-1.5 md:gap-2 relative">
           <div className="hidden md:block w-px h-6 mx-1" style={{ background: "rgba(255,255,255,0.1)" }} />
 
           {/* User pill */}
           <div
             className="flex items-center gap-2 rounded-full cursor-pointer transition-all"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle dropdown
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             style={{
               border: "1px solid rgba(255,255,255,0.1)",
               padding: "5px 10px 5px 5px",

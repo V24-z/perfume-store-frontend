@@ -9,11 +9,16 @@ function Profile() {
 
   const handleLogout = () => {
     logout();
+    // FIXED: Clear refresh token as well on logout
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
     navigate("/login");
   };
+
   useEffect(() => {
       window.scrollTo(0, 0);
     }, []);
+    
   if (!user) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">

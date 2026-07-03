@@ -17,20 +17,26 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  const login = (userData, token) => {
+  // FIXED: Now accepts the refreshToken from your backend login response
+  const login = (userData, token, refreshToken) => {
     setUser(userData);
 
     localStorage.setItem("user", JSON.stringify(userData));
-    // FIXED: Shifted storage key from "token" to "access_token" to match your admin console components
-    localStorage.setItem("access_token", token); 
+    localStorage.setItem("access_token", token);
+    
+    // Store the refresh token
+    if (refreshToken) {
+      localStorage.setItem("refresh_token", refreshToken); 
+    }
   };
 
   const logout = () => {
     setUser(null);
 
     localStorage.removeItem("user");
-    // FIXED: Changed removal hook key to "access_token" to clean up session profiles correctly
     localStorage.removeItem("access_token"); 
+    // FIXED: Ensure the refresh token is wiped out on logout
+    localStorage.removeItem("refresh_token"); 
   };
 
   return (

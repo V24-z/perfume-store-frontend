@@ -36,98 +36,89 @@ export default function Wishlist() {
 
   if (wishlistItems.length === 0) {
     return (
-      <div className="min-h-screen bg-[#fafafa] text-slate-900 antialiased font-sans flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-400 shadow-sm border border-slate-100 mb-6">
-          <Heart size={24} strokeWidth={1.5} />
+      <div className="min-h-screen bg-slate-50/50 flex flex-col items-center justify-center p-4">
+        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center text-slate-300 shadow-sm border border-slate-100 mb-4">
+          <Heart size={24} />
         </div>
-
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-          Your wishlist is empty
-        </h2>
-
-        <p className="text-sm text-slate-500 mt-2 max-w-sm leading-relaxed">
-          Save your favourite perfumes here to keep track of your signature scents.
+        <h2 className="text-xl font-black text-slate-900 tracking-tight mb-2">Your Wishlist is Empty</h2>
+        <p className="text-xs text-slate-500 mb-6 max-w-xs text-center leading-relaxed">
+          Curate your personal collection of signature scents. Start exploring to add items here.
         </p>
-
         <Link
-          to="/"
-          className="mt-8 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider bg-slate-900 text-white px-7 py-4 rounded-full shadow-sm hover:bg-slate-800 transition-all active:scale-98"
+          to="/shop"
+          className="bg-slate-900 text-white px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:bg-slate-800 transition-all active:scale-95 no-underline shadow-sm"
         >
-          Explore Boutique
-          <ArrowRight size={14} />
+          Explore Catalog <ArrowRight size={14} />
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa] text-slate-900 antialiased font-sans p-6 sm:p-12">
-      <div className="max-w-7xl mx-auto space-y-10">
-
+    <div className="min-h-screen bg-slate-50/50 text-slate-900 antialiased font-sans p-4 sm:p-6 lg:p-8">
+      <div className="max-w-5xl mx-auto space-y-8">
+        
         {/* ══ HEADER ══ */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 pb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="w-1 h-1 rounded-full bg-slate-900" />
-              <p className="text-[10px] uppercase tracking-widest font-bold text-slate-500">Lumière Boutique</p>
-            </div>
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-              My Wishlist
-            </h1>
+        <div className="border-b border-slate-200/60 pb-5">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="w-1.5 h-4 rounded-full bg-gradient-to-b from-rose-500 to-pink-500" />
+            <p className="text-[10px] uppercase tracking-widest font-bold text-rose-500">Personal Vault</p>
           </div>
-          <p className="text-sm text-slate-500 font-medium">
-            {wishlistItems.length} {wishlistItems.length === 1 ? "item" : "items"} saved
-          </p>
+          <div className="flex items-end justify-between">
+            <h1 className="text-2xl font-black tracking-tight text-[#1a0533]">My Wishlist</h1>
+            <p className="text-xs font-bold text-slate-400 bg-white px-2.5 py-1 rounded-lg border border-slate-100 shadow-sm">
+              {wishlistItems.length} {wishlistItems.length === 1 ? 'Item' : 'Items'}
+            </p>
+          </div>
         </div>
 
-        {/* ══ PRODUCT GRID ══ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+        {/* ══ WISHLIST GRID ══ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {wishlistItems.map((product) => {
             const cartItem = cartItems.find((item) => item.product_id === product.id || item.id === product.id);
             const isInCart = !!cartItem;
             const isButtonLoading = processingId === product.id;
 
             return (
-              <div
-                key={product.id}
-                className="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full overflow-hidden"
+              <div 
+                key={product.id} 
+                className="group bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col relative"
               >
-                {/* IMAGE WINDOW */}
-                <div className="relative aspect-[4/5] w-full bg-slate-50 overflow-hidden shrink-0">
+                {/* REMOVE BUTTON */}
+                <button
+                  onClick={() => removeFromWishlist(product.id)}
+                  className="absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-white/90 backdrop-blur border border-slate-100 text-slate-400 flex items-center justify-center hover:text-rose-500 hover:border-rose-100 hover:bg-rose-50 transition-colors shadow-sm cursor-pointer"
+                  title="Remove from wishlist"
+                >
+                  <Trash2 size={13} />
+                </button>
+
+                {/* IMAGE AREA */}
+                <Link to={`/viewdetail/${product.id}`} className="block relative aspect-[4/5] bg-slate-100 overflow-hidden shrink-0">
                   <img
                     src={product.image_url}
                     alt={product.name}
                     loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 ease-out"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  
-                  {/* FLOATING REMOVE BUTTON */}
-                  <button
-                    disabled={processingId !== null}
-                    onClick={() => removeFromWishlist(product.id)}
-                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm border border-slate-100 text-slate-500 hover:bg-white hover:text-rose-600 flex items-center justify-center shadow-sm transition-all active:scale-90 disabled:opacity-50 disabled:pointer-events-none cursor-pointer z-10"
-                    title="Remove from wishlist"
-                  >
-                    <Trash2 size={14} strokeWidth={2} />
-                  </button>
-                </div>
+                </Link>
 
-                {/* CARD DATA */}
-                <div className="p-5 flex flex-col flex-1 justify-between space-y-4">
-                  <div className="space-y-1.5">
-                    <p className="text-[10px] uppercase font-bold tracking-widest text-slate-400">
-                      {product.brand}
+                {/* PRODUCT DETAILS */}
+                <div className="p-4 flex flex-col flex-1 justify-between gap-4">
+                  <div>
+                    <p className="text-[9px] uppercase font-bold tracking-widest text-violet-600 mb-1">
+                      {product.brand || "Lumière"}
                     </p>
-                    <h3 className="font-medium text-sm text-slate-800 leading-snug line-clamp-2 min-h-[2.5rem]">
-                      {product.name}
-                    </h3>
+                    <Link to={`/viewdetail/${product.id}`} className="no-underline">
+                      <h3 className="font-bold text-sm text-slate-800 leading-snug line-clamp-2 hover:text-violet-700 transition-colors">
+                        {product.name}
+                      </h3>
+                    </Link>
                   </div>
 
-                  <div className="space-y-4 pt-1">
-                    <p className="text-base font-semibold text-slate-900">
-                      ₹{new Intl.NumberFormat("en-IN").format(
-                        product.discount_price > 0 ? product.discount_price : product.price
-                      )}
+                  <div className="space-y-3">
+                    <p className="text-base font-black text-slate-900">
+                      ₹{new Intl.NumberFormat("en-IN").format(product.price)}
                     </p>
 
                     {/* ACTION CONTROLS */}

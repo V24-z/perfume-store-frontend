@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Mail, Phone, MapPin, Send, CheckCircle } from "lucide-react";
 
 const Contact = () => {
@@ -37,7 +37,9 @@ const Contact = () => {
   // Handle Input Changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, name: value }));
+    
+    // FIXED: Changed `name: value` to `[name]: value` to properly update specific fields dynamically
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Real-time validation if the field has been touched
     if (touched[name]) {
@@ -78,9 +80,16 @@ const Contact = () => {
     if (Object.keys(currentErrors).length === 0) {
       setIsSubmitting(true);
       try {
-        // Simulate API Request
+        // Simulate API Request duration
         await new Promise((resolve) => setTimeout(resolve, 1500));
+        
+        // FIXED: Store submitted form data in localStorage
+        const existingMessages = JSON.parse(localStorage.getItem('contact_messages') || '[]');
+        existingMessages.push({ ...formData, timestamp: new Date().toISOString() });
+        localStorage.setItem('contact_messages', JSON.stringify(existingMessages));
+
         setIsSuccess(true);
+        // FIXED: Empty the field inputs immediately
         setFormData({ name: "", email: "", subject: "", message: "" });
         setTouched({});
       } catch (err) {
@@ -166,7 +175,7 @@ const Contact = () => {
                 </p>
                 <button
                   onClick={() => setIsSuccess(false)}
-                  className="mt-4 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 underline transition-colors"
+                  className="mt-4 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-900 underline transition-colors cursor-pointer border-0 bg-transparent"
                 >
                   Send another message
                 </button>
@@ -254,7 +263,6 @@ const Contact = () => {
                     Message Description
                   </label>
                   <textarea
-                  type="text"
                     id="message"
                     name="message"
                     rows="5"
@@ -277,7 +285,7 @@ const Contact = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full text-xs font-semibold uppercase tracking-wider bg-slate-900 text-white rounded-xl py-3.5 px-4 flex items-center justify-center gap-2 shadow-sm hover:bg-slate-800 transition-all active:scale-98 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full text-xs font-semibold uppercase tracking-wider bg-slate-900 text-white rounded-xl py-3.5 px-4 flex items-center justify-center gap-2 shadow-sm hover:bg-slate-800 transition-all active:scale-98 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer border-0"
                 >
                   {isSubmitting ? (
                     <>

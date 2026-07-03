@@ -31,15 +31,24 @@ function Order() {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
   useEffect(() => {
     if (!user) return;
 
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`${API_URL}/orders/user/${user.id}`);
+        // FIXED: You were getting a 401 error because you weren't passing the access_token here
+        const token = localStorage.getItem("access_token");
+        
+        const res = await axios.get(`${API_URL}/orders/user/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         setOrders(res.data);
       } catch (err) {
         console.error(err);

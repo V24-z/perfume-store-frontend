@@ -80,6 +80,9 @@ function Header() {
 
   const handleLogout = () => {
     logout();
+    // FIXED: Clear refresh token as well on logout
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token"); 
     setDropdownOpen(false);
     navigate("/login");
   };

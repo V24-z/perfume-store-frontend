@@ -7,7 +7,6 @@ import useCartAnimation from "../context/usecartAnimation";
 import { Heart, ShoppingBag, Zap, ChevronLeft } from "lucide-react";
 import useWishlist from "../context/useWhishlist";
 
-// Safely access environment variables
 const API_URL = (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) || "";
 
 function ViewSingleProduct() {
@@ -23,7 +22,6 @@ function ViewSingleProduct() {
 
   const imgRef = useRef(null);
 
-  // Check if current product is in wishlist
   const isWishlisted = product ? wishlistItems.some((item) => item.id === product.id) : false;
 
   const toggleWishlist = () => {
@@ -85,68 +83,79 @@ function ViewSingleProduct() {
   if (error) return <div className="min-h-screen flex items-center justify-center text-red-500 font-medium">{error}</div>;
   if (!product) return null;
 
-  const stockStatus = product.stock_quantity > 10 ? { label: "In Stock", color: "bg-green-100 text-green-800" } : 
-                      product.stock_quantity > 0 ? { label: `Only ${product.stock_quantity} left`, color: "bg-amber-100 text-amber-800" } : 
-                      { label: "Out of Stock", color: "bg-red-100 text-red-800" };
+  const stockStatus = product.stock_quantity > 10 ? { label: "In Stock", color: "bg-green-50 text-green-700 ring-green-600/20" } : 
+                      product.stock_quantity > 0 ? { label: `Only ${product.stock_quantity} left`, color: "bg-amber-50 text-amber-700 ring-amber-600/20" } : 
+                      { label: "Out of Stock", color: "bg-red-50 text-red-700 ring-red-600/20" };
 
-  // Find the exact cart item to check quantity
   const cartItem = cartItems.find((item) => item.product_id === product.id || item.id === product.id);
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="min-h-screen bg-white font-sans text-slate-900">
+      <div className="max-w-[1400px] mx-auto px-6 py-8">
         
         {/* Back Navigation */}
         <button 
           onClick={() => navigate("/")} 
-          className="flex items-center text-gray-500 hover:text-black mb-8 transition-colors font-medium"
+          className="flex items-center text-slate-400 hover:text-slate-900 mb-8 transition-colors font-bold uppercase tracking-wider text-xs"
         >
-          <ChevronLeft size={20} className="mr-1" /> Back to Home
+          <ChevronLeft size={16} className="mr-1" /> Back to Boutique
         </button>
 
-        <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-start">
+        <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
-          {/* Left Column: Image Gallery (Sticky) */}
-          <div className="sticky top-24">
-            <div className="aspect-square bg-gray-50 rounded-[2.5rem] flex items-center justify-center p-12 overflow-hidden border border-gray-100">
+          {/* ── BIG IMAGE SECTION (Takes up 7 columns) ── */}
+          <div className="lg:col-span-7 sticky top-24">
+            <div className="relative aspect-[4/5] md:aspect-square bg-slate-50 rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-slate-100 flex items-center justify-center group">
+              
+              {/* TOP RIGHT WISHLIST ICON */}
+              <button 
+                onClick={toggleWishlist}
+                className="absolute top-6 right-6 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md border border-white/50 shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer"
+                title="Toggle Wishlist"
+              >
+                <Heart 
+                  size={24} 
+                  className={`transition-colors duration-300 ${isWishlisted ? "fill-rose-500 text-rose-500" : "text-slate-400"}`} 
+                /> 
+              </button>
+
               <img 
                 ref={imgRef} 
                 src={product.image_url} 
                 alt={product.name} 
-                className="max-h-full object-contain hover:scale-105 transition-transform duration-500" 
+                className="w-full h-full object-cover mix-blend-multiply group-hover:scale-105 transition-transform duration-700 ease-out" 
               />
             </div>
           </div>
 
-          {/* Right Column: Product Details */}
-          <div className="flex flex-col py-4">
+          {/* ── PRODUCT DETAILS (Takes up 5 columns) ── */}
+          <div className="lg:col-span-5 flex flex-col py-4 lg:py-10">
             
-            {/* Header / Titles */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-purple-600 font-bold tracking-widest text-xs uppercase">
+            <div className="mb-8">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-violet-600 font-black tracking-[0.2em] text-[10px] uppercase">
                   {product.brand}
                 </span>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide ${stockStatus.color}`}>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase ring-1 ring-inset ${stockStatus.color}`}>
                   {stockStatus.label}
                 </span>
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
+              <h1 className="text-4xl md:text-5xl font-black text-slate-900 leading-[1.1] mb-6 tracking-tight">
                 {product.name}
               </h1>
-              <p className="text-3xl font-semibold text-gray-900">
+              <p className="text-3xl font-bold text-slate-900 tabular-nums">
                 ₹{new Intl.NumberFormat("en-IN").format(product.price)}
               </p>
             </div>
 
-            {/* Description */}
-            <p className="text-gray-600 leading-relaxed mb-10 text-lg">
+            <div className="w-12 h-1 bg-slate-200 mb-8 rounded-full" />
+
+            <p className="text-slate-500 leading-relaxed mb-10 text-base md:text-lg font-medium">
               {product.description}
             </p>
 
-            {/* Call to Actions */}
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 mt-auto">
               <button
                 onClick={() => {
                   if (cartItem && increaseQty) {
@@ -157,14 +166,14 @@ function ViewSingleProduct() {
                   }
                 }}
                 disabled={product.stock_quantity === 0}
-                className={`w-full flex items-center justify-center gap-3 py-4 rounded-full font-bold transition-all active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none ${
+                className={`w-full flex items-center justify-center gap-3 py-4 md:py-5 rounded-2xl font-bold uppercase tracking-wider text-xs transition-all active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none cursor-pointer ${
                   cartItem 
-                    ? "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200" 
-                    : "bg-black text-white hover:bg-gray-800 shadow-md hover:shadow-lg"
+                    ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 ring-1 ring-inset ring-emerald-600/20" 
+                    : "bg-slate-900 text-white hover:bg-slate-800 shadow-xl shadow-slate-900/10"
                 }`}
               >
-                <ShoppingBag size={20} />
-                {cartItem ? `Added To Cart (${cartItem.quantity}) ✓` : "Add To Cart"}
+                <ShoppingBag size={18} />
+                {cartItem ? `In Cart (${cartItem.quantity}) ✓` : "Add To Bag"}
               </button>
               
               <button 
@@ -173,24 +182,11 @@ function ViewSingleProduct() {
                   navigate("/checkout"); 
                 }} 
                 disabled={product.stock_quantity === 0}
-                className="w-full flex items-center justify-center gap-3 border-2 border-black bg-white text-black py-4 rounded-full font-bold hover:bg-black hover:text-white transition-all active:scale-[0.98] disabled:opacity-60 disabled:border-gray-300 disabled:text-gray-400 disabled:pointer-events-none"
+                className="w-full flex items-center justify-center gap-3 border-2 border-slate-900 bg-white text-slate-900 py-4 md:py-5 rounded-2xl font-bold uppercase tracking-wider text-xs hover:bg-slate-900 hover:text-white transition-all active:scale-[0.98] disabled:opacity-60 disabled:border-slate-300 disabled:text-slate-400 disabled:pointer-events-none cursor-pointer"
               >
-                <Zap size={20} /> Buy Now
+                <Zap size={18} /> Buy Now
               </button>
             </div>
-
-            {/* Wishlist Toggle */}
-            <button 
-              onClick={toggleWishlist}
-              className="mt-8 flex items-center justify-center gap-2 text-gray-500 hover:text-pink-500 font-medium transition-colors w-max mx-auto md:mx-0"
-            >
-              <Heart 
-                size={22} 
-                className={`transition-colors ${isWishlisted ? "fill-pink-500 text-pink-500" : ""}`} 
-              /> 
-              {isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
-            </button>
-            
           </div>
         </div>
       </div>

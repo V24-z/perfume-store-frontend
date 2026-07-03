@@ -112,8 +112,9 @@ function Login() {
     try {
       const { data } = await axios.post(`${API_URL}/login`, form);
       console.log("Login response:", data);
-      // Save user and JWT
-      login(data.user, data.access_token);
+      
+      // FIXED: Now passing the refresh token to your context
+      login(data.user, data.access_token, data.refresh_token);
 
       setMessage("Logged in successfully");
       setForm({

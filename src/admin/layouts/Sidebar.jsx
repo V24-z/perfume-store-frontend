@@ -5,7 +5,6 @@ const navSections = [
   {
     label: "Main",
     items: [
-      // FIXED: Added 'end' prop to prevent partial matching causing multiple active states
       { to: "/admin/", icon: "ti-layout-dashboard", label: "Dashboard", end: true },
       { to: "/admin/products", icon: "ti-box", label: "Products" },
       { to: "/admin/orders", icon: "ti-shopping-cart", label: "Orders" },
@@ -28,8 +27,9 @@ const Sidebar = ({ onClose }) => {
 
   const handleLogout = () => {
     logout();
-    // Safety: Ensure local storage token is cleared
     localStorage.removeItem("access_token");
+    // FIXED: Clear refresh token on logout
+    localStorage.removeItem("refresh_token");
     navigate("/login");
   };
 
@@ -97,7 +97,7 @@ const Sidebar = ({ onClose }) => {
               <NavLink
                 key={to}
                 to={to}
-                end={end} // Apply the end prop here
+                end={end} 
                 onClick={onClose}
                 className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium mb-0.5 no-underline transition-all"
                 style={({ isActive }) => ({
