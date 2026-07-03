@@ -4,10 +4,10 @@ import useCart from "../context/useCart";
 import axios from "axios";
 import { animate } from "motion";
 import useCartAnimation from "../context/usecartAnimation";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingBag, Zap, ChevronLeft } from "lucide-react";
 import useWishlist from "../context/useWhishlist";
 
-// Safely access environment variables to prevent esbuild target warnings
+// Safely access environment variables
 const API_URL = (typeof import.meta !== "undefined" && import.meta.env?.VITE_API_URL) || "";
 
 function ViewSingleProduct() {
@@ -81,53 +81,72 @@ function ViewSingleProduct() {
     );
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500">{error}</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center font-bold text-lg text-gray-500">Loading...</div>;
+  if (error) return <div className="min-h-screen flex items-center justify-center text-red-500 font-medium">{error}</div>;
   if (!product) return null;
 
-  const stockStatus = product.stock_quantity > 10 ? { label: "In Stock", color: "bg-green-50 text-green-700" } : 
-                      product.stock_quantity > 0 ? { label: `Only ${product.stock_quantity} left`, color: "bg-amber-50 text-amber-700" } : 
-                      { label: "Out of Stock", color: "bg-red-50 text-red-600" };
+  const stockStatus = product.stock_quantity > 10 ? { label: "In Stock", color: "bg-green-100 text-green-800" } : 
+                      product.stock_quantity > 0 ? { label: `Only ${product.stock_quantity} left`, color: "bg-amber-100 text-amber-800" } : 
+                      { label: "Out of Stock", color: "bg-red-100 text-red-800" };
 
   // Find the exact cart item to check quantity
   const cartItem = cartItems.find((item) => item.product_id === product.id || item.id === product.id);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 py-3 text-sm text-gray-500">
-          <button onClick={() => navigate("/")} className="hover:text-purple-600 transition">Home</button> / <span className="text-gray-800">{product.name}</span>
-        </div>
-      </div>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        
+        {/* Back Navigation */}
+        <button 
+          onClick={() => navigate("/")} 
+          className="flex items-center text-gray-500 hover:text-black mb-8 transition-colors font-medium"
+        >
+          <ChevronLeft size={20} className="mr-1" /> Back to Home
+        </button>
 
-      <div className="max-w-6xl mx-auto p-6">
-        <div className="grid md:grid-cols-2 gap-10 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex justify-center items-center rounded-xl p-10 relative" style={{ background: "#EEEDFE", minHeight: "360px" }}>
-            <img ref={imgRef} src={product.image_url} alt={product.name} className="w-48 h-48 object-contain" />
-            <button 
-              onClick={toggleWishlist} 
-              className="absolute top-4 right-4 bg-white border border-gray-100 p-2.5 rounded-full hover:bg-gray-50 transition shadow-sm active:scale-95"
-            >
-              <Heart size={18} className={isWishlisted ? "fill-pink-500 text-pink-500" : "text-gray-400"} />
-            </button>
+        <div className="grid md:grid-cols-2 gap-12 lg:gap-20 items-start">
+          
+          {/* Left Column: Image Gallery (Sticky) */}
+          <div className="sticky top-24">
+            <div className="aspect-square bg-gray-50 rounded-[2.5rem] flex items-center justify-center p-12 overflow-hidden border border-gray-100">
+              <img 
+                ref={imgRef} 
+                src={product.image_url} 
+                alt={product.name} 
+                className="max-h-full object-contain hover:scale-105 transition-transform duration-500" 
+              />
+            </div>
           </div>
 
-          <div className="flex flex-col justify-center">
-            <h1 className="text-3xl font-semibold text-gray-900 leading-tight">{product.name}</h1>
-            <p className="text-gray-500 font-medium tracking-wide uppercase text-sm mt-1">{product.brand}</p>
-            <p className="text-3xl font-bold mt-4 text-purple-900">₹{new Intl.NumberFormat("en-IN").format(product.price)}</p>
+          {/* Right Column: Product Details */}
+          <div className="flex flex-col py-4">
             
-            <div className="mt-3">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide ${stockStatus.color}`}>
-                {stockStatus.label}
-              </span>
+            {/* Header / Titles */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-purple-600 font-bold tracking-widest text-xs uppercase">
+                  {product.brand}
+                </span>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold tracking-wide ${stockStatus.color}`}>
+                  {stockStatus.label}
+                </span>
+              </div>
+              
+              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-4">
+                {product.name}
+              </h1>
+              <p className="text-3xl font-semibold text-gray-900">
+                ₹{new Intl.NumberFormat("en-IN").format(product.price)}
+              </p>
             </div>
-            
-            <p className="mt-6 text-gray-600 leading-relaxed text-sm">
+
+            {/* Description */}
+            <p className="text-gray-600 leading-relaxed mb-10 text-lg">
               {product.description}
             </p>
-            
-            <div className="mt-8 flex gap-3">
+
+            {/* Call to Actions */}
+            <div className="flex flex-col gap-4">
               <button
                 onClick={() => {
                   if (cartItem && increaseQty) {
@@ -138,12 +157,13 @@ function ViewSingleProduct() {
                   }
                 }}
                 disabled={product.stock_quantity === 0}
-                className={`px-5 py-3.5 rounded-xl w-full font-bold tracking-wide transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-60 disabled:pointer-events-none ${
+                className={`w-full flex items-center justify-center gap-3 py-4 rounded-full font-bold transition-all active:scale-[0.98] disabled:opacity-60 disabled:pointer-events-none ${
                   cartItem 
-                    ? "bg-green-50 text-green-700 hover:bg-green-100 ring-1 ring-inset ring-green-600/20" 
-                    : "bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
+                    ? "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200" 
+                    : "bg-black text-white hover:bg-gray-800 shadow-md hover:shadow-lg"
                 }`}
               >
+                <ShoppingBag size={20} />
                 {cartItem ? `Added To Cart (${cartItem.quantity}) ✓` : "Add To Cart"}
               </button>
               
@@ -152,12 +172,25 @@ function ViewSingleProduct() {
                   if (!cartItem) addToCart(product); 
                   navigate("/checkout"); 
                 }} 
-                disabled={product.stock_quantity === 0} 
-                className="border border-gray-200 bg-white px-5 py-3.5 rounded-xl w-full font-bold text-gray-800 hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95 disabled:opacity-60 disabled:pointer-events-none"
+                disabled={product.stock_quantity === 0}
+                className="w-full flex items-center justify-center gap-3 border-2 border-black bg-white text-black py-4 rounded-full font-bold hover:bg-black hover:text-white transition-all active:scale-[0.98] disabled:opacity-60 disabled:border-gray-300 disabled:text-gray-400 disabled:pointer-events-none"
               >
-                Buy Now
+                <Zap size={20} /> Buy Now
               </button>
             </div>
+
+            {/* Wishlist Toggle */}
+            <button 
+              onClick={toggleWishlist}
+              className="mt-8 flex items-center justify-center gap-2 text-gray-500 hover:text-pink-500 font-medium transition-colors w-max mx-auto md:mx-0"
+            >
+              <Heart 
+                size={22} 
+                className={`transition-colors ${isWishlisted ? "fill-pink-500 text-pink-500" : ""}`} 
+              /> 
+              {isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
+            </button>
+            
           </div>
         </div>
       </div>
