@@ -110,6 +110,10 @@ export default function App() {
   const [catFilter, setCatFilter] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const [modal, setModal] = useState(null); 
   const [activeProduct, setActiveProduct] = useState(null);
   const [formData, setFormData] = useState(initialForm);
@@ -140,7 +144,8 @@ export default function App() {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API_BASE_URL}/products/`);
+        // Appending limit=1000 so the admin dashboard gets a full batch for local pagination
+        const res = await axios.get(`${API_BASE_URL}/products/`, { params: { limit: 1000 } });
         setProducts(res.data);
       } catch (err) {
         console.error("Could not fetch products from server:", err);
@@ -150,6 +155,11 @@ export default function App() {
     };
     fetchProducts();
   }, [refreshKey]);
+
+  // Reset pagination if the user searches or filters
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, catFilter]);
 
   const triggerMessage = (text) => {
     setSuccessMsg(text);
@@ -168,6 +178,13 @@ export default function App() {
 
     return (nameMatch || brandMatch) && catMatch;
   });
+
+  // Calculate pages based on the filtered records
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const openAdd = () => {
     setFormData(initialForm);
@@ -242,17 +259,16 @@ export default function App() {
       stock_quantity: Number(formData.stock_quantity),
       volume_ml: formData.volume_ml ? Number(formData.volume_ml) : null,
       category_id: formData.category_id,
+      is_active: true, // Forces new/edited records to remain visible to the endpoint
     };
 
     setActionLoading(true);
     
     try {
       if (modal === "edit") {
-        // FIXED: Appended security wrapper config to authorize PUT requests
         await axios.put(`${API_BASE_URL}/products/${activeProduct.id}`, payload, getAuthHeaders());
         triggerMessage(`"${payload.name}" updated successfully!`);
       } else {
-        // FIXED: Appended security wrapper config to authorize POST requests
         await axios.post(`${API_BASE_URL}/products/`, payload, getAuthHeaders());
         triggerMessage(`"${payload.name}" successfully created!`);
       }
@@ -281,7 +297,6 @@ export default function App() {
         category_id: activeProduct.category_id,
       };
 
-      // FIXED: Added getAuthHeaders() to authorize the direct stock updates
       try {
         await axios.patch(`${API_BASE_URL}/products/${activeProduct.id}/`, {
           stock_quantity: qty,
@@ -308,7 +323,6 @@ export default function App() {
   const handleDeleteProduct = async () => {
     setActionLoading(true);
     try {
-      // FIXED: Attached getAuthHeaders() wrapper to authorize product deletions
       await axios.delete(`${API_BASE_URL}/products/${activeProduct.id}/`, getAuthHeaders());
       triggerMessage(`"${activeProduct.name}" removed from catalogue.`);
       setModal(null);
@@ -398,8 +412,6 @@ export default function App() {
                 className="bg-transparent border-none outline-none text-xs flex-1 text-slate-700 placeholder-slate-400"
               />
             </div>
-
-           
           </div>
 
           <div className="overflow-x-auto">
@@ -448,7 +460,7 @@ export default function App() {
                       </div>
                     </td>
                   </tr>
-                ) : filteredProducts.length === 0 ? (
+                ) : paginatedProducts.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="text-center py-16">
                       <div className="max-w-xs mx-auto">
@@ -456,14 +468,13 @@ export default function App() {
                           No Perfumes Found
                         </p>
                         <p className="text-xs text-slate-400">
-                          Ensure your FastAPI local instance is serving requests
-                          properly.
+                          Adjust your search filters or add new fragrances to the database.
                         </p>
                       </div>
                     </td>
                   </tr>
                 ) : (
-                  filteredProducts.map((p, idx) => {
+                  paginatedProducts.map((p, idx) => {
                     const displayCategory =
                       p.category?.name ||
                       p.category_name ||
@@ -477,7 +488,8 @@ export default function App() {
                         style={{ borderBottom: "1px solid #f9f8fc" }}
                       >
                         <td className="py-4 px-4 text-slate-400 font-medium">
-                          {idx + 1}
+                          {/* Shows the absolute item index across the current filtered set */}
+                          {(currentPage - 1) * itemsPerPage + idx + 1}
                         </td>
 
                         <td className="py-4 px-4">
@@ -629,23 +641,49 @@ export default function App() {
             </table>
           </div>
 
+          {/* ── PAGINATION CONTROLS ── */}
           <div
-            className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-50"
+            className="px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-50"
             style={{ borderTop: "1px solid #f0edf5" }}
           >
-            <p className="text-xs text-slate-400 m-0">
-              Showing {filteredProducts.length} of {products.length} registered
-              fragrances
-            </p>
-            <div className="flex gap-4 text-xs font-semibold">
-              <span className="text-amber-700 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                {lowStockCount} items low stock
+            <div className="flex flex-col gap-1">
+              {filteredProducts.length === 0 ? (
+                <p className="text-xs text-slate-400 m-0">No entries to display</p>
+              ) : (
+                <p className="text-xs text-slate-400 m-0">
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of {filteredProducts.length} entries
+                </p>
+              )}
+              <div className="flex gap-3 text-[10px] font-semibold mt-1">
+                <span className="text-amber-700 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  {lowStockCount} low stock
+                </span>
+                <span className="text-red-700 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                  {outOfStockCount} out of stock
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button 
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 disabled:opacity-50 cursor-pointer hover:bg-slate-100 transition-colors"
+              >
+                Prev
+              </button>
+              <span className="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 rounded-lg">
+                Page {currentPage} of {totalPages || 1}
               </span>
-              <span className="text-red-700 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
-                {outOfStockCount} critical restocks
-              </span>
+              <button 
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-200 bg-white text-slate-600 disabled:opacity-50 cursor-pointer hover:bg-slate-100 transition-colors"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>

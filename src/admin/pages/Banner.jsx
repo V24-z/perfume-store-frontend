@@ -99,7 +99,7 @@ function Banner() {
       setDeleteId(null);
       toast.success("Banner deleted successfully");
     } catch (error) {
-      toast.error("Failed to delete banner",error);
+      toast.error("Failed to delete banner", error);
     } finally {
       setLoading(false);
     }
@@ -162,8 +162,8 @@ function Banner() {
               <input type="text" name="image_url" placeholder="Image URL" value={formData.image_url} onChange={handleChange} className="border p-2 rounded w-full" required />
               
               <div className="flex justify-end gap-3 mt-6">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded bg-gray-200">Cancel</button>
-                <button type="submit" disabled={loading} className="px-4 py-2 rounded bg-indigo-600 text-white">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 rounded bg-gray-200" disabled={loading}>Cancel</button>
+                <button type="submit" disabled={loading} className="px-4 py-2 rounded bg-indigo-600 text-white disabled:opacity-70">
                   {loading ? "Saving..." : editId ? "Update" : "Create"}
                 </button>
               </div>
@@ -179,8 +179,20 @@ function Banner() {
             <h2 className="text-xl font-semibold mb-4">Delete Banner</h2>
             <p className="mb-6">Are you sure you want to delete this banner?</p>
             <div className="flex justify-end gap-3">
-              <button onClick={() => setDeleteId(null)} className="px-4 py-2 rounded bg-gray-200">Cancel</button>
-              <button onClick={() => handleDelete(deleteId)} className="px-4 py-2 rounded bg-red-600 text-white">Delete</button>
+              <button 
+                onClick={() => setDeleteId(null)} 
+                className="px-4 py-2 rounded bg-gray-200"
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => handleDelete(deleteId)} 
+                disabled={loading} 
+                className="px-4 py-2 rounded bg-red-600 text-white disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {loading ? "Deleting..." : "Delete"}
+              </button>
             </div>
           </div>
         </div>

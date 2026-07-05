@@ -18,29 +18,36 @@ export default function Wishlist() {
 
   const handleAddToCartClick = async (product) => {
     if (processingId === product.id) return;
+    
     if (product.stock_quantity <= 0) {
       toast.error("Out of stock");
       return;
     }
     
-    try {
-      setProcessingId(product.id);
-      const cartItem = cartItems.find(item => item.product_id === product.id || item.id === product.id);
-      
-      if (cartItem) {
-        if (cartItem.quantity >= product.stock_quantity) {
-          toast.error("Stock not available more");
-          return;
-        }
-        await increaseQty(cartItem);
-      } else {
-        await addToCart(product);
+    // Check if the item is already in the cart first
+    const cartItem = cartItems.find(item => item.product_id === product.id || item.id === product.id);
+    
+    if (cartItem) {
+      // If already in cart, increase quantity without triggering the loading spinner
+      if (cartItem.quantity >= product.stock_quantity) {
+        toast.error("Stock not available more");
+        return;
       }
-    } catch (err) {
-      console.error("Failed to add variant to cart:", err);
-    } finally {
-      // Fixed: Removes the loading spinner ONLY after API process correctly finishes
-      setProcessingId(null);
+      try {
+        await increaseQty(cartItem);
+      } catch (err) {
+        console.error("Failed to increase quantity:", err);
+      }
+    } else {
+      // If not in cart, trigger the loading spinner for the initial add
+      try {
+        setProcessingId(product.id);
+        await addToCart(product);
+      } catch (err) {
+        console.error("Failed to add variant to cart:", err);
+      } finally {
+        setProcessingId(null);
+      }
     }
   };
 

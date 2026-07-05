@@ -4,7 +4,6 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function CreateAdmin() {
-  // FIXED: Changed key from "token" to "access_token" to successfully match session storage keys
   const token = localStorage.getItem("access_token");
 
   const initialState = {
@@ -21,6 +20,11 @@ export default function CreateAdmin() {
   const [tableLoading, setTableLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  // Delete Modal States
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [adminToDelete, setAdminToDelete] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     fetchAdmins();
@@ -45,7 +49,6 @@ export default function CreateAdmin() {
   const validate = () => {
     let newErrors = {};
 
-    // Name
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
     } else if (!/^[A-Za-z ]+$/.test(formData.name)) {
@@ -54,7 +57,6 @@ export default function CreateAdmin() {
       newErrors.name = "Minimum 3 characters";
     }
 
-    // Email
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (
@@ -63,14 +65,12 @@ export default function CreateAdmin() {
       newErrors.email = "Invalid email";
     }
 
-    // Phone
     if (!formData.phon.trim()) {
       newErrors.phon = "Phone number is required";
     } else if (!/^[6-9]\d{9}$/.test(formData.phon)) {
       newErrors.phon = "Enter valid 10-digit mobile number";
     }
 
-    // Password
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (
@@ -129,8 +129,73 @@ export default function CreateAdmin() {
     }
   };
 
+  // Handle Opening Delete Modal
+  const handleDeleteClick = (admin) => {
+    setAdminToDelete(admin);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Handle Deletion Execution
+  const confirmDelete = async () => {
+    if (!adminToDelete) return;
+    
+    setDeleteLoading(true);
+    try {
+      // Update this URL if your backend delete route differs
+      await axios.delete(`${API_URL}/delete-admin/${adminToDelete.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setMessage(`Successfully deleted ${adminToDelete.name}`);
+      fetchAdmins();
+    } catch (err) {
+      setError(err.response?.data?.detail || "Failed to delete admin");
+    } finally {
+      setDeleteLoading(false);
+      setIsDeleteModalOpen(false);
+      setAdminToDelete(null);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50/50 text-slate-900 antialiased font-sans p-6 sm:p-8">
+    <div className="min-h-screen bg-slate-50/50 text-slate-900 antialiased font-sans p-6 sm:p-8 relative">
+      
+      {/* ══ DELETE CONFIRMATION MODAL ══ */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 transition-opacity">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-slate-200 transform transition-all">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Confirm Deletion</h3>
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+              Are you sure you want to delete <span className="font-bold text-slate-800">{adminToDelete?.name}</span>? This action is permanent and cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={deleteLoading}
+                className="px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleteLoading}
+                className="flex items-center gap-2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors disabled:bg-red-400"
+              >
+                {deleteLoading ? (
+                  <>
+                    <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Yes, Delete"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-[1400px] mx-auto space-y-8">
         
         {/* ══ HEADER ══ */}
@@ -259,9 +324,16 @@ export default function CreateAdmin() {
               {/* Action Button */}
               <button
                 disabled={loading}
-                className="w-full text-xs font-bold uppercase tracking-wider bg-blue-600 text-white rounded-xl py-3.5 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-sm mt-2 border-0"
+                className="w-full flex justify-center items-center gap-2 text-xs font-bold uppercase tracking-wider bg-blue-600 text-white rounded-xl py-3.5 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-all shadow-sm mt-2 border-0"
               >
-                {loading ? "Registering Keys..." : "Create Admin Account"}
+                {loading ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Registering Keys...
+                  </>
+                ) : (
+                  "Create Admin Account"
+                )}
               </button>
             </form>
           </div>
@@ -298,6 +370,7 @@ export default function CreateAdmin() {
                       <th className="p-3 font-semibold">Email</th>
                       <th className="p-3 font-semibold">Phone</th>
                       <th className="p-3 font-semibold text-right">Registered</th>
+                      <th className="p-3 font-semibold text-center">Actions</th>
                     </tr>
                   </thead>
 
@@ -328,6 +401,15 @@ export default function CreateAdmin() {
                                 year: "numeric",
                               })
                             : "—"}
+                        </td>
+                        
+                        <td className="p-3 text-center">
+                          <button
+                            onClick={() => handleDeleteClick(admin)}
+                            className="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-lg font-bold transition-colors"
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))}

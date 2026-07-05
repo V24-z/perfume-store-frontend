@@ -73,11 +73,11 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
         />
         {/* Dynamic Stock Label at Top Right Corner */}
         {stock > 0 ? (
-          <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-500 text-white shadow-sm z-10 uppercase">
+          <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-500 text-white shadow-sm z-10 uppercase font-sans">
             In Stock
           </span>
         ) : (
-          <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-500 text-white shadow-sm z-10 uppercase">
+          <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-500 text-white shadow-sm z-10 uppercase font-sans">
             Out of Stock
           </span>
         )}
@@ -85,7 +85,7 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
 
       <div className="flex-1 min-w-0 flex flex-col">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-bold text-sm text-[#1a0533] leading-snug truncate">
+          <h3 className="font-bold text-sm text-[#1a0533] leading-snug truncate font-sans tracking-tight">
             {item.products?.name}
           </h3>
           <button
@@ -97,7 +97,7 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
           </button>
         </div>
 
-        <p className="text-xs font-medium text-slate-400 mt-0.5">
+        <p className="text-xs font-medium text-slate-400 mt-0.5 font-mono">
           ₹{fmt(item.products?.price)} each
         </p>
 
@@ -118,7 +118,7 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
               <Minus size={12} />
             </motion.button>
 
-            <span className={`w-5 text-center text-xs font-bold tabular-nums ${isOutOfStock ? "text-slate-400" : "text-slate-800"}`}>
+            <span className={`w-5 text-center text-xs font-bold tabular-nums font-mono ${isOutOfStock ? "text-slate-400" : "text-slate-800"}`}>
               {item.quantity}
             </span>
 
@@ -138,7 +138,7 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
             </motion.button>
           </div>
 
-          <p className="font-extrabold text-sm text-[#1a0533] tabular-nums">
+          <p className="font-extrabold text-sm text-[#1a0533] tabular-nums font-mono">
             ₹{fmt(lineTotal)}
           </p>
         </div>
@@ -159,28 +159,28 @@ function OrderSummary({ subtotal, itemCount }) {
         variants={fadeVariants}
         initial="hidden"
         animate="visible"
-        className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 lg:sticky lg:top-6 shadow-sm font-['Inter',sans-serif]"
+        className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 lg:sticky lg:top-6 shadow-sm font-sans"
       >
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 font-sans">
           Order Valuation
         </p>
-        <h2 className="font-extrabold text-base text-[#1a0533] mb-5 tracking-tight">
+        <h2 className="font-extrabold text-xl text-[#1a0533] mb-5 tracking-wide font-serif">
           {itemCount} {itemCount === 1 ? "item" : "items"} in your bag
         </h2>
 
-        <div className="space-y-3.5 text-xs font-medium text-slate-500">
+        <div className="space-y-3.5 text-xs font-medium text-slate-500 font-sans">
           <div className="flex justify-between items-center">
             <span>Bag Subtotal</span>
-            <span className="tabular-nums font-semibold text-slate-800">
+            <span className="tabular-nums font-semibold text-slate-800 font-mono text-sm">
               ₹{fmt(subtotal)}
             </span>
           </div>
 
           <div className="flex justify-between items-center">
             <span>Shipping Fees</span>
-            <span className="tabular-nums font-semibold text-slate-800">
+            <span className="tabular-nums font-semibold text-slate-800 font-mono text-sm">
               {shipping === 0 ? (
-                <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Free</span>
+                <span className="text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 font-sans text-xs uppercase tracking-wide">Free</span>
               ) : (
                 `₹${fmt(shipping)}`
               )}
@@ -191,8 +191,8 @@ function OrderSummary({ subtotal, itemCount }) {
         <div className="border-t border-dashed border-slate-200 my-5" />
 
         <div className="flex items-center justify-between bg-[#1a0533] text-white rounded-xl px-4 py-3.5 shadow-inner">
-          <span className="text-xs uppercase font-bold tracking-wider text-slate-300">Total Due</span>
-          <span className="text-lg font-black tracking-tight tabular-nums">
+          <span className="text-sm uppercase font-bold tracking-widest text-slate-300 font-serif">Total Due</span>
+          <span className="text-xl font-black tracking-tight tabular-nums font-mono">
             ₹{fmt(total)}
           </span>
         </div>
@@ -200,7 +200,7 @@ function OrderSummary({ subtotal, itemCount }) {
         <Link
           to="/checkout"
           aria-disabled={disabled}
-          className={`group relative flex items-center justify-center gap-2 w-full mt-5 py-3.5 rounded-xl text-center text-xs font-bold uppercase tracking-wider no-underline border-0 transition-all duration-300 focus:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10
+          className={`group relative flex items-center justify-center gap-2 w-full mt-5 py-3.5 rounded-xl text-center text-xs font-bold uppercase tracking-wider no-underline border-0 transition-all duration-300 focus:outline-none focus-visible:ring-4 focus-visible:ring-violet-500/10 font-sans
             ${
               disabled
                 ? "bg-slate-100 text-slate-400 pointer-events-none"
@@ -216,7 +216,7 @@ function OrderSummary({ subtotal, itemCount }) {
           )}
         </Link>
 
-        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-slate-100 text-[10px] uppercase font-bold tracking-wider text-slate-400">
+        <div className="flex items-center gap-2 mt-5 pt-4 border-t border-slate-100 text-[10px] uppercase font-bold tracking-wider text-slate-400 font-sans">
           <span className="flex items-center gap-1.5">
             <ShieldCheck size={14} className="text-violet-600" /> Secure Checkout Guaranteed
           </span>
@@ -224,17 +224,17 @@ function OrderSummary({ subtotal, itemCount }) {
       </motion.div>
 
       {!disabled && (
-        <div className="fixed inset-x-0 bottom-0 z-40 md:hidden animate-fade-in">
+        <div className="fixed inset-x-0 bottom-0 z-40 md:hidden animate-fade-in font-sans">
           <div className="bg-white/95 backdrop-blur border-t border-slate-200/80 px-4 py-3 flex items-center justify-between gap-4 shadow-[0_-8px_30px_rgb(0,0,0,0.06)]">
             <div>
-              <p className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Total Summary</p>
-              <p className="font-black text-lg text-[#1a0533] tabular-nums mt-0.5">
+              <p className="text-[10px] uppercase font-bold tracking-wider text-slate-400 font-serif">Total Summary</p>
+              <p className="font-black text-xl text-[#1a0533] tabular-nums mt-0.5 font-mono">
                 ₹{fmt(total)}
               </p>
             </div>
             <Link
               to="/checkout"
-              className="flex-1 max-w-[180px] flex items-center justify-center gap-1.5 bg-slate-900 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider no-underline border-0 active:scale-95 transition-all shadow-sm"
+              className="flex-1 max-w-[180px] flex items-center justify-center gap-1.5 bg-slate-900 text-white py-3 rounded-xl text-xs font-bold uppercase tracking-wider no-underline border-0 active:scale-95 transition-all shadow-sm font-sans"
             >
               Checkout
               <ArrowRight size={14} />
@@ -274,15 +274,15 @@ function EmptyCart() {
       variants={fadeVariants}
       initial="hidden"
       animate="visible"
-      className="flex flex-col items-center justify-center text-center py-16 px-6 bg-slate-50 border border-slate-100 rounded-2xl"
+      className="flex flex-col items-center justify-center text-center py-16 px-6 bg-slate-50 border border-slate-100 rounded-2xl font-sans"
     >
       <div className="w-14 h-14 rounded-full bg-white border border-slate-100 shadow-sm flex items-center justify-center mb-5 text-slate-400">
         <ShoppingBag size={22} />
       </div>
-      <h3 className="text-base font-bold text-[#1a0533] mb-1">
+      <h3 className="text-xl font-bold text-[#1a0533] mb-1 font-serif">
         Your bag is empty
       </h3>
-      <p className="text-slate-400 text-xs mb-6 max-w-xs leading-relaxed">
+      <p className="text-slate-400 text-xs mb-6 max-w-xs leading-relaxed font-sans">
         Looks like you haven't added anything yet. Start exploring our curated collections to fill it up.
       </p>
       <Link
@@ -326,7 +326,7 @@ export default function Cart() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10 pb-28 md:pb-12">
         <nav
           aria-label="Breadcrumb"
-          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-5"
+          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-5 font-sans"
         >
           <Link to="/" className="hover:text-violet-600 no-underline text-slate-400 transition-colors">
             Home
@@ -337,11 +337,11 @@ export default function Cart() {
 
         <div className="flex items-center gap-2.5 mb-1.5">
           <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-violet-600 to-fuchsia-600" />
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#1a0533]">
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#1a0533] font-serif">
             Shopping Bag
           </h1>
         </div>
-        <p className="text-xs font-medium text-slate-400 mb-8 pl-4">
+        <p className="text-xs font-medium text-slate-400 mb-8 pl-4 font-sans">
           {loading
             ? "Syncing database items…"
             : `${cartItems.length} ${

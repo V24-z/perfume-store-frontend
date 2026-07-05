@@ -12,6 +12,14 @@ const getAuthHeaders = () => {
 
 function Category() {
   const [categories, setCategories] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // State to manage the delete confirmation modal and its loading state
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    categoryId: null,
+    isDeleting: false,
+  });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -41,9 +49,9 @@ function Category() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      // FIXED: Appended security wrapper configuration to authorize POST requests
       await axios.post(`${API_URL}/categories`, formData, getAuthHeaders());
 
       const res = await axios.get(`${API_URL}/categories`);
@@ -59,25 +67,43 @@ function Category() {
     } catch (error) {
       console.error("Error adding category:", error);
       toast.error(error.response?.data?.detail || "Failed to add category");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  const handleDelete = async (id) => {
+  const openDeleteModal = (id) => {
+    setDeleteModal({ isOpen: true, categoryId: id, isDeleting: false });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, categoryId: null, isDeleting: false });
+  };
+
+  const confirmDelete = async () => {
+    const { categoryId } = deleteModal;
+    if (!categoryId) return;
+
+    setDeleteModal((prev) => ({ ...prev, isDeleting: true }));
+
     try {
-      // FIXED: Attached getAuthHeaders() wrapper to authorize category deletions
-      await axios.delete(`${API_URL}/categories/${id}`, getAuthHeaders());
+      await axios.delete(`${API_URL}/categories/${categoryId}`, getAuthHeaders());
 
       setCategories((prev) =>
-        prev.filter((category) => category.id !== id)
+        prev.filter((category) => category.id !== categoryId)
       );
+      
+      toast.success("Category deleted successfully");
+      closeDeleteModal();
     } catch (error) {
       console.error("Error deleting category:", error);
       toast.error(error.response?.data?.detail || "Failed to delete category");
+      setDeleteModal((prev) => ({ ...prev, isDeleting: false }));
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-6 relative">
       <div className="max-w-5xl mx-auto">
 
         {/* Page Header */}
@@ -94,7 +120,6 @@ function Category() {
 
           <form onSubmit={handleSubmit} className="px-6 py-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Category Name <span className="text-red-500">*</span>
@@ -142,12 +167,25 @@ function Category() {
             <div className="mt-6 flex justify-end">
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-sm font-semibold px-6 py-2.5 rounded-xl shadow-sm transition-colors"
+                disabled={isSubmitting}
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 text-white text-sm font-semibold px-6 py-2.5 rounded-xl shadow-sm transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
-                <svg xmlns="http://www.w3.org/2000/xl" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                </svg>
-                Add Category
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Adding...
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Category
+                  </>
+                )}
               </button>
             </div>
           </form>
@@ -207,7 +245,7 @@ function Category() {
                       <td className="px-6 py-4">
                         <button
                           className="inline-flex items-center gap-1.5 bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 transition-colors"
-                          onClick={() => handleDelete(category.id)}
+                          onClick={() => openDeleteModal(category.id)}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -236,6 +274,53 @@ function Category() {
         </div>
 
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4 transition-opacity">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900">Delete Category</h3>
+              </div>
+              <p className="text-sm text-gray-600">
+                Are you sure you want to delete this category? All associated data might be affected. This action cannot be undone.
+              </p>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+              <button
+                onClick={closeDeleteModal}
+                disabled={deleteModal.isDeleting}
+                className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleteModal.isDeleting}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:bg-red-400 disabled:cursor-not-allowed"
+              >
+                {deleteModal.isDeleting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
