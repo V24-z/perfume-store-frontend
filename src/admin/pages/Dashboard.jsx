@@ -160,11 +160,10 @@ export default function Dashboard() {
   const setDone = (key) => setLoading(l => ({ ...l, [key]: false }));
 
   useEffect(() => {
-    // Products table query with Safe Unwrapping
-    axios.get(`${API_URL}/products/`)
+    // 🚀 FIXED: Fetch all products for admin using the secured /all route
+    axios.get(`${API_URL}/products/all`, getAuthHeaders())
       .then(r => {
         const data = r.data;
-        // Check if API wraps the response in a data or products object
         const productList = Array.isArray(data) ? data : (data?.data || data?.products || []);
         setProducts(productList);
       })
@@ -194,7 +193,6 @@ export default function Dashboard() {
   }, []);
 
   const stats = useMemo(() => {
-    // Fallback if products is undefined or not properly set yet
     if (!Array.isArray(products)) return { featured: 0, lowStock: [], outOfStock: 0, latest: [], categories: [] };
 
     const featuredItems = products.filter(p => p.is_featured).length;
@@ -215,7 +213,6 @@ export default function Dashboard() {
   }, [products]);
 
   const orderStats = useMemo(() => {
-    // Fallback if orders is undefined
     if (!Array.isArray(orders)) return { total: 0, pending: 0, processing: 0, delivered: 0, cancelled: 0, revenue: 0, todayRev: 0, recent: [], sparkPoints: [], statusDistrib: [] };
 
     const byStatus = (s) => orders.filter(o => o.status?.toLowerCase() === s).length;
@@ -495,4 +492,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-} 
+}

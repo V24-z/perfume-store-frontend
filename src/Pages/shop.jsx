@@ -1,6 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { ShoppingCart, Heart, Eye, Search, SlidersHorizontal } from "lucide-react";
+import { 
+  ShoppingCart, 
+  Heart, 
+  Eye, 
+  Search, 
+  SlidersHorizontal,
+  ChevronLeft,
+  ChevronRight
+} from "lucide-react";
 import { animate } from "motion";
 import { Link } from "react-router-dom";
 
@@ -25,6 +33,10 @@ export default function Shop() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   // Dynamic single button async tracking state
   const [processingId, setProcessingId] = useState(null);
   const imageRefs = useRef({});
@@ -39,7 +51,7 @@ export default function Shop() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [currentPage]); // Scroll to top when page changes
 
   // ─── Fly to Cart Animation Sync Sequence ───────────────────────────────────
   const flyToCart = (productId) => {
@@ -100,15 +112,31 @@ export default function Shop() {
       try {
         setLoading(true);
         // Strip out any empty strings or null values so we request ALL items initially
-        const activeFilters = Object.fromEntries(
-          Object.entries(filters).filter(([, v]) => v !== "" && v !== null)
-        );
+        const activeFilters = {
+          ...Object.fromEntries(
+            Object.entries(filters).filter(([, v]) => v !== "" && v !== null)
+          ),
+          page: currentPage,
+          limit: 12 // Assumed items per page for API
+        };
         
         const { data } = await axios.get(`${API_URL}/products`, { params: activeFilters });
         
         // Safely extract the array whether the API wraps it in a data/products object or returns it directly
         const productList = Array.isArray(data) ? data : (data?.data || data?.products || []);
         setProducts(productList);
+
+        // Safely extract total pages from standard API pagination structures
+        const fetchedTotalPages = data?.last_page || data?.total_pages || data?.meta?.last_page;
+        if (fetchedTotalPages) {
+          setTotalPages(fetchedTotalPages);
+        } else if (productList.length > 0 && !data?.last_page) {
+          // Fallback logic if API doesn't return metadata
+          setTotalPages(currentPage + (productList.length === 12 ? 1 : 0));
+        } else {
+          setTotalPages(1);
+        }
+
       } catch (error) {
         console.error("Failed to fetch products:", error);
       } finally {
@@ -121,7 +149,7 @@ export default function Shop() {
     }, 400); // 400ms delay to wait for user to finish typing
 
     return () => clearTimeout(delayDebounceFn);
-  }, [filters]);
+  }, [filters, currentPage]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -144,6 +172,7 @@ export default function Shop() {
       ...prev,
       [name]: value,
     }));
+    setCurrentPage(1); // Reset to page 1 whenever a filter changes
   };
 
   return (
@@ -268,107 +297,169 @@ export default function Shop() {
                 <p className="text-sm font-semibold tracking-wide">No Olfactory Artworks Match Your Filter</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                {products.map((product) => {
-                  const isWishlisted = wishlistItems.some((item) => item.id === product.id);
-                  const cartItem = cartItems.find((item) => item.product_id === product.id || item.id === product.id);
-                  const isInCart = !!cartItem;
-                  const isButtonLoading = processingId === product.id;
-                  const isOutOfStock = product.stock_quantity <= 0;
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {products.map((product) => {
+                    const isWishlisted = wishlistItems.some((item) => item.id === product.id);
+                    const cartItem = cartItems.find((item) => item.product_id === product.id || item.id === product.id);
+                    const isInCart = !!cartItem;
+                    const isButtonLoading = processingId === product.id;
+                    const isOutOfStock = product.stock_quantity <= 0;
 
-                  return (
-                    <div
-                      key={product.id}
-                      className={`group bg-white rounded-2xl overflow-hidden border border-slate-200/80 hover:shadow-xl hover:border-slate-300/60 transition-all duration-300 flex flex-col h-full relative ${isOutOfStock ? "opacity-75" : ""}`}
-                    >
-                      {/* IMAGE AREA */}
-                      <div className="relative aspect-[4/5] w-full bg-slate-100 overflow-hidden shrink-0">
-                        <img
-                          ref={(el) => (imageRefs.current[product.id] = el)}
-                          src={product.image_url}
-                          alt={product.name}
-                          loading="lazy"
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        
-                        {/* ABSOLUTE FLOATING QUICK WISHLIST BUTTON */}
-                        <button
-                          disabled={processingId !== null || isOutOfStock}
-                          onClick={() => isWishlisted ? removeFromWishlist(product.id) : addToWishlist(product)}
-                          className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all duration-200 transform active:scale-90 disabled:opacity-50 ${
-                            isOutOfStock
-                              ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
-                              : isWishlisted 
-                              ? "bg-rose-50 border-rose-100 text-rose-500 cursor-pointer" 
-                              : "bg-white/80 border-slate-100 text-slate-400 hover:text-rose-500 hover:bg-white cursor-pointer"
-                          }`}
-                        >
-                          <Heart size={16} fill={isWishlisted && !isOutOfStock ? "currentColor" : "none"} className="flex-shrink-0" />
-                        </button>
-                        
-                        {/* ABSOLUTE FLOATING STOCK BADGE */}
-                        <span className={`absolute top-4 left-3 px-2 py-1 rounded-full text-[9px] font-bold text-white z-10 uppercase tracking-widest shadow-sm ${isOutOfStock ? "bg-red-500" : "bg-emerald-500"}`}>
-                          {isOutOfStock ? "Out of Stock" : "In Stock"}
-                        </span>
-                      </div>
-
-                      {/* DATA CARD FOOTER */}
-                      <div className="p-4 flex flex-col flex-1 justify-between space-y-4">
-                        <div className="space-y-1">
-                          <p className="text-[10px] uppercase font-bold tracking-widest text-violet-600">
-                            {product.brand}
-                          </p>
-                          <h3 className="font-bold text-sm text-[#1a0533] leading-snug line-clamp-2">
-                            {product.name}
-                          </h3>
+                    return (
+                      <div
+                        key={product.id}
+                        className={`group bg-white rounded-2xl overflow-hidden border border-slate-200/80 hover:shadow-xl hover:border-slate-300/60 transition-all duration-300 flex flex-col h-full relative ${isOutOfStock ? "opacity-75" : ""}`}
+                      >
+                        {/* IMAGE AREA */}
+                        <div className="relative aspect-[4/5] w-full bg-slate-100 overflow-hidden shrink-0">
+                          <img
+                            ref={(el) => (imageRefs.current[product.id] = el)}
+                            src={product.image_url}
+                            alt={product.name}
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          
+                          {/* ABSOLUTE FLOATING QUICK WISHLIST BUTTON */}
+                          <button
+                            disabled={processingId !== null || isOutOfStock}
+                            onClick={() => isWishlisted ? removeFromWishlist(product.id) : addToWishlist(product)}
+                            className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all duration-200 transform active:scale-90 disabled:opacity-50 ${
+                              isOutOfStock
+                                ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                                : isWishlisted 
+                                ? "bg-rose-50 border-rose-100 text-rose-500 cursor-pointer" 
+                                : "bg-white/80 border-slate-100 text-slate-400 hover:text-rose-500 hover:bg-white cursor-pointer"
+                            }`}
+                          >
+                            <Heart size={16} fill={isWishlisted && !isOutOfStock ? "currentColor" : "none"} className="flex-shrink-0" />
+                          </button>
+                          
+                          {/* ABSOLUTE FLOATING STOCK BADGE */}
+                          <span className={`absolute top-4 left-3 px-2 py-1 rounded-full text-[9px] font-bold text-white z-10 uppercase tracking-widest shadow-sm ${isOutOfStock ? "bg-red-500" : "bg-emerald-500"}`}>
+                            {isOutOfStock ? "Out of Stock" : "In Stock"}
+                          </span>
                         </div>
 
-                        <div className="space-y-3 pt-2">
-                          <p className="text-base font-extrabold text-[#1a0533]">
-                            ₹{new Intl.NumberFormat("en-IN").format(product.price)}
-                          </p>
+                        {/* DATA CARD FOOTER */}
+                        <div className="p-4 flex flex-col flex-1 justify-between space-y-4">
+                          <div className="space-y-1">
+                            <p className="text-[10px] uppercase font-bold tracking-widest text-violet-600">
+                              {product.brand}
+                            </p>
+                            <h3 className="font-bold text-sm text-[#1a0533] leading-snug line-clamp-2">
+                              {product.name}
+                            </h3>
+                          </div>
 
-                          {/* ACTION BUTTON WRAPPER */}
-                          <div className="flex gap-2 w-full pt-1">
-                            <button
-                              disabled={isButtonLoading || isOutOfStock}
-                              onClick={() => isInCart && increaseQty ? increaseQty(cartItem) : handleAddToCart(product)}
-                              className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 ${
-                                isOutOfStock
-                                  ? "bg-slate-200 text-slate-500 cursor-not-allowed"
-                                  : isInCart
-                                  ? "bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-inset ring-emerald-600/10 cursor-pointer"
-                                  : "bg-slate-900 text-white hover:bg-slate-800 cursor-pointer"
-                              }`}
-                            >
-                              {isButtonLoading ? (
-                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin flex-shrink-0" />
-                              ) : isOutOfStock ? (
-                                "Unavailable"
-                              ) : isInCart ? (
-                                `In Cart (${cartItem.quantity}) ✓`
-                              ) : (
-                                <>
-                                  <ShoppingCart size={14} className="flex-shrink-0" />
-                                  Add Cart
-                                </>
-                              )}
-                            </button>
+                          <div className="space-y-3 pt-2">
+                            <p className="text-base font-extrabold text-[#1a0533]">
+                              ₹{new Intl.NumberFormat("en-IN").format(product.price)}
+                            </p>
 
-                            <Link
-                              to={`/viewdetail/${product.id}`}
-                              className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50/80 shadow-sm transition-colors flex items-center justify-center"
-                              title="Quick View"
-                            >
-                              <Eye size={15} className="flex-shrink-0" />
-                            </Link>
+                            {/* ACTION BUTTON WRAPPER */}
+                            <div className="flex gap-2 w-full pt-1">
+                              <button
+                                disabled={isButtonLoading || isOutOfStock}
+                                onClick={() => isInCart && increaseQty ? increaseQty(cartItem) : handleAddToCart(product)}
+                                className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 ${
+                                  isOutOfStock
+                                    ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                                    : isInCart
+                                    ? "bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-inset ring-emerald-600/10 cursor-pointer"
+                                    : "bg-slate-900 text-white hover:bg-slate-800 cursor-pointer"
+                                }`}
+                              >
+                                {isButtonLoading ? (
+                                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                                ) : isOutOfStock ? (
+                                  "Unavailable"
+                                ) : isInCart ? (
+                                  `In Cart (${cartItem.quantity}) ✓`
+                                ) : (
+                                  <>
+                                    <ShoppingCart size={14} className="flex-shrink-0" />
+                                    Add Cart
+                                  </>
+                                )}
+                              </button>
+
+                              <Link
+                                to={`/viewdetail/${product.id}`}
+                                className="p-2.5 rounded-xl border border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-50/80 shadow-sm transition-colors flex items-center justify-center"
+                                title="Quick View"
+                              >
+                                <Eye size={15} className="flex-shrink-0" />
+                              </Link>
+                            </div>
                           </div>
                         </div>
                       </div>
+                    );
+                  })}
+                </div>
+                
+                {/* ══ PAGINATION CONTROLS ══ */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-12 pt-6 border-t border-slate-200/60">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 bg-white shadow-sm hover:text-violet-600 hover:bg-violet-50 hover:border-violet-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      aria-label="Previous page"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      {[...Array(totalPages)].map((_, i) => {
+                        const page = i + 1;
+                        
+                        // Show first, last, current, and adjacent pages
+                        if (
+                          page === 1 || 
+                          page === totalPages || 
+                          (page >= currentPage - 1 && page <= currentPage + 1)
+                        ) {
+                          return (
+                            <button
+                              key={page}
+                              onClick={() => setCurrentPage(page)}
+                              className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold shadow-sm transition-all ${
+                                currentPage === page
+                                  ? "bg-violet-600 text-white border-transparent"
+                                  : "bg-white border border-slate-200 text-slate-600 hover:bg-violet-50 hover:text-violet-600 hover:border-violet-200"
+                              }`}
+                            >
+                              {page}
+                            </button>
+                          );
+                        } else if (
+                          page === currentPage - 2 || 
+                          page === currentPage + 2
+                        ) {
+                          return (
+                            <span key={page} className="text-slate-400 font-medium px-1">
+                              ...
+                            </span>
+                          );
+                        }
+                        return null;
+                      })}
                     </div>
-                  );
-                })}
-              </div>
+
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 text-slate-500 bg-white shadow-sm hover:text-violet-600 hover:bg-violet-50 hover:border-violet-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      aria-label="Next page"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
