@@ -99,13 +99,18 @@ export default function Shop() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
+        // Strip out any empty strings or null values so we request ALL items initially
         const activeFilters = Object.fromEntries(
-          Object.entries(filters).filter(([, v]) => v !== "")
+          Object.entries(filters).filter(([, v]) => v !== "" && v !== null)
         );
+        
         const { data } = await axios.get(`${API_URL}/products`, { params: activeFilters });
-        setProducts(data);
+        
+        // Safely extract the array whether the API wraps it in a data/products object or returns it directly
+        const productList = Array.isArray(data) ? data : (data?.data || data?.products || []);
+        setProducts(productList);
       } catch (error) {
-        console.error(error);
+        console.error("Failed to fetch products:", error);
       } finally {
         setLoading(false);
       }
@@ -121,13 +126,13 @@ export default function Shop() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get(
-          `${API_URL}/categories`
-        );
-
-        setCategories(data);
+        const { data } = await axios.get(`${API_URL}/categories`);
+        
+        // Safely extract the categories array
+        const categoryList = Array.isArray(data) ? data : (data?.data || []);
+        setCategories(categoryList);
       } catch (error) {
-        console.error(error);
+        console.error("Failed to fetch categories:", error);
       }
     };
 

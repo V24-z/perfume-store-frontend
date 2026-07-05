@@ -10,7 +10,10 @@ function SearchBar() {
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
+  
   const wrapperRef = useRef(null);
+  const dropdownRef = useRef(null); // Added reference for the portal dropdown
+  
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
 
   // 1. Handle user typing synchronously
@@ -87,10 +90,14 @@ function SearchBar() {
     };
   }, [showSuggestions, suggestions, loading]);
 
-  // 4. Click outside to close
+  // 4. Click outside to close (Fixed)
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target)) {
+      // Check if click is outside both the input wrapper AND the portal dropdown
+      const isOutsideWrapper = wrapperRef.current && !wrapperRef.current.contains(e.target);
+      const isOutsideDropdown = !dropdownRef.current || !dropdownRef.current.contains(e.target);
+
+      if (isOutsideWrapper && isOutsideDropdown) {
         setShowSuggestions(false);
       }
     };
@@ -140,6 +147,7 @@ function SearchBar() {
       {/* Dropdown Portal */}
       {showSuggestions && createPortal(
         <div
+          ref={dropdownRef} // Attached the new ref here
           style={{ 
             position: "fixed", 
             top: dropdownPos.top, 

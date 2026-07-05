@@ -31,10 +31,10 @@ const STATUS_STYLES = {
 };
 
 function StatusBadge({ status = "" }) {
-  const twClass = STATUS_STYLES[status.toLowerCase()] || "bg-gray-50 text-gray-600 ring-gray-500/10";
+  const twClass = STATUS_STYLES[status?.toLowerCase()] || "bg-gray-50 text-gray-600 ring-gray-500/10";
   return (
     <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${twClass}`}>
-      {status}
+      {status || "Unknown"}
     </span>
   );
 }
@@ -160,19 +160,43 @@ export default function Dashboard() {
   const setDone = (key) => setLoading(l => ({ ...l, [key]: false }));
 
   useEffect(() => {
-    // Products table query remains public
-    axios.get(`${API_URL}/products/`).then(r => setProducts(r.data)).catch(console.error).finally(() => setDone("products"));
+    // Products table query with Safe Unwrapping
+    axios.get(`${API_URL}/products/`)
+      .then(r => {
+        const data = r.data;
+        // Check if API wraps the response in a data or products object
+        const productList = Array.isArray(data) ? data : (data?.data || data?.products || []);
+        setProducts(productList);
+      })
+      .catch(console.error)
+      .finally(() => setDone("products"));
 
-    // Authorized headers applied for secure order tracking
-    axios.get(`${API_URL}/orders/all`, getAuthHeaders()).then(r => setOrders(r.data)).catch(console.error).finally(() => setDone("orders"));
+    // Authorized headers applied for secure order tracking with Safe Unwrapping
+    axios.get(`${API_URL}/orders/all`, getAuthHeaders())
+      .then(r => {
+        const data = r.data;
+        const orderList = Array.isArray(data) ? data : (data?.data || data?.orders || []);
+        setOrders(orderList);
+      })
+      .catch(console.error)
+      .finally(() => setDone("orders"));
 
     // Authorized headers applied for secure user lookup
-    axios.get(`${API_URL}/users`, getAuthHeaders()).then(r => setUsers(r.data?.data || r.data || [])).catch(console.error).finally(() => setDone("users"));
+    axios.get(`${API_URL}/users`, getAuthHeaders())
+      .then(r => setUsers(r.data?.data || r.data || []))
+      .catch(console.error)
+      .finally(() => setDone("users"));
 
-    axios.get(`${API_URL}/banners`, getAuthHeaders()).then().catch(console.error).finally(() => setDone("banners"));
+    axios.get(`${API_URL}/banners`, getAuthHeaders())
+      .then()
+      .catch(console.error)
+      .finally(() => setDone("banners"));
   }, []);
 
   const stats = useMemo(() => {
+    // Fallback if products is undefined or not properly set yet
+    if (!Array.isArray(products)) return { featured: 0, lowStock: [], outOfStock: 0, latest: [], categories: [] };
+
     const featuredItems = products.filter(p => p.is_featured).length;
     const lowStock = products.filter(
       (p) => Number(p.stock_quantity) <= 5 && Number(p.stock_quantity) > 0,
@@ -191,6 +215,9 @@ export default function Dashboard() {
   }, [products]);
 
   const orderStats = useMemo(() => {
+    // Fallback if orders is undefined
+    if (!Array.isArray(orders)) return { total: 0, pending: 0, processing: 0, delivered: 0, cancelled: 0, revenue: 0, todayRev: 0, recent: [], sparkPoints: [], statusDistrib: [] };
+
     const byStatus = (s) => orders.filter(o => o.status?.toLowerCase() === s).length;
     const revenue = orders
       .filter(o => o.status?.toLowerCase() === "delivered")
@@ -231,6 +258,7 @@ export default function Dashboard() {
   }, [orders]);
 
   const userStats = useMemo(() => {
+    if (!Array.isArray(users)) return { total: 0 };
     const normalized = users.map(u => ({ ...u, role: u.role || "user" }));
     return { total: normalized.length };
   }, [users]);
@@ -467,4 +495,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}
+} 
