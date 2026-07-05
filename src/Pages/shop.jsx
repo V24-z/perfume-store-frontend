@@ -82,7 +82,7 @@ export default function Shop() {
   };
 
   const handleAddToCart = async (product) => {
-    if (processingId) return;
+    if (processingId || product.stock_quantity <= 0) return;
     try {
       setProcessingId(product.id);
       flyToCart(product.id);
@@ -94,20 +94,15 @@ export default function Shop() {
     }
   };
 
+  // Implemented Debounce to Fix API spam during brand typing
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-
         const activeFilters = Object.fromEntries(
           Object.entries(filters).filter(([, v]) => v !== "")
         );
-
-        const { data } = await axios.get(
-          `${API_URL}/products`,
-          { params: activeFilters }
-        );
-
+        const { data } = await axios.get(`${API_URL}/products`, { params: activeFilters });
         setProducts(data);
       } catch (error) {
         console.error(error);
@@ -116,7 +111,11 @@ export default function Shop() {
       }
     };
 
-    fetchProducts();
+    const delayDebounceFn = setTimeout(() => {
+      fetchProducts();
+    }, 400); // 400ms delay to wait for user to finish typing
+
+    return () => clearTimeout(delayDebounceFn);
   }, [filters]);
 
   useEffect(() => {
@@ -270,11 +269,12 @@ export default function Shop() {
                   const cartItem = cartItems.find((item) => item.product_id === product.id || item.id === product.id);
                   const isInCart = !!cartItem;
                   const isButtonLoading = processingId === product.id;
+                  const isOutOfStock = product.stock_quantity <= 0;
 
                   return (
                     <div
                       key={product.id}
-                      className="group bg-white rounded-2xl overflow-hidden border border-slate-200/80 hover:shadow-xl hover:border-slate-300/60 transition-all duration-300 flex flex-col h-full relative"
+                      className={`group bg-white rounded-2xl overflow-hidden border border-slate-200/80 hover:shadow-xl hover:border-slate-300/60 transition-all duration-300 flex flex-col h-full relative ${isOutOfStock ? "opacity-75" : ""}`}
                     >
                       {/* IMAGE AREA */}
                       <div className="relative aspect-[4/5] w-full bg-slate-100 overflow-hidden shrink-0">
@@ -285,18 +285,26 @@ export default function Shop() {
                           loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
+                        
                         {/* ABSOLUTE FLOATING QUICK WISHLIST BUTTON */}
                         <button
-                          disabled={processingId !== null}
+                          disabled={processingId !== null || isOutOfStock}
                           onClick={() => isWishlisted ? removeFromWishlist(product.id) : addToWishlist(product)}
-                          className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all duration-200 transform active:scale-90 disabled:opacity-50 cursor-pointer ${
-                            isWishlisted 
-                              ? "bg-rose-50 border-rose-100 text-rose-500" 
-                              : "bg-white/80 border-slate-100 text-slate-400 hover:text-rose-500 hover:bg-white"
+                          className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full border shadow-sm backdrop-blur-md transition-all duration-200 transform active:scale-90 disabled:opacity-50 ${
+                            isOutOfStock
+                              ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed"
+                              : isWishlisted 
+                              ? "bg-rose-50 border-rose-100 text-rose-500 cursor-pointer" 
+                              : "bg-white/80 border-slate-100 text-slate-400 hover:text-rose-500 hover:bg-white cursor-pointer"
                           }`}
                         >
-                          <Heart size={16} fill={isWishlisted ? "currentColor" : "none"} className="flex-shrink-0" />
+                          <Heart size={16} fill={isWishlisted && !isOutOfStock ? "currentColor" : "none"} className="flex-shrink-0" />
                         </button>
+                        
+                        {/* ABSOLUTE FLOATING STOCK BADGE */}
+                        <span className={`absolute top-4 left-3 px-2 py-1 rounded-full text-[9px] font-bold text-white z-10 uppercase tracking-widest shadow-sm ${isOutOfStock ? "bg-red-500" : "bg-emerald-500"}`}>
+                          {isOutOfStock ? "Out of Stock" : "In Stock"}
+                        </span>
                       </div>
 
                       {/* DATA CARD FOOTER */}
@@ -318,16 +326,20 @@ export default function Shop() {
                           {/* ACTION BUTTON WRAPPER */}
                           <div className="flex gap-2 w-full pt-1">
                             <button
-                              disabled={isButtonLoading}
+                              disabled={isButtonLoading || isOutOfStock}
                               onClick={() => isInCart && increaseQty ? increaseQty(cartItem) : handleAddToCart(product)}
-                              className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 disabled:opacity-60 cursor-pointer ${
-                                isInCart
-                                  ? "bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-inset ring-emerald-600/10"
-                                  : "bg-slate-900 text-white hover:bg-slate-800"
+                              className={`flex-1 text-xs font-bold uppercase tracking-wider rounded-xl py-2.5 px-3 flex items-center justify-center gap-2 border-0 shadow-sm transition-all active:scale-95 ${
+                                isOutOfStock
+                                  ? "bg-slate-200 text-slate-500 cursor-not-allowed"
+                                  : isInCart
+                                  ? "bg-emerald-50 text-emerald-700 font-semibold ring-1 ring-inset ring-emerald-600/10 cursor-pointer"
+                                  : "bg-slate-900 text-white hover:bg-slate-800 cursor-pointer"
                               }`}
                             >
                               {isButtonLoading ? (
                                 <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin flex-shrink-0" />
+                              ) : isOutOfStock ? (
+                                "Unavailable"
                               ) : isInCart ? (
                                 `In Cart (${cartItem.quantity}) ✓`
                               ) : (

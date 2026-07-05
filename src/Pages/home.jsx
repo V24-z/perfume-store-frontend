@@ -70,7 +70,7 @@ function Home() {
   };
 
   const handleAddToCart = async (product) => {
-    if (processingId) return;
+    if (processingId || product.stock_quantity <= 0) return;
     try {
       setProcessingId(product.id);
       flyToCart(product.id);
@@ -474,11 +474,12 @@ function Home() {
                 );
                 const isInCart = !!cartItem;
                 const isButtonLoading = processingId === product.id;
+                const isOutOfStock = product.stock_quantity <= 0;
 
                 return (
                   <div
                     key={product.id}
-                    className="bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-all duration-300"
+                    className={`bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-all duration-300 ${isOutOfStock ? "opacity-75" : ""}`}
                   >
                     <div className="relative h-36 sm:h-44 md:h-52 lg:h-60 xl:h-64 bg-slate-100">
                       <img
@@ -488,9 +489,15 @@ function Home() {
                         alt={product.name}
                         className="w-full h-full object-cover"
                       />
+                      
+                      {/* Stock Label */}
+                      <span className={`absolute top-2 left-2 sm:top-3 sm:left-3 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold text-white z-10 ${isOutOfStock ? "bg-red-500" : "bg-emerald-500"}`}>
+                        {isOutOfStock ? "OUT OF STOCK" : "IN STOCK"}
+                      </span>
+                      
                       <span
                         className="absolute top-2 right-2 sm:top-3 sm:right-3 px-1.5 py-0.5 sm:px-2 sm:py-1
-                                      rounded-full text-[9px] sm:text-[10px] font-bold bg-[#534AB7] text-white"
+                                      rounded-full text-[9px] sm:text-[10px] font-bold bg-[#534AB7] text-white z-10"
                       >
                         FEATURED
                       </span>
@@ -526,16 +533,17 @@ function Home() {
                         )}
                       </div>
                       <div className="flex gap-2 mt-4">
-                        {/* NEW BUTTON LOGIC */}
                         <button
-                          disabled={isButtonLoading}
+                          disabled={isButtonLoading || isOutOfStock}
                           onClick={() =>
                             isInCart
                               ? increaseQty(cartItem)
                               : handleAddToCart(product)
                           }
-                          className={` w-12 h-12 flex items-center justify-center rounded-xl transition cursor-pointer relative ${
-                            isInCart
+                          className={`w-12 h-12 flex items-center justify-center rounded-xl transition cursor-pointer relative ${
+                            isOutOfStock
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : isInCart
                               ? "bg-green-100 text-green-600"
                               : "bg-purple-100 text-[#534AB7] hover:bg-purple-200"
                           }`}
@@ -545,14 +553,12 @@ function Home() {
                           ) : (
                             <ShoppingCart size={20} />
                           )}
-                           {isInCart && (
+                           {isInCart && !isOutOfStock && (
                           <span className="absolute -top-1 right-1 text-[10px] font-bold border w-4 h-4 rounded-full border-white text-gray-200 flex items-center justify-center" style={{ background: "#14532d", fontSize: 8 }}>
                            {cartItem.quantity}
                           </span>
                         )}
                         </button>
-
-                        
 
                         <Link
                           to={`/viewdetail/${product.id}`}
@@ -564,16 +570,21 @@ function Home() {
                         </Link>
 
                         <button
+                          disabled={isOutOfStock}
                           onClick={() =>
                             isWishlisted
                               ? removeFromWishlist(product.id)
                               : addToWishlist(product)
                           }
-                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-pink-100 text-pink-600 cursor-pointer"
+                          className={`w-12 h-12 flex items-center justify-center rounded-xl cursor-pointer ${
+                            isOutOfStock
+                              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                              : "bg-pink-100 text-pink-600"
+                          }`}
                         >
                           <Heart
                             size={20}
-                            fill={isWishlisted ? "currentColor" : "none"}
+                            fill={isWishlisted && !isOutOfStock ? "currentColor" : "none"}
                           />
                         </button>
                       </div>
@@ -601,33 +612,40 @@ function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-auto sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-              {newArrivals.map((product) => (
-                <div
-                  key={product.id}
-                  className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-slate-100"
-                >
-                  <div className="h-36 sm:h-44 md:h-48 lg:h-52 overflow-hidden">
-                    <img
-                      src={product.image_url}
-                      loading="lazy"
-                      alt={product.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
+              {newArrivals.map((product) => {
+                const isOutOfStock = product.stock_quantity <= 0;
+                return (
+                  <div
+                    key={product.id}
+                    className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-slate-100 relative ${isOutOfStock ? "opacity-75" : ""}`}
+                  >
+                    <div className="h-36 sm:h-44 md:h-48 lg:h-52 overflow-hidden relative">
+                      <img
+                        src={product.image_url}
+                        loading="lazy"
+                        alt={product.name}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      />
+                      {/* Stock Label */}
+                      <span className={`absolute top-2 left-2 sm:top-3 sm:left-3 px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-[9px] sm:text-[10px] font-bold text-white z-10 ${isOutOfStock ? "bg-red-500" : "bg-emerald-500"}`}>
+                        {isOutOfStock ? "OUT OF STOCK" : "IN STOCK"}
+                      </span>
+                    </div>
 
-                  <div className="p-3 sm:p-4">
-                    <h3 className="font-semibold text-sm sm:text-base text-[#1a0533] leading-snug line-clamp-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
-                      {product.brand}
-                    </p>
-                    <p className="font-bold text-indigo-600 mt-1.5 sm:mt-2 text-sm sm:text-base">
-                      ₹{product.price}
-                    </p>
+                    <div className="p-3 sm:p-4">
+                      <h3 className="font-semibold text-sm sm:text-base text-[#1a0533] leading-snug line-clamp-2">
+                        {product.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+                        {product.brand}
+                      </p>
+                      <p className="font-bold text-indigo-600 mt-1.5 sm:mt-2 text-sm sm:text-base">
+                        ₹{product.price}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </section>

@@ -47,7 +47,7 @@ export const CartProvider = ({ children }) => {
     };
   }, [USER_ID]);
 
-  // Add to Cart (Optimized for instant UI update)
+  // Add to Cart (Optimized with Optimistic UI Update)
   const addToCart = async (product) => {
     if (!USER_ID) {
       toast.error("Please login to add items to cart");
@@ -70,29 +70,41 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
+    // Optimistic Update: Instantly add to state to bypass slow loading
+    const tempId = `temp-${Date.now()}`;
+    const optimisticItem = {
+        id: tempId,
+        product_id: product.id,
+        quantity: 1,
+        user_id: USER_ID,
+        products: product
+    };
+    
+    setCartItems((prev) => [...prev, optimisticItem]);
+
     try {
       const payload = {
         user_id: USER_ID,
         product_id: product.id,
         quantity: 1,
       };
-      // Use returned data to update state directly avoiding a slow secondary fetch request
+      
       const { data } = await axios.post(`${API_URL}/cart`, payload);
       
       if (data && data.data && data.data.length > 0) {
         const insertedItem = data.data[0];
-        setCartItems((prev) => [...prev, {
-            id: insertedItem.id,
-            product_id: insertedItem.product_id,
-            quantity: insertedItem.quantity,
-            user_id: insertedItem.user_id,
-            products: product
-        }]);
+        // Replace temp ID with real DB ID
+        setCartItems((prev) => prev.map(item => item.id === tempId ? {
+            ...item,
+            id: insertedItem.id
+        } : item));
       } else {
         await fetchCart();
       }
       toast.success("Added to cart");
     } catch (error) {
+      // Revert optimistic update on error
+      setCartItems((prev) => prev.filter(item => item.id !== tempId));
       console.error("Add to Cart Error:", error);
       toast.error("Failed to add item to cart");
     }
