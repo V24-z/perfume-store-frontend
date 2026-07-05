@@ -1,6 +1,7 @@
 import { useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
 import {
   Trash2,
   Plus,
@@ -40,6 +41,21 @@ const fmt = (n) =>
 // ─── CART ITEM CARD ───
 function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
   const lineTotal = (item.products?.price || 0) * (item.quantity || 0);
+  const stock = item.products?.stock_quantity || 0;
+  const isOutOfStock = stock <= 0;
+
+  const handleIncrease = () => {
+    if (item.quantity >= stock) {
+      toast.error("stock not avalible more");
+      return;
+    }
+    onIncrease(item);
+  };
+
+  const handleDecrease = () => {
+    if (isOutOfStock) return;
+    onDecrease(item);
+  };
 
   return (
     <motion.div
@@ -55,6 +71,16 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
+        {/* Dynamic Stock Label at Top Right Corner */}
+        {stock > 0 ? (
+          <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-500 text-white shadow-sm z-10 uppercase">
+            In Stock
+          </span>
+        ) : (
+          <span className="absolute top-1 right-1 px-1.5 py-0.5 rounded text-[8px] font-bold bg-red-500 text-white shadow-sm z-10 uppercase">
+            Out of Stock
+          </span>
+        )}
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col">
@@ -78,25 +104,35 @@ function CartItemCard({ item, onIncrease, onDecrease, onRemove }) {
         <div className="mt-auto flex items-center justify-between pt-3">
           <div className="flex items-center gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50 px-1.5 py-1">
             <motion.button
-              whileTap={{ scale: 0.8 }}
-              whileHover={{ scale: 1.0 }}
-              onClick={() => onDecrease(item)}
+              whileTap={!isOutOfStock ? { scale: 0.8 } : {}}
+              whileHover={!isOutOfStock ? { scale: 1.0 } : {}}
+              onClick={handleDecrease}
+              disabled={isOutOfStock}
               aria-label="Decrease quantity"
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-900 hover:text-white transition-colors duration-200 focus:outline-none border-0 bg-transparent cursor-pointer"
+              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-200 focus:outline-none border-0 bg-transparent ${
+                isOutOfStock 
+                  ? "text-slate-300 cursor-not-allowed" 
+                  : "text-slate-600 hover:bg-slate-900 hover:text-white cursor-pointer"
+              }`}
             >
               <Minus size={12} />
             </motion.button>
 
-            <span className="w-5 text-center text-xs font-bold text-slate-800 tabular-nums">
+            <span className={`w-5 text-center text-xs font-bold tabular-nums ${isOutOfStock ? "text-slate-400" : "text-slate-800"}`}>
               {item.quantity}
             </span>
 
             <motion.button
-              whileTap={{ scale: 0.8 }}
-              whileHover={{ scale: 1.0 }}
-              onClick={() => onIncrease(item)}
+              whileTap={!isOutOfStock ? { scale: 0.8 } : {}}
+              whileHover={!isOutOfStock ? { scale: 1.0 } : {}}
+              onClick={handleIncrease}
+              disabled={isOutOfStock}
               aria-label="Increase quantity"
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-slate-900 hover:text-white transition-colors duration-200 focus:outline-none border-0 bg-transparent cursor-pointer"
+              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors duration-200 focus:outline-none border-0 bg-transparent ${
+                isOutOfStock 
+                  ? "text-slate-300 cursor-not-allowed" 
+                  : "text-slate-600 hover:bg-slate-900 hover:text-white cursor-pointer"
+              }`}
             >
               <Plus size={12} />
             </motion.button>
@@ -119,7 +155,6 @@ function OrderSummary({ subtotal, itemCount }) {
 
   return (
     <>
-      {/* Desktop / Tablet Summary Card Container - Applied custom font styling here */}
       <motion.div
         variants={fadeVariants}
         initial="hidden"
@@ -188,7 +223,6 @@ function OrderSummary({ subtotal, itemCount }) {
         </div>
       </motion.div>
 
-      {/* Mobile Sticky Bottom Checkout Banner */}
       {!disabled && (
         <div className="fixed inset-x-0 bottom-0 z-40 md:hidden animate-fade-in">
           <div className="bg-white/95 backdrop-blur border-t border-slate-200/80 px-4 py-3 flex items-center justify-between gap-4 shadow-[0_-8px_30px_rgb(0,0,0,0.06)]">
@@ -290,7 +324,6 @@ export default function Cart() {
       className="min-h-screen bg-slate-50/30 text-slate-900 antialiased font-sans"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-10 pb-28 md:pb-12">
-        {/* Breadcrumb Navigation */}
         <nav
           aria-label="Breadcrumb"
           className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 mb-5"
@@ -302,7 +335,6 @@ export default function Cart() {
           <span className="text-[#1a0533] font-bold">Cart</span>
         </nav>
 
-        {/* Header Title Section */}
         <div className="flex items-center gap-2.5 mb-1.5">
           <div className="w-1.5 h-5 rounded-full bg-gradient-to-b from-violet-600 to-fuchsia-600" />
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#1a0533]">
@@ -318,7 +350,6 @@ export default function Cart() {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-          {/* LEFT CART AREA */}
           <div className="lg:col-span-2">
             {loading && <CartSkeleton />}
 
@@ -346,7 +377,6 @@ export default function Cart() {
             )}
           </div>
 
-          {/* RIGHT SUMMARY SIDEBAR */}
           <div className="lg:col-span-1">
             <OrderSummary subtotal={subtotal} itemCount={cartItems.length} />
           </div>
