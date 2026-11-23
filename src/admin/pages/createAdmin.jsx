@@ -4,7 +4,6 @@ import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function CreateAdmin() {
-  // FIXED: Changed key from "token" to "access_token" to successfully match session storage keys
   const token = localStorage.getItem("access_token");
 
   const initialState = {
@@ -29,7 +28,7 @@ export default function CreateAdmin() {
   const fetchAdmins = async () => {
     setTableLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/admins`, {
+      const res = await axios.get(`${API_URL}/create-admin`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
