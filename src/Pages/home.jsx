@@ -91,9 +91,16 @@ function Home() {
           axios.get(`${API_URL}/banners`),
         ]);
 
-        setNewArrivals(newArrivalsRes.data);
-        setFeaturedProducts(featuredRes.data);
-        setBanners(bannersRes.data);
+        const getArray = (data, key) => {
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data?.data)) return data.data;
+          if (key && Array.isArray(data?.[key])) return data[key];
+          return [];
+        };
+
+        setNewArrivals(getArray(newArrivalsRes.data, "products"));
+        setFeaturedProducts(getArray(featuredRes.data, "products"));
+        setBanners(getArray(bannersRes.data, "banners"));
       } catch (error) {
         console.error(error);
       } finally {
