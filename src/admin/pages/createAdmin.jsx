@@ -28,7 +28,7 @@ export default function CreateAdmin() {
   const fetchAdmins = async () => {
     setTableLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/create-admin`, {
+      const res = await axios.get(`${API_URL}/admins`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
